@@ -1,0 +1,62 @@
+
+        cc2 - Level II C Compiler Executive
+           (c) Copyright 1987 Rick Adams
+              Color Central Software
+                   712 Brett Ave
+               Rohnert Park, CA 94928
+This program is copyrighted; it is NOT in the public domain.
+But you may distribute it, upload it, download it, etc, etc,
+as long as it's FREE, and you don't mess with this doc file
+and/or the copyright notices.  Remember: FREE.  "Buy the new
+ZikZak 'C' compiler for only $79.99; includes FREE 'cc2'
+command!" does NOT qualify <grin>.
+Use the -x option to see what commands CC2 will execute, when
+running it the first couple of times.  If those look like the
+commands you would have wanted, you can re-do that command,
+piping it into a shell.  That way you can get familiar with
+how it works.
+CC2 combines C.PREP, C.PASS1, C.PASS2 and C.OPT into one
+step using pipes.  This makes it faster.  CC2 can compile
+itself in 3 minutes 57 seconds on my machine, whereas CC1
+takes 5 minutes 34 seconds.
+CC2 FILE.C, with no options, will compile FILE.C and put the
+resulting module into your execution directory with the filename
+(and module name) FILE.  Take a look at the options below if
+you want something else.
+I hope you enjoy it.
+Rick Adams, Delphi username RICKADAMS.
+Command syntax:
+    cc2 [options] file [file...]
+Recognized file suffixes:
+    .c   C source file(s)
+    .a   Assembly language source file(s)
+    .r   Relocatable module format file(s)
+If a source file has a .c suffix, CC2 will run C.PREP, C.PASS1, C.PASS2, C.OPT
+C.ASM and C.LINK on it, if no other options intervene.  Source files with a .a
+suffix get put right into the assembly phase.  Source files with an .r suffix
+go right to the C.LINK phase.  Any intermediate files are deleted.
+Recognized options (upper and lower case are equivalent):
+-a                 Don't do assembly or link steps; leave output in ".a" file.
+-c                 Output comments in assembly language code.
+-d<name>           Define <name> with a value of 1 to the preprocessor.
+-d<name>=<string>  Define <name> with a value of <string> to the preprocessor.
+-e=<edition>       Set edition number of module to <edition>.
+-f=<filename>      Output module to <filename>.  Set module name to
+                   <filename> unless -n option is also present.
+-l=<library>       Specify library to use before the standard library.  You
+                   can have more than one of these, if you like.
+-m=<size>          Set size of module memory allocation.
+-n=<name>          Set module name to <name>.
+-o                 Don't do assembler code optimization.
+-p                 Invoke compiler function profiler.
+-q                 Don't echo filenames of source files.
+-r                 Suppress the link step.  Leave output in the .r file.
+-s                 Don't generate stack-checking code.
+-x                 Write commands to stdout instead of executing them.
+                   Handy for seeing what CC2 is going to do before actually
+                   going through with it.  You can pipe this output to a shell
+                   (with options -p t x, if you like).  Or, you can redirect
+                   stdout to a file, thus creating a shell command file.
+-z                 Take filenames of source files from standard input.
+                   This means that you can get your filenames from a disk
+                   file, or even a pipe.
