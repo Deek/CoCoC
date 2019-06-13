@@ -1,0 +1,9 @@
+level equ 2
+ opt -c
+ opt f
+* NOTE: This file assumes Defs Directory in on Root
+*       of Default Disk Device (/DD)
+ ifp1
+ use /DD/DEFS/os9defs
+ use /DD/DEFS/systype
+ endc

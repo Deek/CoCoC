@@ -1,0 +1,292 @@
+ opt -l
+ ttl System Type Definitions
+ page
+************************************************************
+*
+*     CPU Type Definitions
+*
+ org 1
+Color rmb 1
+COLOR3 rmb 1 
+CPUType set COLOR3
+
+************************************************************
+*
+*    Clock Speed Type Definitions
+*
+OneMHz equ 1
+TwoMHz equ 2
+CPUSpeed set OneMHz
+
+************************************************************
+*
+*    Power Line Frequency Definitions
+*
+Hz50 equ 1 Assemble clock for 50 hz power
+Hz60 equ 2 Assemble clock for 60 hz power
+PwrLnFrq set Hz60 Set to Appropriate freq
+
+************************************************************
+* ACIA type set up
+*
+ org 1
+ACIA6850 rmb 1 MC6850 acia.
+ACIA6551 rmb 1 SY6551 acia.
+ACIA2661 rmb 1 SC2661 acia.
+ACIATYPE set ACIA6551
+
+ ttl Coco III Dynamic Address Translator Definitions
+ page
+************************************************************
+*
+*     Dynamic Address Translator Definitions
+*
+DAT.BlCt equ 8 D.A.T. blocks/address space
+DAT.BlSz equ (256/DAT.BlCt)*256 D.A.T. block size
+DAT.ImSz equ DAT.BlCt*2 D.A.T. Image size
+DAT.Addr equ -(DAT.BlSz/256) D.A.T. MSB Address bits
+DAT.Task equ $FF91 Task Register address
+DAT.TkCt equ 32 Number of DAT Tasks
+DAT.Regs equ $FFA0 DAT Block Registers base address
+DAT.Free equ $333E Free Block Number
+DAT.BlMx equ $3F Maximum Block number
+DAT.BMSz equ $40 Memory Block Map size
+DAT.WrPr equ 0 no write protect
+DAT.WrEn equ 0 no write enable
+SysTask equ 0 Coco System Task number
+IOBlock equ $3F
+ROMBlock equ $3F
+IOAddr equ $7F
+ROMCount equ 1 number of blocks of ROM (High RAM Block)
+RAMCount equ 1 initial blocks of RAM
+MoveBlks equ DAT.BlCt-ROMCount-2 Block numbers used for copies
+
+BlockTyp equ 1 chk only first bytes of RAM block
+ByteType equ 2 chk entire block of RAM
+Limited equ 1 chk only upper memory for ROM modules
+UnLimitd equ 2 chk all NotRAM for modules
+* NOTE: this check assumes any NotRAM with a module will
+*       always start with $87CD in first two bytes of block
+RAMCheck equ BlockTyp chk only beg bytes of block
+ROMCheck equ Limited chk only upper few blocks for ROM
+LastRAM equ IOBlock maximum RAM block number
+
+************************************************************
+* Color Computer 3 Specific
+*
+CPUType set Color3
+CPUSpeed set TwoMHz
+MappedIO equ True (Actually False but it works better this way)
+
+************************************************************
+* Hardware addresses
+*
+PalAdr equ $FFB0 Palette registers
+BordReg equ $FF9A Border color register
+GIMERegs equ $FF00 Base address of GIME registers
+
+************************************************************
+* Device addresses
+*
+A.AciaP set $FF68 Aciapak Address
+A.ModP set $FF6C ModPak Address
+*
+* VDG Devices
+*
+A.TermV set $FFC0 VDG Term
+A.V1 set $FFC1 Possible additional VDG Devices
+A.V2 set $FFC2
+A.V3 set $FFC3
+A.V4 set $FFC4
+*
+* Window Devices
+*
+ org $FF9F
+A.W rmb 1 $FF9F Generic Window Descriptor
+A.TermW rmb 1 $FFA0 Windowing Term
+A.W1 rmb 1 $FFA1
+A.W2 rmb 1 $FFA2
+A.W3 rmb 1 $FFA3
+A.W4 rmb 1 $FFA4
+A.W5 rmb 1 $FFA5
+A.W6 rmb 1 $FFA6
+A.W7 rmb 1 $FFA7
+A.W8 rmb 1 $FFA8
+A.W9 rmb 1 $FFA9
+A.W10 rmb 1 $FFAA
+A.W11 rmb 1 $FFAB
+A.W12 rmb 1 $FFAC
+A.W13 rmb 1 $FFAD
+A.W14 rmb 1 $FFAE
+A.W15 rmb 1 $FFAF
+
+
+ ttl Graphics System Defs
+************************************************************
+* Special character Bit position equates
+*
+SHIFTBIT equ %00000001
+CNTRLBIT equ %00000010
+ALTERBIT equ %00000100
+UPBIT equ %00001000
+DOWNBIT equ %00010000
+LEFTBIT equ %00100000
+RIGHTBIT equ %01000000
+SPACEBIT equ %10000000
+
+************************************************************
+* Pointer Device Packet Definition
+*
+ org 0
+Pt.Valid rmb 1 Is returned info valid (0=no/1=yes)
+Pt.Actv rmb 1 Active Side 0=off/1=Right/2=left
+Pt.ToTm rmb 1 Time out Initial value
+ rmb 2 reserved
+Pt.TTTo rmb 1 Time Till Timeout
+Pt.TSSt rmb 2 Time Since Start Counter 
+Pt.CBSA rmb 1 Current Button State    Button A
+Pt.CBSB rmb 1 Current Button State    Button B
+Pt.CCtA rmb 1 Click Count             Button A
+Pt.CCtB rmb 1 Click Count             Button B
+Pt.TTSA rmb 1 Time This State Counter Button A
+Pt.TTSB rmb 1 Time This State Counter Button B
+Pt.TLSA rmb 1 Time Last State Counter Button A
+Pt.TLSB rmb 1 Time Last State Counter Button B
+ rmb 2 Reserved
+Pt.BDX rmb 2 Button down X value EXPERIMENTAL
+Pt.BDY rmb 2 Button down Y value
+Pt.Stat rmb 1 Window Pointer type location
+Pt.Res rmb 1 Resolution (0..640 by: 0=ten/1=one)
+Pt.AcX rmb 2 Actual X Value
+Pt.AcY rmb 2 Actual Y Value
+Pt.WRX rmb 2 Window Relative X
+Pt.WRY rmb 2 Window Relative Y
+Pt.Siz equ . Packet Size 32 bytes
+
+************************************************************
+* Standard system get/put buffer defs
+*
+*
+* system group numbers
+*
+ org 200
+Grp.Fnt rmb 1 font group
+Grp.Clip rmb 1 clipboard group
+Grp.Ptr rmb 1 pointer group
+Grp.Pat2 rmb 1 pattern group 2 color
+Grp.Pat4 rmb 1 pattern group 4 color
+Grp.Pat6 rmb 1 pattern group 16 color
+*
+* font buffer numbers
+* 
+ org 1
+Fnt.S8x8 rmb 1 standard 8x8 font
+Fnt.S6x8 rmb 1 standard 6x8 font
+Fnt.G8x8 rmb 1 standard graphics 8x8 font
+*
+* pattern buffer numbers
+*
+ org 1
+Pat.Dot rmb 1
+Pat.Vrt rmb 1
+Pat.Hrz rmb 1
+Pat.XHtc rmb 1
+Pat.LSnt rmb 1
+Pat.RSnt rmb 1
+Pat.SDot rmb 1
+Pat.BDot rmb 1
+*
+* pointer buffer numbers
+*
+ org 1
+Ptr.Arr rmb 1 Arrow pointer
+Ptr.Pen rmb 1 Pencil pointer
+Ptr.LCH rmb 1 Large cross hair pointer
+Ptr.Slp rmb 1 Wait timer pointer
+Ptr.Ill rmb 1 Illegal action pointer
+Ptr.Txt rmb 1 Text pointer
+Ptr.SCH rmb 1 Small cross hair pointer
+
+ ttl Definitions for Windowing Environment
+ page
+************************************************************
+* Window/Menu Bar Data Structure
+*
+* To be used in SS.WnSet SETSTAT to set up a Framed Window
+* for use in the high level windowing package.
+*
+NUMMENS equ 10 maximum number of menus on menu bar
+NUMITMS equ 20 maximum number of items in a menu
+MXTTLEN equ 15 max chars for menu and item names
+WINSYNC equ $C0C0 synch bytes for window validation
+*
+* Menu Item Descriptor : (MN.ITEMS)
+*   one required for each item within the menu
+*
+ org 0
+MI.TTL rmb MXTTLEN item name 
+MI.ENBL rmb 1 enable flag
+MI.RES rmb 5 reserved bytes
+MI.SIZ equ . size of menu item descriptor
+*
+* Menu Descriptor : 
+*  one for each menu on the manu bar
+*  each is pointed to by MB.MPTR below
+*
+ org 0
+MN.TTL rmb MXTTLEN menu title
+MN.ID rmb 1 menu id number (1-255)
+MN.XSIZ rmb 1 horiz. size of desired pull down
+MN.NITS rmb 1 number of items in menu
+MN.ENBL rmb 1 enable flag
+MN.RES rmb 2 reserved bytes
+MN.ITEMS rmb 2 pointer to array of menu items
+MN.SIZ equ . size of menu descriptor
+*
+* Window Descriptor: 
+*    one required for each application in a framed window
+*
+ org 0
+WN.TTL rmb 20 title of window for title bar
+WN.NMNS rmb 1 number of menus in menu bar
+WN.XMIN rmb 1 minimal horiz. size for application to run
+WN.YMIN rmb 1 minimal vert. size for application to run
+WN.SYNC rmb 2 synch bytes ($C0C0)
+WN.RES rmb 7 reserved bytes
+WN.BAR rmb 2 pointer to arry of menu descriptors
+WN.SIZ equ . size of window/menu bar descriptor
+
+************************************************************
+* Window Type Definitions
+* 
+*  To be used in setting up the border of the window in
+* the SS.WnSel SETSTAT
+*
+ org 0
+WT.NBox rmb 1 No Box
+WT.FWin rmb 1 Framed Window
+WT.FSWin rmb 1 Framed Window w/Scroll Bars
+WT.SBox rmb 1 Shadowed Box
+WT.DBox rmb 1 Double Box
+WT.PBox rmb 1 Plain Box
+
+************************************************************
+* Pre-Defined Menu IDs for the system
+*
+ org 1
+MId.Mov rmb 1 move box
+MId.Cls rmb 1 close box
+MId.Grw rmb 1 grow box
+MId.SUp rmb 1 scroll up
+MId.SDn rmb 1 scroll down
+MId.SRt rmb 1 scroll right
+MId.SLt rmb 1 scroll left
+MId.Chr rmb 1 character was depressed
+ org 20
+MId.Tdy rmb 1 tandy menu
+MId.Fil rmb 1 Files Menu
+MId.Edt rmb 1 Edit Menu
+MId.Sty rmb 1 Styles menu
+MId.Fnt rmb 1 Font menu
+
+ opt l

@@ -1,190 +1,386 @@
- opt -l
- csect
-F$LINK rmb 1  Link to Module 
-F$LOAD rmb 1  Load Module from File 
-F$UNLINK rmb 1  Unlink Module 
-F$FORK rmb 1  Start New Process 
-F$WAIT rmb 1  Wait for Child Process to Die 
-F$CHAIN rmb 1  Chain Process to New Module 
-F$EXIT rmb 1  Terminate Process 
-F$MEM rmb 1  Set Memory Size 
-F$SEND rmb 1  Send Signal to Process 
-F$ICPT rmb 1  Set Signal Intercept 
-F$SLEEP rmb 1  Suspend Process 
-F$SSPD rmb 1  Suspend Process 
-F$ID rmb 1  Return Process ID 
-F$SPRIOR rmb 1  Set Process Priority 
-F$SSWI rmb 1  Set Software Interrupt 
-F$PERR rmb 1  Print Error 
-F$PRSNAM rmb 1  Parse Pathlist Name 
-F$CMPNAM rmb 1  Compare Two Names 
-F$SCHBIT rmb 1  Search Bit Map 
-F$ALLBIT rmb 1  Allocate in Bit Map 
-F$DELBIT rmb 1  Deallocate in Bit Map 
-F$TIME rmb 1  Get Current Time 
-F$STIME rmb 1  Set Current Time 
-F$CRC rmb 1  Generate CRC 
-F$GPRDSC rmb 1  get Process Descriptor copy 
-F$GBLKMP rmb 1  get System Block Map copy 
-F$GMODDR rmb 1  get Module Directory copy 
-F$CPYMEM rmb 1  Copy External Memory 
-F$SUSER rmb 1  Set User ID number 
-F$UNLOAD rmb 1  Unlink Module by name 
- endsect
 
- csect $28
-F$SRQMEM rmb 1  System Memory Request 
-F$SRTMEM rmb 1  System Memory Return 
-F$IRQ rmb 1  Enter IRQ Polling Table 
-F$IOQU rmb 1  Enter I/O Queue 
-F$APROC rmb 1  Enter Active Process Queue 
-F$NPROC rmb 1  Start Next Process 
-F$VMODUL rmb 1  Validate Module 
-F$FIND64 rmb 1  Find Process/Path Descriptor 
-F$ALL64 rmb 1  Allocate Process/Path Descriptor 
-F$RET64 rmb 1  Return Process/Path Descriptor 
-F$SSVC rmb 1  Service Request Table Initialization 
-F$IODEL rmb 1  Delete I/O Module 
-F$SLINK rmb 1  System Link 
-F$BOOT rmb 1  Bootstrap System 
-F$BTMEM rmb 1  Bootstrap Memory Request 
-F$GPROCP rmb 1  Get Process ptr 
-F$MOVE rmb 1  Move Data (low bound first) 
-F$ALLRAM rmb 1  Allocate RAM blocks 
-F$ALLIMG rmb 1  Allocate Image RAM blocks 
-F$DELIMG rmb 1  Deallocate Image RAM blocks 
-F$SETIMG rmb 1  Set Process DAT Image 
-F$FREELB rmb 1  Get Free Low Block 
-F$FREEHB rmb 1  Get Free High Block 
-F$ALLTSK rmb 1  Allocate Process Task number 
-F$DELTSK rmb 1  Deallocate Process Task number 
-F$SETTSK rmb 1  Set Process Task DAT registers 
-F$RESTSK rmb 1  Reserve Task number 
-F$RELTSK rmb 1  Release Task number 
-F$DATLOG rmb 1  Convert DAT Block/Offset to Logical 
-F$DATTMP rmb 1  Make temporary DAT image 
-F$LDAXY rmb 1  Load A [X,[Y]] 
-F$LDAXYP rmb 1  Load A [X+,[Y]] 
-F$LDDDXY rmb 1  Load D [D+X,[Y]] 
-F$LDABX rmb 1  Load A from 0,X in task B 
-F$STABX rmb 1  Store A at 0,X in task B 
-F$ALLPRC rmb 1  Allocate Process Descriptor 
-F$DELPRC rmb 1  Deallocate Process Descriptor 
-F$ELINK rmb 1  Link using Module Directory Entry 
-F$FMODUL rmb 1  Find Module Directory Entry 
-F$MAPBLK rmb 1  Map Specific Block 
-F$CLRBLK rmb 1  Clear Specific Block 
-F$DELRAM rmb 1  Deallocate RAM blocks 
- endsect
 
+* History : os9defs.a 
+* ??/??/?? Created                                              LAC
+* 86/06/11 Added SS.FDInf for 68k compatability                 EBM 
+
+ ttl OS-9 System Symbol Definitions
+ page
+***************
+*
+*     System Service Request Code Definitions
+*
+ csect 0
+F$Link: rmb 1 Link to Module
+F$Load: rmb 1 Load Module from File
+F$UnLink: rmb 1 Unlink Module
+F$Fork: rmb 1 Start New Process
+F$Wait: rmb 1 Wait for Child Process to Die
+F$Chain: rmb 1 Chain Process to New Module
+F$Exit: rmb 1 Terminate Process
+F$Mem: rmb 1 Set Memory Size
+F$Send: rmb 1 Send Signal to Process
+F$Icpt: rmb 1 Set Signal Intercept
+F$Sleep: rmb 1 Suspend Process
+F$SSpd: rmb 1 Suspend Process
+F$ID: rmb 1 Return Process ID
+F$SPrior: rmb 1 Set Process Priority
+F$SSWI: rmb 1 Set Software Interrupt
+F$PErr: rmb 1 Print Error
+F$PrsNam: rmb 1 Parse Pathlist Name
+F$CmpNam: rmb 1 Compare Two Names
+F$SchBit: rmb 1 Search Bit Map
+F$AllBit: rmb 1 Allocate in Bit Map
+F$DelBit: rmb 1 Deallocate in Bit Map
+F$Time: rmb 1 Get Current Time
+F$STime: rmb 1 Set Current Time
+F$CRC: rmb 1 Generate CRC
+F$GPrDsc: rmb 1 get Process Descriptor copy
+F$GBlkMp: rmb 1 get System Block Map copy
+F$GModDr: rmb 1 get Module Directory copy
+F$CpyMem: rmb 1 Copy External Memory
+F$SUser: rmb 1 Set User ID number
+F$UnLoad: rmb 1 Unlink Module by name
+F$Alarm: rmb 1 Alarm handling
+ rmb 2    reserved
+F$NMLink: rmb 1 Link to Module without adding to address space
+F$NMLoad: rmb 1 Load Module without adding to address space
+ ends
+ csect $27 Beginning of System Reserved Calls
+F$VIRQ: rmb 1 virtual IRQ handling
+F$SRqMem: rmb 1 System Memory Request
+F$SRtMem: rmb 1 System Memory Return
+F$IRQ: rmb 1 Enter IRQ Polling Table
+F$IOQu: rmb 1 Enter I/O Queue
+F$AProc: rmb 1 Enter Active Process Queue
+F$NProc: rmb 1 Start Next Process
+F$VModul: rmb 1 Validate Module
+F$Find64: rmb 1 Find Process/Path Descriptor
+F$All64: rmb 1 Allocate Process/Path Descriptor
+F$Ret64: rmb 1 Return Process/Path Descriptor
+F$SSvc: rmb 1 Service Request Table Initialization
+F$IODel: rmb 1 Delete I/O Module
+F$SLink: rmb 1 System Link
+F$Boot: rmb 1 Bootstrap System
+F$BtMem: rmb 1 Bootstrap Memory Request
+F$GProcP: rmb 1 Get Process ptr
+F$Move: rmb 1 Move Data (low bound first)
+F$AllRAM: rmb 1 Allocate RAM blocks
+F$AllImg: rmb 1 Allocate Image RAM blocks
+F$DelImg: rmb 1 Deallocate Image RAM blocks
+F$SetImg: rmb 1 Set Process DAT Image
+F$FreeLB: rmb 1 Get Free Low Block
+F$FreeHB: rmb 1 Get Free High Block
+F$AllTsk: rmb 1 Allocate Process Task number
+F$DelTsk: rmb 1 Deallocate Process Task number
+F$SetTsk: rmb 1 Set Process Task DAT registers
+F$ResTsk: rmb 1 Reserve Task number
+F$RelTsk: rmb 1 Release Task number
+F$DATLog: rmb 1 Convert DAT Block/Offset to Logical
+ rmb 1
+F$LDAXY: rmb 1 Load A [X,[Y]]
+F$LDAXYP: rmb 1 Load A [X+,[Y]]
+F$LDDDXY: rmb 1 Load D [D+X,[Y]]
+F$LDABX: rmb 1 Load A from 0,X in task B
+F$STABX: rmb 1 Store A at 0,X in task B
+F$AllPrc: rmb 1 Allocate Process Descriptor
+F$DelPrc: rmb 1 Deallocate Process Descriptor
+F$ELink: rmb 1 Link using Module Directory Entry
+F$FModul: rmb 1 Find Module Directory Entry
+F$MapBlk: rmb 1 Map Specific Block
+F$ClrBlk: rmb 1 Clear Specific Block
+F$DelRAM: rmb 1 Deallocate RAM blocks
+F$GCMDir: rmb 1 Pack module directory
+F$AlHRam: rmb 1 Allocate HIGH RAM Blocks
+ endsect
+ page
+************************************************************
+*
+*     I/O Service Request Code Definitions
+*
  csect $80
-I$ATTACH rmb 1  Attach I/O Device 
-I$DETACH rmb 1  Detach I/O Device 
-I$DUP rmb 1  Duplicate Path 
-I$CREATE rmb 1  Create New File 
-I$OPEN rmb 1  Open Existing File 
-I$MAKDIR rmb 1  Make Directory File 
-I$CHGDIR rmb 1  Change Default Directory 
-I$DELETE rmb 1  Delete File 
-I$SEEK rmb 1  Change Current Position 
-I$READ rmb 1  Read Data 
-I$WRITE rmb 1  Write Data 
-I$READLN rmb 1  Read Line of ASCII Data 
-I$WRITLN rmb 1  Write Line of ASCII Data 
-I$GETSTT rmb 1  Get Path Status 
-I$SETSTT rmb 1  Set Path Status 
-I$CLOSE rmb 1  Close Path 
-I$DELETX rmb 1  Delete from current exec dir 
+I$Attach: rmb 1 Attach I/O Device
+I$Detach: rmb 1 Detach I/O Device
+I$Dup: rmb 1 Duplicate Path
+I$Create: rmb 1 Create New File
+I$Open: rmb 1 Open Existing File
+I$MakDir: rmb 1 Make Directory File
+I$ChgDir: rmb 1 Change Default Directory
+I$Delete: rmb 1 Delete File
+I$Seek: rmb 1 Change Current Position
+I$Read: rmb 1 Read Data
+I$Write: rmb 1 Write Data
+I$ReadLn: rmb 1 Read Line of ASCII Data
+I$WritLn: rmb 1 Write Line of ASCII Data
+I$GetStt: rmb 1 Get Path Status
+I$SetStt: rmb 1 Set Path Status
+I$Close: rmb 1 Close Path
+I$DeletX: rmb 1 Delete from current exec dir
+ ends
+
+************************************************************
+*
+*      File Access Modes
+*
+READ.: equ %00000001
+WRITE.: equ %00000010
+UPDAT.: equ READ.+WRITE.
+EXEC.: equ %00000100
+PREAD.: equ %00001000
+PWRIT.: equ %00010000
+PEXEC.: equ %00100000
+SHARE.: equ %01000000
+DIR.: equ %10000000
+ISIZ.: equ %00100000
+
+ 
+************************************************************
+*
+*     Signal Codes
+*
+ csect 0
+S$Kill: rmb 1 Non-Interceptable Abort
+S$Wake: rmb 1 Wake-up Sleeping Process
+S$Abort: rmb 1 Keyboard Abort
+S$Intrpt: rmb 1 Keyboard Interrupt
+S$Window: rmb 1 Window Change
  endsect
 
- csect
-SS.OPT rmb 1  Read/Write PD Options 
-SS.READY rmb 1  Check for Device Ready 
-SS.SIZE rmb 1  Read/Write File Size 
-SS.RESET rmb 1  Device Restore 
-SS.WTRK rmb 1  Device Write Track 
-SS.POS rmb 1  Get File Current Position 
-SS.EOF rmb 1  Test for End of File 
-SS.LINK rmb 1  Link to Status routines 
-SS.ULINK rmb 1  Unlink Status routines 
-SS.FEED rmb 1  issue form feed 
-SS.FRZ rmb 1  Freeze DD_ information 
-SS.SPT rmb 1  Set DD_TKS to given value 
-SS.SQD rmb 1  Sequence down hard disk 
-SS.DCMD rmb 1  Send direct command to disk 
-SS.DEVNM rmb 1  Return Device name (32-bytes at [X]) 
-SS.FD rmb 1  Return File Descriptor (Y-bytes at [X]) 
-SS.TICKS rmb 1  Set Lockout honor duration 
-SS.LOCK rmb 1  Lock/Release record 
-SS.DSTAT rmb 1  Return Display Status (CoCo) 
-SS.JOY rmb 1  Return Joystick Value (CoCo) 
-SS.BLKRD rmb 1  Block Read 
-SS.BLKWR rmb 1  Block Write 
-SS.RETEN rmb 1  Retension cycle 
-SS.WFM rmb 1  Write File Mark 
-SS.RFM rmb 1  Read past File Mark 
-SS.ELOG rmb 1  Read Error Log 
-SS.SSIG rmb 1  Send signal on data ready 
-SS.RELEA rmb 1  Release device 
+ page
+************************************************************
+*
+*     Status Codes for GetStat/PutStat
+*
+ csect 0
+SS.Opt: rmb 1 Read/Write PD Options
+SS.Ready: rmb 1 Check for Device Ready
+SS.Size: rmb 1 Read/Write File Size
+SS.Reset: rmb 1 Device Restore
+SS.WTrk: rmb 1 Device Write Track
+SS.Pos: rmb 1 Get File Current Position
+SS.EOF: rmb 1 Test for End of File
+SS.Link: rmb 1 Link to Status routines
+SS.ULink: rmb 1 Unlink Status routines
+SS.Feed: rmb 1 issue form feed
+SS.Frz: rmb 1 Freeze DD. information
+SS.SPT: rmb 1 Set DD.TKS to given value
+SS.SQD: rmb 1 Sequence down hard disk
+SS.DCmd: rmb 1 Send direct command to disk
+SS.DevNm: rmb 1 Return Device name (32-bytes at [X])
+SS.FD: rmb 1 Return File Descriptor (Y-bytes at [X])
+SS.Ticks: rmb 1 Set Lockout honor duration
+SS.Lock: rmb 1 Lock/Release record
+SS.DStat: rmb 1 Return Display Status (CoCo)
+SS.Joy: rmb 1 Return Joystick Value (CoCo)
+SS.BlkRd: rmb 1 Block Read
+SS.BlkWr: rmb 1 Block Write
+SS.Reten: rmb 1 Retension cycle
+SS.WFM: rmb 1 Write File Mark
+SS.RFM: rmb 1 Read past File Mark
+SS.ELog: rmb 1 Read Error Log
+SS.SSig: rmb 1 Send signal on data ready
+SS.Relea: rmb 1 Release device
+SS.AlfaS: rmb 1 Return Alfa Display Status (CoCo)
+SS.Attr equ SS.AlfaS Serves 68K/RBF/Setstat thru net
+SS.Break: rmb 1 Send break signal out acia
+SS.RsBit: rmb 1 Reserve bitmap sector (do not allocate in) LSB(X)=sct#
+ rmb 1 reserved
+SS.FDInf: equ $20 to serve 68K/RBF/GetStat only, thru NET
+ rmb 4 reserve $20-$23 for Japanese version (Hoshi)
+SS.SetMF: rmb 1 reserve $24 for Gimix G68 (Flex compatability?)
+SS.Cursr: rmb 1 Cursor information for COCO
+SS.ScSiz: rmb 1 Return screen size for COCO
+SS.KySns: rmb 1 Getstat/Putstat for COCO keyboard
+SS.ComSt: rmb 1 Getstat/Putstat for Baud/Parity
+SS.Open:  rmb 1 Putstat to tell driver a path was opened
+SS.Close: rmb 1 Putstat to tell driver a path was closed
+SS.HngUp: rmb 1 Putstat to tell driver to hangup phone
  endsect
 
- csect $c8
-E$PTHFUL rmb 1  Path Table full 
-E$BPNUM rmb 1  Bad Path Number 
-E$POLL rmb 1  Polling Table Full 
-E$BMODE rmb 1  Bad Mode 
-E$DEVOVF rmb 1  Device Table Overflow 
-E$BMID rmb 1  Bad Module ID 
-E$DIRFUL rmb 1  Module Directory Full 
-E$MEMFUL rmb 1  Process Memory Full 
-E$UNKSVC rmb 1  Unknown Service Code 
-E$MODBSY rmb 1  Module Busy 
-E$BPADDR rmb 1  Bad Page Address 
-E$EOF rmb 1  End of File 
- rmb 1
-E$NES rmb 1  Non-Existing Segment 
-E$FNA rmb 1  File Not Accesible 
-E$BPNAM rmb 1  Bad Path Name 
-E$PNNF rmb 1  Path Name Not Found 
-E$SLF rmb 1  Segment List Full 
-E$CEF rmb 1  Creating Existing File 
-E$IBA rmb 1  Illegal Block Address 
- rmb 1
-E$MNF rmb 1  Module Not Found 
- rmb 1
-E$DELSP rmb 1  Deleting Stack Pointer memory 
-E$IPRCID rmb 1  Illegal Process ID 
- rmb 1
-E$NOCHLD rmb 1  No Children 
-E$ISWI rmb 1  Illegal SWI code 
-E$PRCABT rmb 1  Process Aborted 
-E$PRCFUL rmb 1  Process Table Full 
-E$IFORKP rmb 1  Illegal Fork Parameter 
-E$KWNMOD rmb 1  Known Module 
-E$BMCRC rmb 1  Bad Module CRC 
-E$USIGP rmb 1  Unprocessed Signal Pending 
-E$NEMOD rmb 1  Non Existing Module 
-
-E$BNAM rmb 1  Bad Name 
-E$NORAM rmb 1  No Ram Available 
-E$BPRCID rmb 1  Bad Process ID 
-E$NOTASK rmb 1  No available Task number 
- rmb 1
-
-E$UNIT rmb 1  Illegal Unit (drive) 
-E$SECT rmb 1  Bad SECTor number 
-E$WP rmb 1  Write Protect 
-E$CRC rmb 1  Bad Check Sum 
-E$READ rmb 1  Read Error 
-E$WRITE rmb 1  Write Error 
-E$NOTRDY rmb 1  Device Not Ready 
-E$SEEK rmb 1  Seek Error 
-E$FULL rmb 1  Media Full 
-E$BTYP rmb 1  Bad Type (incompatable) media 
-E$DEVBSY rmb 1  Device Busy 
-E$DIDC rmb 1  Disk ID Change 
-E$LOCK rmb 1  Record is busy (locked out) 
-E$SHARE rmb 1  Non-sharable file busy 
-E$DEADLK rmb 1  I/O Deadlock error 
+ csect $80 
+SS.AAGBf: rmb 1 Putstat to Allocate Additional Graphic Buffer
+SS.SLGBf: rmb 1 Putstat to Select a different Graphic Buffer
+SS.Mount: rmb 1 Network 4 Mount Setstat
+SS.RdNet: rmb 1 Read Raw Sector from Network 4 Omnidrive
+SS.MpGPB: rmb 1 Putstat to request a Get/Put Buffer be mapped in workspace
+SS.Slots: rmb 1 Network 4 slots? getstat
+SS.WnSet: rmb 1 Set up High Level Windowing Information
+SS.MnSel: rmb 1 Request High level Menu Handler take determine next event
+SS.SBar: rmb 1 Putstat to set position block on Window scroll bars
+SS.Mouse: rmb 1 Return Mouse information packet (COCO)
+SS.MsSig: rmb 1 Putstat to tell driver to send signal on mouse event
+SS.AScrn: rmb 1 Allocate a screen for application poking
+SS.DScrn: rmb 1 Display a screen allocated by SS.AScrn
+SS.FScrn: rmb 1 Free a screen allocated by SS.AScrn
+SS.PScrn: rmb 1 Polymorph Screen into different screen Type
+         rmb 2 Reserved
+SS.Palet: rmb 1 Return palette information
+SS.Montr: rmb 1 Get and Set Monitor Type
+SS.ScTyp: rmb 1 Get screen type information
+SS.GIP: rmb 1 Global Input Parameters (SetStat)
+SS.UMBar: rmb 1 update menu bar (SetStat)
+SS.FBRgs: rmb 1 return color registers (GetStat)
+SS.DfPal: rmb 1 set/return default palette registers (GetStat/SetStat)
+SS.Tone: rmb 1 Generate a tone using 6 bit sound
  endsect
- opt l
+
+ ttl Structure Formats
+ page
+************************************************************
+*
+*     Module Definitions
+*
+*     Universal Module Offsets
+*
+ csect 0
+M$ID: rmb 2 ID Code
+M$Size: rmb 2 Module Size
+M$Name: rmb 2 Module Name
+M$Type: rmb 1 Type / Language
+M$Revs: rmb 1 Attributes / Revision Level
+M$Parity: rmb 1 Header Parity
+M$IDSize: equ * Module ID Size
+*
+*     Type-Dependent Module Offsets
+*
+*   System, File Manager, Device Driver, Program Module
+*
+M$Exec: rmb 2 Execution Entry Offset
+*
+*   Device Driver, Program Module
+*
+M$Mem: rmb 2 Stack Requirement
+*
+*   Device Driver, Device Descriptor Module
+*
+M$Mode: rmb 1 Device Driver Mode Capabilities
+ ends
+*
+*   Device Descriptor Module
+*
+ csect M$IDSize
+M$FMgr: rmb 2 File Manager Name Offset
+M$PDev: rmb 2 Device Driver Name Offset
+ rmb 1 M$Mode (defined above)
+M$Port: rmb 3 Port Address
+M$Opt: rmb 1 Device Default Options
+M$DTyp: rmb 1 Device Type
+ ends
+
+
+ page
+************************************************************
+*
+*   Machine Characteristics Definitions
+*
+R$CC: equ 0 Condition Codes register
+R$A: equ 1 A Accumulator
+R$B: equ 2 B Accumulator
+R$D: equ R$A Combined A:B Accumulator
+R$DP: equ 3 Direct Page register
+R$X: equ 4 X Index register
+R$Y: equ 6 Y Index register
+R$U: equ 8 User Stack register
+R$PC: equ 10 Program Counter register
+R$Size: equ 12 Total register package size
+
+Entire: equ %10000000 Full Register Stack flag
+FIRQMask: equ %01000000 Fast-Interrupt Mask bit
+HalfCrry: equ %00100000 Half Carry flag
+IRQMask: equ %00010000 Interrupt Mask bit
+Negative: equ %00001000 Negative flag
+Zero: equ %00000100 Zero flag
+TwosOvfl: equ %00000010 Two's Comp Overflow flag
+Carry: equ %00000001 Carry bit
+IntMasks: equ IRQMask+FIRQMask
+Sign: equ %10000000 sign bit
+
+
+ ttl Error Code Definitions
+  pag
+************************************************************
+*
+*     Error Code Definitions
+*
+
+*
+* System Dependent Error Codes
+*
+ csect 186
+E$StkOvf: rmb 1 Stack overflow
+E$IllArg: rmb 1 Illegal argument
+ rmb 1 reserved
+E$ICoord: rmb 1 Illegal coordinates
+E$Bug: rmb 1 Bug (should never be returned)
+E$BufSiz: rmb 1 Buffer size is too small
+E$IllCmd: rmb 1 Illegal command
+E$TblFul: rmb 1 Screen or window table is full
+E$BadBuf: rmb 1 Bad/Undefined buffer number
+E$IWDef: rmb 1 Illegal window definition
+E$WUndef: rmb 1 Window undefined
+ ends
+*
+* Standard OS-9 Error Codes
+*
+ csect 200
+E$PthFul: rmb 1 Path Table full
+E$BPNum: rmb 1 Bad Path Number
+E$Poll: rmb 1 Polling Table Full
+E$BMode: rmb 1 Bad Mode
+E$DevOvf: rmb 1 Device Table Overflow
+E$BMID: rmb 1 Bad Module ID
+E$DirFul: rmb 1 Module Directory Full
+E$MemFul: rmb 1 Process Memory Full
+E$UnkSvc: rmb 1 Unknown Service Code
+E$ModBsy: rmb 1 Module Busy
+E$BPAddr: rmb 1 Bad Page Address
+E$EOF: rmb 1 End of File
+ rmb 1
+E$NES: rmb 1 Non-Existing Segment
+E$FNA: rmb 1 File Not Accesible
+E$BPNam: rmb 1 Bad Path Name
+E$PNNF: rmb 1 Path Name Not Found
+E$SLF: rmb 1 Segment List Full
+E$CEF: rmb 1 Creating Existing File
+E$IBA: rmb 1 Illegal Block Address
+ rmb 1
+E$MNF: rmb 1 Module Not Found
+ rmb 1
+E$DelSP: rmb 1 Deleting Stack Pointer memory
+E$IPrcID: rmb 1 Illegal Process ID
+ rmb 1
+E$NoChld: rmb 1 No Children
+E$ISWI: rmb 1 Illegal SWI code
+E$PrcAbt: rmb 1 Process Aborted
+E$PrcFul: rmb 1 Process Table Full
+E$IForkP: rmb 1 Illegal Fork Parameter
+E$KwnMod: rmb 1 Known Module
+E$BMCRC: rmb 1 Bad Module CRC
+E$USigP: rmb 1 Unprocessed Signal Pending
+E$NEMod: rmb 1 Non Existing Module
+
+E$BNam: rmb 1 Bad Name
+E$BMHP: rmb 1 (bad module header parity)
+E$NoRam: rmb 1 No Ram Available
+E$BPrcID: rmb 1 Bad Process ID
+E$NoTask: rmb 1 No available Task number
+ ends
+
+ csect $F0
+E$Unit: rmb 1 Illegal Unit (drive)
+E$Sect: rmb 1 Bad SECTor number
+E$WP: rmb 1 Write Protect
+E$CRC: rmb 1 Bad Check Sum
+E$Read: rmb 1 Read Error
+E$Write: rmb 1 Write Error
+E$NotRdy: rmb 1 Device Not Ready
+E$Seek: rmb 1 Seek Error
+E$Full: rmb 1 Media Full
+E$BTyp: rmb 1 Bad Type (incompatable) media
+E$DevBsy: rmb 1 Device Busy
+E$DIDC: rmb 1 Disk ID Change
+E$Lock: rmb 1 Record is busy (locked out)
+E$Share: rmb 1 Non-sharable file busy
+E$DeadLk: rmb 1 I/O Deadlock error
+ ends
+

@@ -1,0 +1,56 @@
+
+**********
+* LSIT UTILITY COMMAND 
+* A "LIST" Command for poor typists
+* Syntax: lsit <path>
+* Lsit copies input from path to standard output
+* NOTE: This command is similar to the
+* LIST command.  It's name was changed
+* to allow easy assembly and testing
+* since LIST normally is already in memory.
+
+
+PRGRM equ $10
+OBJCT equ $01
+STK equ 200
+
+ csect
+IPATH rmb 1 input path number
+PRMPTR rmb 2 parameter pointer
+BUFSIZ rmb 200 size of input buffer
+ endsect
+
+ psect list,PRGRM+OBJCT,$81,0,STK,LSTENT
+
+BUFFER equ 200 allocate line buffer
+READ. equ 1 file access mode
+
+LSTENT stx PRMPTR save parameter ptr
+ lda #READ. select read access mode
+ os9 I$Open open input file
+ bcs LSIT50 exit if error
+ sta IPATH save input path number
+ stx PRMPTR save updated param ptr
+
+LSIT20 lda IPATH load input path number
+ leax BUFFER,u load buffer pointer
+ ldy #BUFSIZ max bytes to read
+ os9 I$ReadLn read line of input
+ bcs LSIT30 exit if error
+ lda #1 load st. out path #
+ os9 I$WritLn output line
+ bcc LSIT20 repeat if no error
+ bra LSIT50 exit if error
+
+LSIT30 cmpb #E$EOF at end of file?
+ bne LSIT50 branch if not
+ lda IPATH load input path number
+ os9 I$Close close input path
+ bcs LSIT50 ..exit if error
+ ldx PRMPTR restore param ptr
+ lda 0,x
+ cmpa #$0D end of param line?
+ bne LSTENT ..no; list next file
+ clrb
+LSIT50 os9 F$Exit ..terminate
+ endsect

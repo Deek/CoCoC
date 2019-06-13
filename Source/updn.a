@@ -1,0 +1,61 @@
+
+* This is a program to convert characters from lower to
+* upper case (by using the u option), and upper to lower 
+* (by using no option).  To use type:
+*      updn u (for lower to upper) < input  > output 
+
+ nam updn
+
+ opt l
+ ttl ASSEMBLY LANGUAGE EXAMPLE
+
+PRGRM equ $10
+OBJCT equ $01
+stk equ 250
+ psect updn,PRGRM+OBJCT,$81,0,stk,entry
+
+ vsect
+temp rmb 1
+uprbnd rmb 1
+lwrbnd rmb 1
+ endsect
+
+entry lda ,x+ search parameter area
+ anda #$df make upper case
+ cmpa #'U see if a U was input
+ beq upper branch to set uppercase
+ cmpa #$0D carriage return?
+ bne entry no; go get another char
+
+ lda #'A get lower bound
+ sta lwrbnd set it in storage area
+ lda #'Z get upper bound
+ sta uprbnd set it in storage area
+ bra start1 go to start of code
+
+upper lda #'a get lower bound
+ sta lwrbnd set it in storage
+ lda #'z get upper bound
+ sta uprbnd set it in storage
+
+start1 leax temp,u get storage address
+ lda #0 standard input
+ ldy #$01 number of characters
+loop os9 I$Read do the read
+ bcs exit exit if error
+ ldb temp get character read
+ cmpb lwrbnd test char bound
+ blo write branch if out
+ cmpb uprbnd test char bound
+ bhi write branch if out
+ eorb #$20 flip case bit
+write stb temp put it in storage
+ inca reg 'a' standard out
+ os9 I$WritLn write the character
+ deca return to standard in
+ bcc loop get char if no error
+exit cmpb #E$EOF is it an EOF error
+ bne exit1 not eof, leave carry
+ clrb clear carry, no error
+exit1 os9 F$Exit error returned, exit
+ endsect
