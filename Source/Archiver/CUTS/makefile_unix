@@ -1,0 +1,17 @@
+CFLAGS = -DUNIX
+
+cuts: cuts.o cuts_decode.o cuts_encode.o cuts_getopt.o
+	cc cuts.o cuts_decode.o cuts_encode.o cuts_getopt.o -o cuts
+
+cuts.o:	cuts.c cuts.h
+cuts_decode.o: cuts_decode.c cuts.h
+cuts_encode.o: cuts_encode.c cuts.h
+cuts_getopt.o: cuts_getopt.c cuts.h
+
+clean: cuts.o cuts_decode.o cuts_encode.o cuts_getopt.o
+	rm *.o
+
+print.file: cuts.c cuts_decode.c cuts_encode.c cuts_getopt.c
+	list $? >/p
+	touch print.file
+

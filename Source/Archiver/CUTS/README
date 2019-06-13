@@ -1,0 +1,66 @@
+This is the 1.6 release of the CUTS source code.
+
+This file contains a brief history of the program, and instructions
+for compiling CUTS on the various systems which are currently
+supported.
+
+The CUTS format was designed by me at the request of Eric Tilenius to
+provide a method for transferring CoCo and OS9 binaries over
+electronic mail.  As far as our testing can show, CUTS-encoded files
+are resistant to character losses due to: ASCII <-> EBCDIC conversion
+(which can trash uuencoded files) and mailers which strip
+leading/trailing spaces or barf on lines longer than 80 characters.
+
+Any changes, fixes, or alterations to this source should be forwarded
+to me via Email at one of the following addresses:
+
+Internet: koonce@math.berkeley.edu
+Bitnet:   koonce@UCBBRAHMS
+UUCP:    ...!ucbvax!math!koonce
+Delphi:  TIMKOONCE
+CompuServe: 72276,1135
+
+In particular, I would like to know about any changes needed to
+port CUTS to other systems.
+                                        Tim Koonce
+                                        November 1, 1989
+
+--------------- Compilation Instructions -----------------------------
+
+** OS9 
+   (Compilation under OS9/6809 requires the Kreider C libraries.)  If
+you have 'make', then compile with 'make -f makefile_os9'.  Otherwise,
+you can use the following command line:
+
+cc  -dOS9 -f=cuts cuts.c cuts_decode.c cuts_encode.c cuts_getopt.c
+
+** Unix 
+     Use the command line 'make -f makefile_unix'
+
+** VMS 
+     Read instructions in file 'makefile_vms.com'.
+
+** IBM PC/Turbo C 
+     Copy all CUTS files into one directory, and compile with the
+following command line:
+
+tcc -DIBMPC *.c C:\TC\LIB\wildargs.obj
+
+The last item on the command line is the full pathname of the
+wildargs.obj file supplied with Turbo C.  It may be different for your
+system.  It provides command-line wildcard expansion.  If you do not
+have this file, or do not wish wildcard expansion, you can compile
+with the command line:
+
+tcc -DIBMPC *.c
+
+
+-------------------------Credits-------------------------------------
+
+Concept:  Eric Tilenius              ewtileni@pucc.bitnet
+Design: Tim Koonce                   koonce@math.berkeley.edu
+Initial coding:  Simmule Turner      simmy%ocean@nu.cs.fsu.edu
+VMS port: Eddie Kuns                 ekuncs@zodiac.rutgers.edu
+Sun/BSD port: Claude Morin           klode@deepthot.uwo.ca
+IBM PC port: Don Ingli               ingli%umcutsa@umcvmb.missouri.edu
+             Ernest Campbell         ATDEP@auducvax.bitnet

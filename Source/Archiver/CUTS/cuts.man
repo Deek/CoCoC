@@ -1,0 +1,58 @@
+CUTS(3)                 (Advanced C Utility)                 CUTS(3)
+
+NAME
+        cuts - Coco Usenet Transfer Utility
+
+SYNOPSIS
+        cuts [-d] [-o name] <file>...
+        cuts <-e> [-o name] [[<->abm] <file>] ...
+
+DESCRIPTION
+        Cuts is used to send binary files, or ascii files that
+        have lines longer than 80 characters through Electronic
+        Mail systems.  It also circumvents conversion problems
+        between ASCII-EBCDIC computers.  This version of cuts
+        can correctly decode cuts files that have been merged
+        together.
+
+OPTIONS
+        -q         'Quiet' mode, suppress extraneous output.
+        -v         Displays version message
+        -h         Displays help message
+        -d         Decode
+        -e         Encode, output normally goes to standard output.
+        -o <name>  Send output to name, if name is - output is
+                   sent to stdout (works with -d, and -e).
+
+        The following may precede a filename (or list of filenames) to
+        indicate the file type:
+              -a <file>  ASCII
+              -b <file>  Generic binary (DEFAULT if not specified)
+              -m <file>  machine-specific binary
+        These options are ignored if they are specified while decoding.
+        The -b option should be used for portable binary files such as
+        graphics and archived source files.  The -m option should be
+        used for binary files specific to a certain machine, i.e.
+        executable files.
+
+EXAMPLES
+        (1) cuts -e -o cuts.cut aif.cut -a cuts.doc -m cuts
+        (2) cuts -e termcap.l >term.cut
+        (3) cuts -e -a cuts.doc cuts.man cuts.c -m cuts -o cuts.cut
+        (4) cuts cuts.cut shellplus.cut
+
+    (1) encode sending output to cuts.cut, encoding aif.cut as BIN,
+    cuts.doc as ASC, and cuts as machine-specific binary.
+    (2) encode termcap.l and send output to term.cut (encoding
+    normally goes to stdout).
+    (3) encode sending output to cuts.cut with the three files cuts.doc,
+    cuts.man, and cuts.c all encoded as ASC files and encoding cuts as
+    a machine-specific file.
+    (4) decode the files cuts.cut and shellplus.cut
+
+AUTHORS
+        Simmule Turner, ucp - initial coding
+        Tim Koonce - maintenance
+        Eddie Kuns - VMS port
+        Don R Ingli, Ernest Campbell - IBM PC port
+        Eric Tilenius - original concept
