@@ -1,0 +1,17 @@
+Several targets have special importance to Make.  When defined,
+the dependents gain special attributes.
+
+.SUFFIXES   The dependency list for this target specifies the suffixes
+            to be use in constructing implicit dependencies.  This
+            list is tried in the order specified to attempt to construct
+            implicit dependencies.  Specify .SUFFIXES with no dependents
+            to clear the suffixes list.  Repetitions accumulate.
+
+.PRECIOUS   The dependency list for this target specifies files that
+            should not be deleted if an error occurs.  Normally, if
+            an error occurs in constructing a specific target, that
+            target is deleted by make.
+
+.SILENT     If this target is specified, the make proceeds silently,
+            without echoing commands to the terminal.  Equivalent to
+            the -s command line switch.

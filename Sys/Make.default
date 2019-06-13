@@ -1,0 +1,33 @@
+* Default rules for "make".  This file is read before the "makefile"
+*
+* Compiler name and flags.  Used by default rules below.
+CC = cc
+CFLAGS = -dOS9
+* Linker name and flags
+LINK = cc
+LFLAGS =
+* Assembler name and flags.
+RMA = rma
+RFLAGS =
+* Directories to use for executables and .r files.
+* Note: ODIR is relative to current exec dir; RDIR is  relative to data dir
+ODIR =                              
+RDIR =
+
+* When trying to find implicit source files, Make will append each suffix
+*   in turn until it finds a source file that exists, and for which
+*   there is a rule defined below.
+.SUFFIXES: .r .a .c
+
+* .c specifies how to build a no-extension file from a .c file
+* .c.r specifies how to compile .c files into .r files.
+.c:;$(CC) $(CFLAGS) $(LFLAGS) $< -f=$(ODIR/)$@
+.r:;$(LINK) $(LFLAGS) $< -o=$(ODIR/)$@
+.c.r:;$(CC) $(CFLAGS) -r=$(RDIR) $<
+.a.r:;$(RMA) $(RFLAGS) $< -o=$(RDIR/)$@
+
+* Notes: RDIR support here is a bit of a hack.  A macro such as
+*   $(RDIR/) will expand the same as $(RDIR), except that a trailing
+*   slash will be added, but only if RDIR is not null.  So,
+*   If RDIR = RELS, then $(RDIR/) will be "RELS/", but if RDIR =
+*   then $(RDIR/) will be null.

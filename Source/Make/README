@@ -1,0 +1,55 @@
+This is the source for the Make utility.  Please tell me if you come
+up with any improvements to it.
+
+Delphi: TIMKOONCE, TIMKIENTZLE
+Internet: koonce@math.berkeley.edu
+Bitnet: koonce@UCBBRAHMS
+
+Installing Make:
+ - "make.default" should be in the "/dd/sys" directory with r, pr attr
+ - "make" should be in your current exec dir with the appropriate attr
+
+Customizing Make:
+ - The major way you can customize make is to edit /dd/sys/make.default
+   to change the default rules to fit your own particular setup.
+   I am especially interested in knowing good default rules for use with
+   other languages (i.e. Pascal, ASM, RMA, etc.)
+ - If you want to re-compile, there are a couple of easy customizations
+   you can make to the source:
+     - The filename for "/dd/sys/make.default" is defined in h.h.
+       You can change it to your preference.
+     - By undefining DEFN0, make will use compiled-in rules, defined
+       in rules.c.  This will help make start up faster.
+
+Among other changes I've made:
+ - I fixed the -q and -p options
+ - I added support for -f, -z, and -u
+ - I generalized the implicit command checking to allow for targets with
+   no suffix, i.e.  .r:; <command>  defines a command to build a target
+   with no suffix from a .r file.
+ - I added recognition of the semicolon separator to include commands
+   on the same line
+ - I added support for ODIR and RDIR (see make.default for more info)
+ - If there is no makefile, make will build a null entry for a target
+   on the command line, and try to apply it's rules from there.
+
+Differences from Tandy Make:
+- SDIR is not supported.
+- The default rules are probably different.
+- This make doesn't have the annoying bug of making intermediate
+  files many times if they occur in more than one branch of the
+  dependency tree.  (Yea!)
+- To determine a timestamp for a file with no suffix, this make will
+  first look in the current exec dir, then the current data dir.
+
+Differences from Unix Make:
+- The -k option is not supported.
+- The ~ modifier is not supported.
+
+General comments.
+   I took this up largely to get a make which didn't have the most
+annoying bugs of Tandy make, and which supported implicit dependency
+checking.  Many of the features (such as double-colon targets and
+.PRECIOUS targets) have not been fully tested.  The current version
+works well for me.  I would like to see -k implemented, and more
+reasonable output from -d.
