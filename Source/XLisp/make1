@@ -1,0 +1,222 @@
+echo 'xlisp.c'
+-x
+echo c.prep:
+C.PREP xlisp.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlisp.r
+del ctmp.4.o
+echo 'xlbind.c'
+-x
+echo c.prep:
+C.PREP xlbind.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlbind.r
+del ctmp.4.o
+echo 'xldmem.c'
+-x
+echo c.prep:
+C.PREP xldmem.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xldmem.r
+del ctmp.4.o
+echo 'xleval.c'
+-x
+echo c.prep:
+C.PREP xleval.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xleval.r
+del ctmp.4.o
+echo 'xlfio.c'
+-x
+echo c.prep:
+C.PREP xlfio.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlfio.r
+del ctmp.4.o
+echo 'xlio.c'
+-x
+echo c.prep:
+C.PREP xlio.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlio.r
+del ctmp.4.o
+echo 'xllist.c'
+-x
+echo c.prep:
+C.PREP xllist.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xllist.r
+del ctmp.4.o
+echo 'xlmath.c'
+-x
+echo c.prep:
+C.PREP xlmath.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlmath.r
+del ctmp.4.o
+echo 'xlobj.c'
+-x
+echo c.prep:
+C.PREP xlobj.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlobj.r
+del ctmp.4.o
+echo 'xlprin.c'
+-x
+echo c.prep:
+C.PREP xlprin.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlprin.r
+del ctmp.4.o
+echo 'xlread.c'
+-x
+echo c.prep:
+C.PREP xlread.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlread.r
+del ctmp.4.o
+echo 'xlstr.c'
+-x
+echo c.prep:
+C.PREP xlstr.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlstr.r
+del ctmp.4.o
+echo 'xlsubr.c'
+-x
+echo c.prep:
+C.PREP xlsubr.c >ctmp.4.m
+x
+echo c.pass1:
+C.PASS1 ctmp.4.m -o=ctmp.4.i
+del ctmp.4.m
+echo c.pass2:
+C.PASS2 ctmp.4.i -o=ctmp.4.a
+del ctmp.4.i
+echo c.opt:
+C.OPT ctmp.4.a ctmp.4.o
+del ctmp.4.a
+echo c.asm:
+C.ASM ctmp.4.o -o=xlsubr.r
+del ctmp.4.o
+c.link /d0/lib/cstart.r xlisp.r xlbind.r xldmem.r xleval.r xlfio.r xlio.r xllist.r xlmath.r xlobj.r xlprin.r xlread.r xlstr.r xlsubr.r -l=/d0/lib/clib.l -o=xlisp -M=5K

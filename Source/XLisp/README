@@ -1,0 +1,748 @@
+
+
+
+
+              XLISP: An Experimental Object Oriented Language
+
+
+                                     by
+                                 David Betz
+                             114 Davenport Ave.
+                           Manchester, NH  03103
+
+                               (603) 625-4691
+
+
+        XLISP is an experimental programming language combining some
+        of  the  features  of LISP with an object oriented extension
+        capability.  It was  implemented  to  allow  experimentation
+        with  object oriented programming on small computers.  There
+        are currently implementations running on  the  PDP-11  under
+        RSX-11,  RT-11, and UNIX V7, on the VAX-11 under VAX/VMS and
+        Berkeley VAX/UNIX and on the Z-80 running  CP/M-80.   It  is
+        completely  written  in  the programming language 'C' and is
+        believed to be easily extended  with  user  written  builtin
+        functions  and  classes.  It is available free of charge and
+        is in the public domain.
+
+        Many traditional LISP functions are built  into  XLISP.   In
+        addition,   XLISP   defines  the  object  classes  'Object',
+        'Class', and 'Keymap' as primitives.  'Object' is  the  only
+        class  that  has  no superclass and hence is the root of the
+        class hierarchy tree.  'Class' is the  class  of  which  all
+        classes  are  instances  (it  is  the only object that is an
+        instance of itself).  'Keymap' is a  class  whose  instances
+        are mappings from input key sequences to messages.
+
+        This document is intended  to  be  a  brief  description  of
+        XLISP.    It   assumes  some  knowledge  of  LISP  and  some
+        understanding   of   the   concepts   of   object   oriented
+        programming.
+
+        XLISP: An Experimental Object Oriented Language       Page 2
+        XLISP Command Loop
+
+
+        When XLISP is started, it issues the following prompt:
+
+        >
+
+        This indicates that XLISP is waiting for an expression to be
+        typed.   When  an  incomplete expression has been typed (one
+        where the left and right parens don't match)  XLISP  changes
+        its prompt to:
+
+        n>
+
+        where n is an integer indicating how many levels  of  parens
+        remain unclosed.
+
+        When a complete expression has been entered, XLISP  attempts
+        to  evaluate  that  expression.  If the expression evaluates
+        successfully, XLISP prints the result of the evaluation  and
+        then  returns  to  the  initial  prompt  waiting for another
+        expression to be typed.
+
+        Input can be aborted at any time  by  typing  the  EOF  key.
+        Another EOF will exit from XLISP.
+
+        XLISP: An Experimental Object Oriented Language       Page 3
+        DATA TYPES AND THE EVALUATOR
+
+
+        XLISP data types
+
+        There are several different data types  available  to  XLISP
+        programmers.
+
+
+              o  symbols
+
+              o  strings
+
+              o  integers
+
+              o  objects
+
+              o  file pointers
+
+              o  lists
+
+              o  subrs (builtin functions)
+
+
+        The XLISP evaluator
+
+        The process of evaluation in XLISP:
+
+              o  Integers,  strings,  objects,  file  pointers,  and
+                 subrs evaluate to themselves
+
+              o  Symbols evaluate to the value associated with their
+                 current binding
+
+              o  Lists are evaluated by evaluating the first element
+                 of the list
+
+                  o  If it evaluates to a subr, the builtin function
+                     is  executed  using the remaining list elements
+                     as arguments (they are evaluated  by  the  subr
+                     itself)
+
+                  o  If it evaluates to a list, the list is  assumed
+                     to be a function definition and the function is
+                     evaluated using the  values  of  the  remaining
+                     list elements as arguments
+
+                  o  If it evaluates to an object, the  second  list
+                     element  is  evaluated  and  used  as a message
+                     selector.  The message formed by combining  the
+                     selector  with the values of the remaining list
+                     elements is sent to the object.
+
+
+
+        XLISP: An Experimental Object Oriented Language       Page 4
+        LEXICAL CONVENTIONS
+
+
+        XLISP lexical conventions:
+
+        The following conventions are followed when  entering  XLISP
+        programs:
+
+        Comments in XLISP code begin with a semi-colon character and
+        continue to the end of the line.
+
+        Symbol names  in  XLISP  can  consist  of  any  sequence  of
+        non-blank printable characters except the following:
+
+                ( ) . ' " ;
+
+        Symbol names must not begin with a digit.
+
+        Integer literals consist of a sequence of digits  optionally
+        beginning with a '+' or '-'.  The range of values an integer
+        can represent is limited by the size of a  C  'int'  on  the
+        machine that XLISP is running on.
+
+        Literal strings are sequences of  characters  surrounded  by
+        double  quotes.   Within quoted strings the '\' character is
+        used to allow non-printable characters to be included.   The
+        codes recognized are:
+
+                \\      means the character '\'
+                \n      means newline
+                \t      means tab
+                \r      means return
+                \e      means escape
+                \nnn    means the character whose octal code is nnn
+
+        The single quote character can be used as a shorthand for  a
+        call on the function 'quote':
+
+                                'foo
+        is equivalent to:
+                                (quote foo)
+
+        XLISP: An Experimental Object Oriented Language       Page 5
+        OBJECTS
+
+
+        Objects:
+
+        Definitions:
+
+              o  selector - a symbol used to select  an  appropriate
+                 method
+
+              o  message - a selector and a list of actual arguments
+
+              o  method - the code that implements a message
+
+        Since XLISP was  created  to  provide  a  simple  basis  for
+        experimenting  with  object oriented programming, one of the
+        primitive data types included was 'object'.   In  XLISP,  an
+        object  consists of a data structure containing a pointer to
+        the object's class as well as a list containing  the  values
+        of the object's instance variables.
+
+        Officially, there is no way to see inside an object (look at
+        the  values  of  its  instance  variables).  The only way to
+        communicate with an object is by sending it a message.  When
+        the  XLISP  evaluator  evaluates  a  list the value of whose
+        first element is an object, it interprets the value  of  the
+        second  element  of the list (which must be a symbol) as the
+        message selector.  The evaluator determines the class of the
+        receiving object and attempts to find a method corresponding
+        to the message selector in the set of messages  defined  for
+        that  class.   If  the  message is not found in the object's
+        class and the class has a super-class, the search  continues
+        by  looking  at  the  messages  defined for the super-class.
+        This process continues from  one  super-class  to  the  next
+        until  a  method  for the message is found.  If no method is
+        found, an error occurs.
+
+        When a method is found, the evaluator  binds  the  receiving
+        object  to  the  symbol 'self', binds the class in which the
+        method was found to the symbol 'msgclass', and evaluates the
+        method  using the remaining elements of the original list as
+        arguments  to  the  method.   These  arguments  are   always
+        evaluated prior to being bound to their corresponding formal
+        arguments.  The result of evaluating the method becomes  the
+        result of the expression.
+
+        XLISP: An Experimental Object Oriented Language       Page 6
+        OBJECTS
+
+
+        Classes:
+
+        Object  THE TOP OF THE CLASS HIERARCHY
+
+            Messages:
+
+                print   THE DEFAULT OBJECT PRINT ROUTINE
+                    returns     the object
+
+                show    SHOW AN OBJECT'S INSTANCE VARIABLES
+                    returns     the object
+
+                class   RETURN THE CLASS OF AN OBJECT
+                    returns     the class of the object
+
+                isnew   THE DEFAULT OBJECT INITIALIZATION ROUTINE
+                    returns     the object
+
+                sendsuper <sel> [<args>...] SEND SUPERCLASS A MESSAGE
+                    <sel>       the message selector
+                    <args>      the message arguments
+                    returns     the result of sending the message
+
+
+        Class   THE CLASS OF ALL OBJECT CLASSES (including itself)
+
+            Messages:
+
+                new     CREATE A NEW INSTANCE OF A CLASS
+                    returns     the new class object
+
+                isnew [<scls>]  INITIALIZE A NEW CLASS
+                    <scls>      the superclass
+                    returns     the new class object
+
+                answer <msg> <fargs> <code>     ADD A MESSAGE TO A CLASS
+                    <msg>       the message symbol
+                    <fargs>     the formal argument list
+                                  this list is of the form:
+                                    (<farg>... [/ <local>...])
+                                  where
+                                    <farg>      a formal argument
+                                    <local>     a local variable
+                    <code>      a list of executable expressions
+                    returns     the object
+
+                ivars <vars>    DEFINE THE LIST OF INSTANCE VARIABLES
+                    <vars>      the list of instance variable symbols
+                    returns     the object
+
+                cvars <vars>    DEFINE THE LIST OF CLASS VARIABLES
+                    <vars>      the list of class variable symbols
+                    returns     the object
+
+        XLISP: An Experimental Object Oriented Language       Page 7
+        OBJECTS
+
+
+        When a new instance of a class is  created  by  sending  the
+        message  'new'  to  an  existing  class, the message 'isnew'
+        followed by whatever parameters were  passed  to  the  'new'
+        message is sent to the newly created object.
+
+        When a new class is created by sending the 'new' message  to
+        the  object  'Class', an optional parameter may be specified
+        indicating of which class the newly generated class is to be
+        a  subclass.   If  this  parameter is omitted, the new class
+        will be a subclass of 'Object'.
+
+         Example:
+
+            ; create 'Foo' as a subclass of 'Object'
+            (setq Foo (Class 'new))
+
+            ; create 'Bar' as a subclass of 'Foo'
+            (setq Bar (Class 'new Foo))
+
+        A class inherits all instance  variables,  class  variables,
+        and methods from its super-class.
+
+        XLISP: An Experimental Object Oriented Language       Page 8
+        OBJECTS
+
+
+        The 'Keymap' Class:
+
+        A keymap is data structure that  translates  a  sequence  of
+        keystrokes into a message.
+
+        In order to create a keymap:
+
+                (setq km (Keymap 'new))
+
+        In order to add a key definition to a keymap (km):
+
+                (km 'key "\eA" 'up)
+                (km 'key "\eB" 'down)
+                (km 'key "\eC" 'right)
+                (km 'key "\eD" 'left)
+
+        Executing a keymap:
+
+                (setq env (list ob1 ob2 ob3 ob4))
+                (km 'process env)
+
+        When the process  message  is  sent,  its  method  enters  a
+        character  input  loop  calling  kbin to get single unechoed
+        characters from the keyboard.  When a sequence of characters
+        is  found that matches one of the sequences defined in a key
+        function call,  the  corresponding  message  is  sent.   The
+        method  tries  to send the message to each of the objects in
+        the environment list.  It stops when it finds an object that
+        knows  how  to  answer  the message.  Along with the message
+        selector given  in  the  key  definition,  the  sequence  of
+        matched characters is passed as a single string parameter.
+
+            Keymap
+
+                new     CREATE A NEW KEYMAP
+                    returns     a new keymap
+
+                isnew   INITIALIZE THE NEW KEYMAP
+                    returns     the keymap
+
+                key <kstr> <ksym>       ADD A KEY DEFINITION TO A KEYMAP
+                    <kstr>      the string defining the key
+                    <ksym>      the symbol for the message
+                    returns     the keymap
+
+                process <envlist>       PROCESS INPUT USING A KEYMAP
+                    <envlist>   list of active objects
+                    returns     the keymap when a message evaluates to nil
+
+        XLISP: An Experimental Object Oriented Language       Page 9
+        SYMBOLS
+
+
+        Symbols:
+
+
+              o  self  -  the  current  object  (within  a   message
+                 context)
+
+              o  msgclass - the class in which  the  current  method
+                 was found
+
+              o  currentenv - the environment list for  the  current
+                 invocation of kmprocess
+
+              o  oblist - the object list
+
+
+        XLISP: An Experimental Object Oriented Language      Page 10
+        FUNCTIONS
+
+
+        Utility functions:
+
+        (load <fname>)  LOAD AN XLISP SOURCE FILE
+            <fname>     the filename string
+            returns     the filename
+
+        (mem)   SHOW MEMORY ALLOCATION STATISTICS
+            returns     nil
+
+        (gc)    FORCE GARBAGE COLLECTION
+            returns     nil
+
+        (alloc <num>)   CHANGE NUMBER OF NODES TO ALLOCATE IN EACH SEGMENT
+            <num>       the number of nodes to allocate
+            returns     the old number of nodes to allocate
+
+        (expand <num>)  EXPAND MEMORY BY ADDING SEGMENTS
+            <num>       the number of segments to add
+            returns     the number of segments added
+
+        XLISP: An Experimental Object Oriented Language      Page 11
+        FUNCTIONS
+
+
+        Functions:
+
+        (eval <expr>)   EVALUATE AN XLISP EXPRESSION
+            <expr>      the expression to be evaluated
+            returns     the result of evaluating the expression
+
+        (set <sym> <expr>)      SET THE VALUE OF A SYMBOL
+            <sym>       the symbol being set
+            <expr>      the new value
+            returns     the new value
+
+        (setq <qsym> <expr>)    SET THE VALUE OF A SYMBOL
+            <qsym>      the symbol being set (quoted)
+            <expr>      the new value
+            returns     the new value
+
+        (print <expr>...)       PRINT A LIST OF VALUES
+            <expr>      the expressions to be printed
+            returns     nil
+
+        (princ <expr>...)       PRINT A LIST OF VALUES WITHOUT QUOTING
+            <expr>      the expressions to be printed
+            returns     nil
+
+        (quote <expr>)  RETURN AN EXPRESSION UNEVALUATED
+        or
+        '<expr>
+            <expr>      the expression to be quoted (quoted)
+            returns     <expr> unevaluated
+
+        (if <texpr> <expr1> [ <expr2> ])    EXECUTE EXPRESSIONS CONDITIONALLY
+            <texpr>     test expression
+            <expr1>     expression evaluated if texpr is non-nil or non-zero
+            <expr2>     expression evaluated if texpr is nil or zero
+            returns     the value of the expression evaluated
+
+        (while <texpr> <expr>...)       ITERATE WHILE AN EXPRESSION IS TRUE
+            <texpr>     test expression evaluated at start of each iteration
+            <expr>      expressions evaluated as long as <texpr> evaluates to
+                        non-nil or non-zero
+            returns     the result of the last expression evaluated
+
+        (repeat <iexpr> <expr>...)      ITERATE USING A REPEAT COUNT
+            <iexpr>     integer expression indicating the repeat count
+            <expr>      expressions evaluated <iexpr> times
+            returns     the result of the last expression evaluated
+
+        (foreach <qsym> <list> <expr>...) ITERATE FOR EACH ELEMENT IN A LIST
+            <qsym>      symbol to assign each list element to (quoted)
+            <list>      list to iterate through
+            <expr>      expressions evaluated for each element in the list
+            returns     the result of the last expression evaluated
+
+        XLISP: An Experimental Object Oriented Language      Page 12
+        FUNCTIONS
+
+
+        (defun <qsym> <qfargs> <expr>...)       DEFINE A NEW FUNCTION
+            <qsym>      symbol to be defined (quoted)
+            <qfargs>    list of formal arguments (quoted)
+                          this list is of the form:
+                            (<farg>... [/ <local>...])
+                          where
+                            <farg>      is a formal argument
+                            <local>     is a local variable
+            <expr>      expressions constituting the body of the
+                        function (quoted)
+            returns     the function symbol
+
+        (cond <pair>...)        EVALUATE CONDITIONALLY
+            <pair>      pair consisting of:
+                            (<pred> <expr>)
+                          where
+                            <pred>      is a predicate expression
+                            <expr>      is evaluated if the predicate
+                                        is not nil
+            returns     the value of the first expression whose predicate
+                        is not nil
+
+        (exit)  EXIT XLISP
+            returns     never returns
+
+        XLISP: An Experimental Object Oriented Language      Page 13
+        FUNCTIONS
+
+
+        I/O Functions:
+
+        (fopen <fname> <mode>)  OPEN A FILE
+            <fname>     the file name string
+            <mode>      the open mode string
+            returns     a file pointer
+
+        (fclose <fp>)   CLOSE A FILE
+            <fp>        the file pointer
+            returns     nil
+
+        (getc [<fp>])   GET A CHARACTER FROM A FILE
+            <fp>        the file pointer (default is stdin)
+            returns     the character (integer)
+
+        (putc <ch> [<fp>])      PUT A CHARACTER TO A FILE
+            <ch>        the character to put (integer)
+            <fp>        the file pointer (default is stdout)
+            returns     the character (integer)
+
+        (fgets [<fp>])  GET A STRING FROM A FILE
+            <fp>        the file pointer (default is stdin)
+            returns     the input string
+
+        (fputs <str> [<fp>]) PUT A STRING TO A FILE
+            <str>       the string to output
+            <fp>        the file pointer (default is stdout)
+            returns     the string
+
+        XLISP: An Experimental Object Oriented Language      Page 14
+        FUNCTIONS
+
+
+        String Functions:
+
+        (strcat <expr>...) CONCATENATE STRINGS
+            <expr>      string expressions
+            returns     result of concatenating the strings
+
+        (strlen <expr>) COMPUTE THE LENGTH OF A STRING
+            <expr>      the string expression
+            returns     the length of the string
+
+        (substr <expr> <sexpr> [<lexpr>]) RETURN SUBSTRING
+            <expr>      string expression
+            <sexpr>     starting position
+            <lexpr>     optional length (default is rest of string)
+            returns     substring starting at <sexpr> for <lexpr>
+
+        (ascii <expr>)  NUMERIC VALUE OF CHARACTER
+            <expr>      string expression
+            returns     numeric value of first character (according to ASCII)
+
+        (chr <expr>)    CHARACTER EQUIVALENT OF ASCII VALUE
+            <expr>      numeric expression
+            returns     one character string with ASCII equivalent of <expr>
+
+        (atoi <expr>)   CONVERT AN ASCII STRING TO AN INTEGER
+            <expr>      string expression
+            returns     the integer value of the string expression
+
+        (itoa <expr>)   CONVERT AN INTEGER TO AN ASCII STRING
+            <expr>      integer expression
+            returns     the string representation of the integer value
+
+        XLISP: An Experimental Object Oriented Language      Page 15
+        FUNCTIONS
+
+
+        List Functions:
+
+        (head <expr>)   RETURN THE HEAD ELEMENT OF A LIST
+        or
+        (car <expr)
+            <expr>      the list
+            returns     the first element of the list
+
+        (tail <expr>)   RETURN THE TAIL ELEMENTS OF A LIST
+        or
+        (cdr <expr>)
+            <expr>      the list
+            returns     the list minus the first element
+
+        (list <expr>...)        CREATE A LIST OF VALUES
+            <expr>      evaluated expressions to be combined into a list
+            returns     the new list
+
+        (nth <n> <list>)        RETURN THE NTH ELEMENT OF A LIST
+            <n>         the number of the element to return
+            <list>      the list to return the nth element of
+            returns     the nth element or nil if the list isn't that long
+
+        (append <expr>...)      APPEND LISTS
+            <expr>      lists whose elements are to be appended
+            returns     the new list
+
+        (cons <e1> <e2>)        CONSTRUCT A NEW LIST ELEMENT
+            <e1>        becomes the head (car) of the new list
+            <e2>        becomes the tail (cdr) of the new list
+            returns     the new list
+
+        (null <expr>)   CHECKS FOR AN EMPTY LIST
+            <expr>      the list to check
+            returns     t if the list is empty, nil otherwise
+
+        (atom <expr>)   CHECKS FOR AN ATOM (ANYTHING THAT ISN'T A LIST)
+            <expr>      the expression to check
+            returns     t if the value is an atom, nil otherwise
+
+        (listp <expr>)  CHECKS FOR A LIST
+            <expr>      the expression to check
+            returns     t if the value is a list, nil otherwise
+
+        XLISP: An Experimental Object Oriented Language      Page 16
+        FUNCTIONS
+
+
+        (type <expr>)   RETURNS THE TYPE OF THE EXPRESSION
+            <expr>      the expression to return the type of
+            returns     nil if the value is nil otherwise one of the symbols:
+                            SYM  for symbols
+                            OBJ  for objects
+                            LIST for list nodes
+                            KMAP for keymap nodes
+                            SUBR for internal subroutine nodes
+                            STR  for string nodes
+                            INT  for integer nodes
+                            FPTR for file pointer nodes
+
+        (eq <expr1> <expr2>)    CHECKS FOR THE EXPRESSIONS BEING THE SAME
+            <expr1>     the first expression
+            <expr2>     the second expression
+            returns     t if they are equal, nil otherwise
+
+        (equal <expr1> <expr2>) CHECKS FOR THE EXPRESSIONS BEING EQUAL
+            <expr1>     the first expression
+            <expr2>     the second expression
+            returns     t if they are equal, nil otherwise
+
+        (read [ <str> ])        READ AN XLISP EXPRESSION
+            <str>       the string to use as input (optional)
+            returns     the expression read
+
+        (reverse <expr>)        REVERSE A LIST
+            <expr>      the list to reverse
+            returns     a new list in the reverse order
+
+        (length <expr>) FIND THE LENGTH OF A LIST
+            <expr>      the list to find the length of
+            returns     the length
+
+        XLISP: An Experimental Object Oriented Language      Page 17
+        FUNCTIONS
+
+
+        Arithmetic Functions:
+
+        (+ <expr>...)   ADD A LIST OF VALUES
+            <expr>      expressions to be added
+            returns     the result of the addition
+
+        (- <expr>...)   SUBTRACT A LIST OF VALUES
+            <expr>      expressions to be subtracted
+            returns     the result of the subtraction
+
+        (* <expr>...)   MULTIPLY A LIST OF VALUES
+            <expr>      expressions to be multiplied
+            returns     the result of the multiplication
+
+        (/ <expr>...)   DIVIDE A LIST OF VALUES
+            <expr>      expressions to be divided
+            returns     the result of the division
+
+        (% <expr>...)   MODulus A LIST OF VALUES
+            <expr>      expressions to be MODulused
+            returns     the result of mod
+
+        (& <expr>...)   THE BITWISE AND OF A LIST OF VALUES
+            <expr>      expressions to be ANDed
+            returns     the bit by bit ANDing of expressions
+
+        (| <expr...)    THE BITWISE OR OF A LIST OF VALUES
+            <expr>      expressions to be ORed
+            returns     the bit by bit ORing of expressions
+
+        (~ <expr>)      THE BITWISE NOT OF A VALUE
+            <expr>      expression to be NOTed
+            returns     the bit by bit inversion of expression
+
+        (min <expr>...) THE SMALLEST OF A LIST OF VALUES
+            <expr>      expressions to be checked
+            returns     the smallest value of the list
+
+        (max <expr>...) THE LARGEST OF A LIST OF VALUES
+            <expr>      expressions to be checked
+            returns     the largest value of the list
+
+        (abs <expr>)    THE ABSOLUTE VALUE OF AN EXPRESSION
+            <expr>      integer expression
+            returns     the absolute value of the expression
+
+        XLISP: An Experimental Object Oriented Language      Page 18
+        FUNCTIONS
+
+
+        Boolean Functions:
+
+        (&& <expr>...)  THE LOGICAL AND OF A LIST OF VALUES
+            <expr>      expressions to be ANDed
+            returns     the result of anding the expressions
+                        (evaluation of expressions stops after the first
+                         expression that evaluates to false)
+
+        (|| <expr>...)  THE LOGICAL OR OF A LIST OF VALUES
+            <expr>      expressions to be ORed
+            returns     the result of oring the expressions
+                        (evaluation of expressions stops after the first
+                         expression that evaluates to true)
+
+        (! <expr>)      THE LOGICAL NOT OF A VALUE
+            <expr>      expression to be NOTed
+            return      logical not of <expr>
+
+        XLISP: An Experimental Object Oriented Language      Page 19
+        FUNCTIONS
+
+
+        Relational Functions:
+
+        The relational functions can be used to compare integers and
+        strings.   The  functions  '==' and '!=' can also be used to
+        compare other types.  The result  of  these  comparisons  is
+        computed the same way as for 'eq'.
+
+        (< <e1> <e2>)   TEST FOR LESS THAN
+            <e1>        the left operand of the comparison
+            <e2>        the right operand of the comparison
+            returns     the result of comparing <e1> with <e2>
+
+        (<= <e1> <e2>)  TEST FOR LESS THAN OR EQUAL TO
+            <e1>        the left operand of the comparison
+            <e2>        the right operand of the comparison
+            returns     the result of comparing <e1> with <e2>
+
+        (== <e1> <e2>)  TEST FOR EQUAL TO
+            <e1>        the left operand of the comparison
+            <e2>        the right operand of the comparison
+            returns     the result of comparing <e1> with <e2>
+
+        (!= <e1> <e2>)  TEST FOR NOT EQUAL TO
+            <e1>        the left operand of the comparison
+            <e2>        the right operand of the comparison
+            returns     the result of comparing <e1> with <e2>
+
+        (>= <e1> <e2>)  TEST FOR GREATER THAN OR EQUAL TO
+            <e1>        the left operand of the comparison
+            <e2>        the right operand of the comparison
+            returns     the result of comparing <e1> with <e2>
+
+        (> <e1> <e2>)   TEST FOR GREATER THAN
+            <e1>        the left operand of the comparison
+            <e2>        the right operand of the comparison
+            returns     the result of comparing <e1> with <e2>
+

@@ -1,0 +1,1 @@
+cc2 -f=Xlisp -m=80 xlbind.c xldmem.c xleval.c xlfio.c xlio.c xlisp.c xllist.c xlmath.c xlobj.c xlprin.c xlread.c xlstr.c xlsubr.c
