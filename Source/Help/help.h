@@ -9,7 +9,7 @@
 /*
  *  Directory where "help" starts.
  */
-#define HELP_DIR  "/dd/help"
+#define HELP_DIR  "/DD/Sys/Help"
 
 /*
  *  Name of shell command forked by "$" escape
@@ -30,3 +30,4 @@ struct stacknode {
 extern char scratch[BUF_SIZE];  /* Available for general use */
 extern int interrupted;  /*  Set to TRUE by sighandler if an interrupt occurs */
 extern char inbuff[BUF_SIZE];
+

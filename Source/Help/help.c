@@ -3,16 +3,16 @@
  *    This program is in the Public Domain.
  */
 
-#define VERSION "2.0"
+#define VERSION "2.1"
 
 #include "help.h"
 #include <signal.h>
 #include <dir.h>
 
 
-char inbuff[1000];   /* Input buffer for input commands */
-char scratch[1000];  /* Scratch buffer for temporary storage */
-char request[1000];
+char inbuff[BUF_SIZE];   /* Input buffer for input commands */
+char scratch[BUF_SIZE];  /* Scratch buffer for temporary storage */
+char request[BUF_SIZE];
 int interrupted;     /* Set to TRUE when signal received */
 
 main(argc,argv)
@@ -30,10 +30,9 @@ main(argc,argv)
     *inbuff = '\0';
 
     if(argc<2) {   /* If no arguments, show top-level topics */
-       sprintf(scratch," OS9 Structured Help Facility, ver. %s",VERSION);
+       sprintf(scratch,"NitrOS9 Help, ver. %s", VERSION);
        outline(scratch);
-       outline("Written by Tim Kientzle, released to Public Domain");
-       outline("For help using the \"Help\" command, type \"?\".");
+       outline("For help using Help, enter \"?\".");
        outline();
        topics();
     } else {
@@ -166,11 +165,11 @@ topichelp()
 {
   outline("");
   outline("At any topic or subtopic prompt:");
-  outline(" ?     will give this help message");
-  outline(" .     will give a list of available topics");
+  outline(" ?     will print this help message");
+  outline(" .     will list available topics");
   outline(" ENTER will return to previous topic level");
-  outline(" BREAK will exit \"help\"");
-  outline(" A topic name will give help on that topic");
+  outline(" BREAK will exit help");
+  outline(" A topic name will display help on that topic");
   outline("");
 }
 

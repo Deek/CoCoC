@@ -6,8 +6,8 @@
 
 #include <stdio.h>
 
-#define HELP_DIR  "/dd/help/"
-#define HELP_FILE "/dd/sys/helpmsg"
+#define HELP_DIR  "./"
+#define HELP_FILE "helpmsg"
 
 main()
 {
@@ -28,7 +28,7 @@ main()
 
    do {
       for( j=line ; *j != '\0' ; j++ )
-             if (*j== '\r' || *j== ' ' )  *j = '\0' ;
+             if (*j== '\n' || *j== ' ' )  *j = '\0' ;
       strcpy(filename,HELP_DIR);
       strcat(filename,line+1);
       strcat(filename,".hlp");

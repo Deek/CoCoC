@@ -81,7 +81,7 @@ char *str;
          while((c=*str)==' ' || c==TAB) str++;   /* ..skip whitespace */
       if(c==LF) str++;  /* If we broke at a LF, skip it */
    }
-   return(rtn);
+   return rtn;
 }
 
 
@@ -121,7 +121,7 @@ char *str;
      puts(str);  /* Output with trailing newline */
      linesleft--;
   }
-  return(rtn);
+  return rtn;
 }
 
 /*
@@ -190,5 +190,5 @@ FILE *fp;
     rtn = fgets(buff,n,fp); /* do fgets */
     if (p=index(buff,'\n')) /* If there's a newline char */
        *p='\0';   /* remove it */
-    return(rtn);
-}    
+    return rtn;
+}
