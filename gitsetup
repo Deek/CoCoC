@@ -1,0 +1,9 @@
+#
+# Add this stuff to your own .git/config file
+#
+[core]
+	autocrlf = input
+
+[filter "crtext"]
+	clean = tr '\\r' '\\n'
+	smudge = "tr '\\n' '\\r'"

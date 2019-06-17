@@ -1,0 +1,10 @@
+Cmds/* binary
+Lib/* binary
+Defs/* filter=crtext
+
+/*.a filter=crtext
+/*.c filter=crtext
+/*.h filter=crtext
+
+*/?akefile filter=crtext
+*/make* filter=crtext
