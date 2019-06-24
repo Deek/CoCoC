@@ -1,0 +1,74 @@
+*******************************
+* Mouse functions for MW C
+* and Multi-Vue.
+*
+* by Mike Sweet 10/4/89
+*
+
+ psect mouse,0,0,0,40,0
+ 
+ ifp1
+ use /dd/defs/os9defs.a
+ use /dd/defs/mousedefs.a
+ endc
+ 
+**********************************
+* int MouseXY(path,column,row);
+* int path;
+* int *column, *row;
+*
+* Get the column and row the mouse
+* pointer is over and return it in
+* the variables pointed to by 'column'
+* and 'row'.  Returns 0 on success and
+* -1 if 'path' is not a window or the
+* pointer is outside the window.
+*
+
+MouseXY:
+ pshs y
+ leas -32,s reserve space for the mouse info packet
+ leax ,s
+ lda 37,s get 'path'
+ ldb #SS.MOUSE
+ ldy #0 automatically select from right or left mouse
+ os9 I$GETSTT
+ bcs nogood return -1 if this call was unsuccessful
+ 
+ lda PT.VALID,s are we the current interactive device?
+ beq nogood no, return -1
+ lda PT.STAT,s on the current window?
+ cmpa #WR_OFWIN off window?
+ beq nogood no, return -1
+
+ ldd 28,s get the window relative xcor
+ lsra divide by 8
+ rorb
+ lsra
+ rorb
+ lsra
+ rorb
+ std [38,s] and save it in 'column'
+
+ ldd 30,s get the window relative ycor
+ lsra divide by 8
+ rorb
+ lsra
+ rorb
+ lsra
+ rorb
+ std [40,s] and save it in 'row'
+
+ ldb PT.CBSB,s
+ lslb
+ orb PT.CBSA,s return button status
+
+
+return leas 32,s restore stack pointer
+ puls y,pc return to caller
+ 
+nogood ldd #-1
+ bra return return -1
+ 
+ endsect
+ 

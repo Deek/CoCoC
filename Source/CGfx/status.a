@@ -1,0 +1,133 @@
+*******************************************
+* System Status Functions                 *
+* Copyright (c) 1989 by Mike Sweet        *
+*******************************************
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect status,0,0,0,0,0
+
+_gs_crsr:
+ pshs y
+ lbsr _Flush
+ lda 5,s
+ ldb #$25
+ bra g0
+ 
+_gs_scsz:
+ pshs y
+ lbsr _Flush
+ lda 5,s
+ ldb #SS.SCSIZ
+g0
+ os9 I$GETSTT
+ stx [6,s]
+ sty [8,s]
+ puls y
+ bcs os9err0
+ clra
+ clrb
+ rts
+
+_gs_palt:
+ pshs y
+ lbsr _Flush
+ ldx 6,s
+ lda 5,s
+ ldb #$91
+ os9 I$GETSTT
+ puls y,pc
+
+_ss_mgpb:
+ pshs y
+ lbsr _Flush
+ lda 7,s
+ ldb 9,s
+ tfr d,x
+ ldy 10,s
+ lda 5,s
+ ldb #$84
+ os9 I$SETSTT
+ sty [12,s]
+ puls y
+ bcc noerr0
+ clra
+ std errno,y
+ clrb
+ rts
+noerr0 tfr x,d
+ rts
+
+_gs_styp:
+ lbsr _Flush
+ lda 3,s
+ ldb #$93
+ os9 I$GETSTT
+ bcc noerr1
+
+os9err0
+ clra
+ std errno,y
+ ldd #-1
+ rts
+noerr1 ldx 4,s
+ sta 1,x
+ clr ,x
+ clra
+ clrb
+ rts
+
+_gs_fbrg:
+ lbsr _Flush
+ lda 3,s
+ ldb #$96
+ os9 I$GETSTT
+ bcs os9err0
+ stx [8,s]
+ ldx 4,s
+ sta 1,x
+ clr ,x
+ clra
+ std [6,s]
+ clrb
+ rts
+
+_ss_gip:
+ pshs y
+ lda 7,s
+ ldb 9,s
+ tfr d,x
+ lda 11,s
+ ldb 13,s
+ tfr d,y
+ lda 5,s
+ ldb #$94
+ os9 I$SETSTT
+ puls y
+
+os9err1 bcc noerr2
+ clra
+ std errno,y
+ ldd #-1
+ rts
+noerr2 clra
+ clrb
+ rts
+
+_ss_dfpl:
+ ldx 4,s
+ lda 3,s
+ ldb #$97
+ os9 I$SETSTT
+ bra os9err1
+
+_ss_mtyp:
+ ldx 4,s
+ lda 3,s
+ ldb #$92
+ os9 I$SETSTT
+ bra os9err1
+
+ endsect

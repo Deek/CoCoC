@@ -1,0 +1,87 @@
+******************************************
+* Configuration Functions                *
+* Copyright (c) 1989 by Mike Sweet       *
+******************************************
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect config,0,0,0,0,0
+
+PSet:
+ ldd #$1b2e
+ bra send4
+
+Lset:
+LSet:
+ ldd #$1b2f
+ bra send3
+
+DefColr:
+ ldd #$1b30
+ pshs d,u
+ leax ,s
+ lda 7,s
+ ldu #2
+ lbsr _write
+ leas 2,s
+ bra os9err0
+
+Palette:
+ ldd #$1b31
+ bra send4
+
+FColor:
+ ldd #$1b32
+ bra send3
+
+BColor:
+ ldd #$1b33
+ bra send3
+
+Border:
+ ldd #$1b34
+ bra send3
+
+ScaleSw:
+ ldd #$1b35
+
+send3 pshs u
+ leas -3,s
+ std ,s
+ lda 10,s
+ sta 2,s
+ ldu #3
+ leax ,s
+ lda 8,s
+ lbsr _write
+ leas 3,s
+ bra os9err0
+
+SetGC:
+ ldd #$1b39
+
+send4 pshs u
+ leas -4,s
+ std ,s
+ lda 11,s
+ ldb 13,s
+ std 2,s
+ ldu #4
+ leax ,s
+ lda 9,s
+ lbsr _write
+ leas 4,s
+
+os9err0 puls u
+ bcc noerr0
+ clra
+ std errno,y
+ ldd #-1
+ rts
+noerr0 clra
+ clrb
+ rts
+
+ endsect

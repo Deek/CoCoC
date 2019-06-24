@@ -1,0 +1,31 @@
+CGFX 7 release notes - 10/9/90
+------------------------------
+
+This archive contains the following files:
+
+  release.notes - this file...
+  cgfx.l        - the CGFX library (version 7)
+  malloc.r      - replacement malloc() and free() functions
+  *.h           - header files.
+
+Some versions of the Kreider library have a buggy malloc() (among other 
+things.)  My version of the malloc() and free() functions (in malloc.r)
+are based off of those presented in K&R 2nd edition.  To use the new malloc,
+type the following:
+
+ merge malloc.r >+cgfx.l
+ 
+(this assumes you are using Shell+)
+
+Most functions have lost weight (in particular, the Dialog() function has
+lost about 800 bytes!), primarily due to minor recoding and register
+variables.
+
+ Mike Sweet
+ 209 Kennedy Plaza
+ Utica, NY 13502
+
+ Delphi: DODGECOLT
+ Internet: sweetmr@sct60a.sunyct.edu
+
+ 

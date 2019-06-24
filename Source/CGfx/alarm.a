@@ -1,0 +1,45 @@
+************************************
+* Alarm Functions                  *
+* Copyright (c) 1989 by Mike Sweet *
+************************************
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect alarm,0,0,0,0,0
+
+SetAlarm:
+ ldx 2,s
+ ldd #1
+ bra return
+
+GetAlarm:
+ ldx 2,s
+ ldd #2
+ bra return
+
+ClrAlarm:
+ clra
+ clrb
+
+return os9 F$ALARM
+ bcs error
+ clra
+ clrb
+ rts
+
+error clra
+ std errno,y
+ ldd #-1
+ rts
+
+SigAlarm:
+ pshs y
+ os9 F$ID
+ puls y
+ ldx 2,s
+ ldb 5,s
+ bra return
+
+ endsect

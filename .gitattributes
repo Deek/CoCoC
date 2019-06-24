@@ -10,7 +10,8 @@ Sys/* filter=crtext
 *.lsp filter=crtext
 *.man filter=crtext
 comp.* filter=crtext
+make.* filter=crtext
+[Mm]akefile* filter=crtext
 
 README filter=crtext
-?akefile filter=crtext
-*/make* filter=crtext
+MANUAL filter=crtext

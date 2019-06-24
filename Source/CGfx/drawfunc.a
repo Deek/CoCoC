@@ -1,0 +1,413 @@
+***********************************************
+*
+* Draw(path,s [,s1,s2,...,sn])
+* int path;
+* char *s [,*s1,*s2,...,*sn];
+*
+* A 'draw' function similay to the BASIC 'DRAW'
+* command.
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect drawfunc,0,0,0,50,0
+
+ vsect
+x1 fdb 1280
+y1 fdb 384
+x2 rmb 2
+y2 rmb 2
+angle fcb 0
+scale fcb 4
+strings rmb 2
+path rmb 1
+xoff rmb 2
+yoff rmb 2
+nomove rmb 1
+blank rmb 1
+ endsect
+
+*****************************
+* a quick macro for NEG D
+*
+negd macro
+ nega
+ negb
+ sbca #0
+ endm
+
+
+Draw:
+ pshs u
+ lda 5,s
+ sta path,y
+
+ leax 6,s
+ stx strings,y
+ ldx ,x
+ bsr parse
+ puls u,pc
+
+
+parse clr nomove,y
+ clr blank,y
+
+ploop lda ,x+
+ cmpa #$20
+ beq ploop
+ cmpa #$3b
+ beq parse
+ cmpa #$5f
+ bls p00
+ anda #$5f
+p00 cmpa #$42
+ bne p10
+ inc blank,y
+ bra ploop
+
+p10 cmpa #$4e
+ bne p20
+ inc nomove,y
+ bra ploop
+
+p20 cmpa #$43
+ bne p30
+ lbsr getnum
+ pshs b,x
+ ldd #$1b32
+ pshs d
+ leax ,s
+ ldu #3
+ lda path,y
+ lbsr _write
+ leas 3,s
+ puls x
+ bra parse
+
+p30 cmpa #$41
+ bne p40
+ lbsr getnum
+ andb #3
+ stb angle,y
+ bra parse
+
+p40 cmpa #$53
+ bne p50
+ lbsr getnum
+ stb scale,y
+ bra parse
+
+p50 cmpa #$4d
+ bne p60
+p50a lda ,x+
+ cmpa #$20
+ beq p50a
+ leax -1,x
+ cmpa #$2b
+ beq p52
+ cmpa #$2d
+ beq p52
+ lbsr getnum
+ lslb
+ rola
+ lslb
+ rola
+ std x2,y
+p51 lda ,x+
+ cmpa #$20
+ beq p51
+ cmpa #$2c
+ lbne prts
+ lbsr getnum
+ lslb
+ rola
+ lslb
+ rola
+ std y2,y
+ lbsr moveto
+ lbra parse
+
+p52 lbsr getnum
+ std xoff,y
+p53 lda ,x+
+ cmpa #$20
+ beq p53
+ cmpa #$2c
+ lbne prts
+ lbsr getnum
+ std yoff,y
+ lbsr move
+ lbra parse
+
+p60 cmpa #$25
+ bne p70
+ lda ,x+
+ anda #$5f
+ cmpa #$53
+ lbne parse
+ pshs x
+ ldx strings,y
+ leax 2,x
+ stx strings,y
+ ldx ,x
+ lbsr ploop
+ puls x
+ lbra ploop
+
+p70 cmpa #$55
+ bne p71
+ lbsr getnum
+ negd
+ std yoff,y
+ clra
+ clrb
+ std xoff,y
+ lbsr move
+ lbra parse
+
+p71 cmpa #$44
+ bne p72
+ lbsr getnum
+ std yoff,y
+ clra
+ clrb
+ std xoff,y
+ lbsr move
+ lbra parse
+
+p72 cmpa #$4c
+ bne p73
+ lbsr getnum
+ negd
+ std xoff,y
+ clra
+ clrb
+ std yoff,y
+ lbsr move
+ lbra parse
+
+p73 cmpa #$52
+ bne p74
+ bsr getnum
+ std xoff,y
+ clra
+ clrb
+ std yoff,y
+ lbsr move
+ lbra parse
+
+p74 cmpa #$45
+ bne p75
+ bsr getnum
+ std xoff,y
+ negd
+ std yoff,y
+ lbsr move
+ lbra parse
+
+p75 cmpa #$46
+ bne p76
+ bsr getnum
+ std yoff,y
+ std xoff,y
+ lbsr move
+ lbra parse
+
+p76 cmpa #$47
+ bne p77
+ bsr getnum
+ std yoff,y
+ negd
+ std xoff,y
+ lbsr move
+ lbra parse
+
+p77 cmpa #$48
+ bne prts
+ bsr getnum
+ negd
+ std yoff,y
+ std xoff,y
+ lbsr move
+ lbra parse
+
+prts rts
+
+
+getnum lda ,x+
+ cmpa #$20
+ beq getnum
+ cmpa #$25
+ beq g10
+ cmpa #$39
+ bhi g02
+ cmpa #$2b
+ beq getnum
+ cmpa #$2d
+ beq g20
+ cmpa #$30
+ bhs g00
+g02 ldd #1
+ rts
+
+g00 suba #$30
+ pshs a
+ clr ,-s
+
+gloop0 ldb ,x+
+ cmpb #$30
+ blo gnext0
+ cmpb #$39
+ bhi gnext0
+ subb #$30
+ clra
+ pshs d
+ ldd 2,s
+ lslb
+ rola
+ lslb
+ rola
+ addd 2,s
+ lslb
+ rola
+ addd ,s++
+ std ,s
+ bra gloop0
+
+gnext0 leax -1,x
+ puls d,pc
+
+g10 lda ,x+
+ anda #$5f
+ cmpa #$44
+ bne g11
+ pshs x
+ ldx strings,y
+ leax 2,x
+ stx strings,y
+ ldd ,x
+ puls x,pc
+
+g11 cmpa #$53
+ bne g02
+ pshs x
+ ldx strings,y
+ leax 2,x
+ stx strings,y
+ ldx ,x
+ bsr getnum
+ puls x,pc
+
+g20 bsr getnum
+ negd
+ rts
+
+
+move lda angle,y
+ beq calcmove
+ deca
+ bne m00
+ ldd xoff,y
+ negd
+ ldu yoff,y
+ stu xoff,y
+ std yoff,y
+ bra calcmove
+
+m00 deca
+ bne m10
+ ldd xoff,y
+ negd
+ std xoff,y
+ ldd yoff,y
+ negd
+ std yoff,y
+ bra calcmove
+
+m10 ldd yoff,y
+ negd
+ ldu xoff,y
+ std xoff,y
+ stu yoff,y
+
+calcmove lda scale,y
+ ldb xoff+1,y
+ mul
+ pshs d
+ lda scale,y
+ ldb xoff,y
+ mul
+ addb ,s
+ stb ,s
+ puls d
+ addd x1,y
+ std x2,y
+
+ lda scale,y
+ ldb yoff+1,y
+ mul
+ pshs d
+ lda scale,y
+ ldb yoff,y
+ mul
+ addb ,s
+ stb ,s
+ puls d
+ addd y1,y
+ std y2,y
+
+moveto tst blank,y
+ bne move00
+ leas -6,s
+ ldd #$1b40
+ std ,s
+ ldd x1,y
+ lsra
+ rorb
+ lsra
+ rorb
+ std 2,s
+ ldd y1,y
+ lsra
+ rorb
+ lsra
+ rorb
+ std 4,s
+ pshs x
+ leax 2,s
+ ldu #6
+ lda path,y
+ lbsr _write
+ ldd #$1b44
+ std 2,s
+ ldd x2,y
+ lsra
+ rorb
+ lsra
+ rorb
+ std 4,s
+ ldd y2,y
+ lsra
+ rorb
+ lsra
+ rorb
+ std 6,s
+ leax 2,s
+ ldu #6
+ lda path,y
+ lbsr _write
+ puls x
+ leas 6,s
+
+move00 tst nomove,y
+ bne mrts
+ ldd x2,y
+ std x1,y
+ ldd y2,y
+ std y1,y
+
+mrts rts
+
+ endsect

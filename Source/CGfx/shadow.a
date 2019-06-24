@@ -1,0 +1,61 @@
+ psect mouse,0,0,0,0,0
+
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+*************************************************
+* Shadow(path,width,length,fg,bg)
+* int path,width,length,fg,bg;
+*
+* Creates an overlay in the center of the current
+* window 'width' by 'length'.
+*
+*
+*
+
+Shadow:
+ pshs y
+ lbsr _Flush
+ leas -9,s
+ lda 14,s
+ ldb #SS.SCSIZ
+ os9 I$GETSTT
+ tfr x,d
+ subd 15,s
+ lsrb
+ stb 3,s
+ tfr y,d
+ subd 17,s
+ lsrb
+ stb 4,s
+ lda 16,s
+ ldb 18,s
+ std 5,s
+ lda 20,s
+ ldb 22,s
+ std 7,s
+ ldd #$1b22
+ std ,s
+ lda #1
+ sta 2,s
+ leax ,s
+ ldy 9,s
+ stu 9,s
+ ldu #9
+ lda 14,s
+ lbsr _write
+ bcc noerror
+ clra
+ std errno,y
+ ldd #-1
+ bra srts
+noerror clra
+ clrb
+srts leas 9,s
+ puls u,pc
+
+
+ endsect
+

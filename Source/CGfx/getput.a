@@ -1,0 +1,117 @@
+************************************
+* Get/Put Functions                *
+* Copyright (c) 1989 by Mike Sweet *
+************************************
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect getput,0,0,0,0,0
+
+DfnGPBuf:
+ pshs u
+ leas -6,s
+ ldu #6
+ ldd #$1b29
+ std ,s
+ lda 13,s
+ ldb 15,s
+ std 2,s
+ ldd 16,s
+ std 4,s
+ lda 11,s
+ leax ,s
+ lbsr _write
+ leas 6,s
+ bra os9err0
+
+KilBuf:
+ pshs u
+ lda 7,s
+ ldb 9,s
+ pshs d
+ ldd #$1b2a
+ pshs d
+ lda 9,s
+ ldu #4
+ leax ,s
+ lbsr _write
+ leas 4,s
+ bra os9err0
+
+GPLoad:
+ pshs u
+ leas -11,s
+ lda 18,s
+ ldb 20,s
+ std 2,s
+ lda 22,s
+ sta 4,s
+ ldd 23,s
+ std 5,s
+ ldd 25,s
+ std 7,s
+ ldd 27,s
+ std 9,s
+ ldd #$1b2b
+ std ,s
+ leax ,s
+ ldu #11
+ lda 16,s
+ lbsr _write
+ leas 11,s
+
+os9err0 puls u
+ bcc noerr0
+ clra
+ std errno,y
+ ldd #-1
+ rts
+noerr0 clra
+ clrb
+ rts
+
+GetBlk:
+ pshs u
+ leas -12,s
+ lda 19,s
+ ldb 21,s
+ std 2,s
+ ldd 22,s
+ std 4,s
+ ldd 24,s
+ std 6,s
+ ldd 26,s
+ std 8,s
+ ldd 28,s
+ std 10,s
+ ldd #$1b2c
+ std ,s
+ leax ,s
+ ldu #12
+ lda 17,s
+ lbsr _write
+ leas 12,s
+ bra os9err0
+
+PutBlk:
+ pshs u
+ leas -8,s
+ lda 15,s
+ ldb 17,s
+ std 2,s
+ ldd 18,s
+ std 4,s
+ ldd 20,s
+ std 6,s
+ ldd #$1b2d
+ std ,s
+ leax ,s
+ ldu #8
+ lda 13,s
+ lbsr _write
+ leas 8,s
+ bra os9err0
+
+ endsect

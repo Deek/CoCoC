@@ -1,0 +1,58 @@
+***************************************
+* Multi-Vue Windowing Functions       *
+* Copyright (c) 1989 by Mike Sweet    *
+***************************************
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect mv_window,0,0,0,0,0
+
+_ss_wset:
+ pshs y
+ lbsr _Flush
+ lda 5,s
+ ldb #$86
+ ldx 8,s
+ ldy 6,s
+ os9 I$SETSTT
+ puls y
+ bra os9err0
+
+_gs_msel:
+ lda 3,s
+ ldb #$87
+ os9 I$GETSTT
+ bcs os9err0
+ pshs a
+ clra
+ std [5,s]
+ puls b,pc
+
+_ss_umbar:
+_ss_umba:
+ lda 3,s
+ ldb #$95
+ os9 I$SETSTT
+
+os9err0 bcc noerr0
+ clra
+ std errno,y
+ ldd #-1
+ rts
+noerr0 clra
+ clrb
+ rts
+
+_ss_sbar:
+ pshs y
+ lda 5,s
+ ldx 6,s
+ ldy 8,s
+ ldb #$88
+ os9 I$SETSTT
+ puls y
+ bra os9err0
+
+ endsect

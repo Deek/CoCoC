@@ -1,0 +1,58 @@
+************************************
+* Font Handling Functions          *
+* Copyright (c) 1989 by Mike Sweet *
+************************************
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect font,0,0,0,0,0
+
+Font:
+ pshs u
+ lda 7,s
+ ldb 9,s
+ pshs d
+ ldd #$1b3a
+ pshs d
+ ldu #4
+ leax ,s
+ lda 9,s
+ lbsr _write
+ leas 4,s
+ bra os9err0
+
+TCharSw:
+ ldd #$1b3c
+ bra send3
+
+BoldSw:
+ ldd #$1b3d
+ bra send3
+
+PropSw:
+ ldd #$1b3f
+
+send3 pshs u
+ leas -3,s
+ std ,s
+ lda 10,s
+ sta 2,s
+ ldu #3
+ leax ,s
+ lda 8,s
+ lbsr _write
+ leas 3,s
+
+os9err0 puls u
+ bcc noerr0
+ clra
+ std errno,y
+ ldd #-1
+ rts
+noerr0 clra
+ clrb
+ rts
+
+ endsect

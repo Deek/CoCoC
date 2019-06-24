@@ -1,0 +1,135 @@
+**************************************
+* Standard Text Functions (MW C)     *
+* Copyright (c) 1989 by Mike Sweet   *
+**************************************
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect text,0,0,0,0,0
+
+CurHome:
+ lda #1
+ bra send1
+
+CurOn:
+ ldd #$0521
+ bra send2
+
+CurOff:
+ ldd #$0520
+ bra send2
+
+CurLft:
+ lda #8
+ bra send1
+
+CurRgt:
+ lda #6
+ bra send1
+
+CurUp:
+ lda #9
+ bra send1
+
+CurDwn:
+ lda #10
+ bra send1
+
+ErLine:
+ lda #3
+ bra send1
+
+ErEOLine:
+ lda #4
+ bra send1
+
+ErEOScrn:
+ lda #11
+ bra send1
+
+Clear:
+ lda #12
+ bra send1
+
+Bell:
+ lda #7
+ bra send1
+
+CrRtn:
+ lda #13
+ bra send1
+
+ReVOn:
+RevOn:
+ ldd #$1f20
+ bra send2
+
+ReVOff:
+RevOff:
+ ldd #$1f21
+ bra send2
+
+UndlnOn:
+ ldd #$1f22
+ bra send2
+
+UndlnOff:
+ ldd #$1f23
+ bra send2
+
+BlnkOn:
+BnlkOn:
+ ldd #$1f24
+ bra send2
+
+BlnkOff:
+ ldd #$1f25
+ bra send2
+
+InsLin:
+ ldd #$1f30
+ bra send2
+
+DelLine:
+ ldd #$1f31
+
+send2 pshs d,u
+ ldu #2
+ bra sendit
+
+send1 pshs d,u
+ ldu #1
+
+sendit leax ,s
+ lda 7,s
+ lbsr _write
+ puls x,u
+
+os9err0 bcc noerr0
+ clra
+ std errno,y
+ ldd #-1
+ rts
+noerr0 clra
+ clrb
+ rts
+
+CurXY:
+ pshs u
+ leas -3,s
+ lda 10,s
+ ldb 12,s
+ addd #$2020
+ std 1,s
+ lda #2
+ sta ,s
+ lda 8,s
+ ldu #3
+ leax ,s
+ lbsr _write
+ leas 3,s
+ puls u
+ bra os9err0
+
+ endsect

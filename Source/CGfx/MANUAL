@@ -1,0 +1,3168 @@
+
+
+
+
+CGFX Reference                                 Introduction
+
+
+
+
+
+
+
+
+
+                       CCGGFFXX LLiibbrraarryy
+                         vveerrssiioonn 77
+                       bbyy MMiikkee SSwweeeett
+                          99/1199/9900
+
+
+
+
+
+IInnttrroodduuccttiioonn: 
+
+          This  is  the  seventh edition of my CGFX library
+          replacement,   with   source   and   some    real
+          documentation.    Version   7   adds  a  few  new
+          functions, which are described in detail  on  the
+          following pages.   Version 7 also fixes some bugs
+          in the buffering added in version 5.  
+
+          This library and its source  are  public  domain.
+          This  means  that you may use and distribute this
+          library as much as you  like,  but  you  may  not
+          charge  for  it  (other  than  cost  of a disk or
+          whatever.) You may freely use  this  library  for
+          your  own  developments, commercial or otherwise.
+          Feel free to change the source as needed for your 
+          own products, but please do not  release  changed
+          versions-  tell  me instead and I will add/change
+          the lib as necessary.    I  make  no  warrentees,
+          express  or implied, as to the reliability and/or
+          usability of this library.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                             1                             
+
+
+
+
+
+
+
+
+CGFX Reference                                 Introduction
+
+
+
+
+          If you come  across  any  bugs/omissions/spelling
+          errors  in  the  library,  or  if  you  have  any
+          suggestions for improvement, send mail to any  of
+          the following addresses: 
+
+
+               Michael Sweet
+               209 Kennedy Plaza
+               Utica, NY  13502
+
+               sweetmr@sct60a.sunyct.edu (internet/bitnet)
+
+               DODGECOLT (Delphi)
+
+
+
+
+BBuuffffeerriinngg: 
+
+          As previously stated, this version of the library 
+          has  optional buffering for the output of certain
+          functions.  To include the buffering code, simply 
+          use the function __F_l_u_s_h().  This will inform  the
+          linker that  buffered  output  is  desired.   The
+          buffer used is 256 bytes  long,  and  is  flushed
+          when one of the following occurs: 
+
+
+               -  The  buffer is filled or you try to write
+                 more than 256 bytes at a time.  
+
+               - You call the __F_l_u_s_h()  function  to  flush
+                 the buffer.    This is not the same as the
+                 _f_l_u_s_h() or _f_l_u_s_h_a_l_l() functions used  with
+                 FILE type I/O.  
+
+               - You call one of the following functions: 
+
+                         writeln(), cwriteln()
+                         read(), cread(), readln(), creadln() 
+                         KilBuf(), GPLoad()
+                         _ss_mgpb(), _ss_wset(), _gs_styp()
+                         DWSet(), DWEnd(), DWSelect()
+                         OWSet(), OWEnd(), CWArea()
+                         Play()
+
+               - You do I/O with a different path.  
+
+
+
+
+
+                             2                             
+
+
+
+
+
+
+
+
+CGFX Reference                                 Introduction
+
+
+
+
+          The  increase  in  speed  for  some things can be
+          phenomenal.   The  table  below   shows   a   few
+          benchmarks for  comparison.    The 'dots' program
+          fills  the   screen   by   setting   each   pixel
+          individually.  The 'hline' program does the same, 
+          but uses  horizontal  lines instead.  The 'vline'
+          program uses  vertical  lines.    'Text'   writes
+          10,000  characters  to a hardware text window one
+          at a time.  
+
+                    Execution Times (mins)
+
+               Program     Unbuffered     Buffered
+
+               dots          9:05           4:54
+               hlines        0:03           0:03
+               vlines        0:04           0:04
+               text          0:37           0:13
+
+
+          Note  that  for  the  tests   using   lines,   no
+          measurable difference  was  detected.    This  is
+          primarily  due  to  the  relatively   few   calls
+          needed.   Larger  numbers of lines would probably
+          reveil a  slight  speed  increase  with  buffered
+          output.   All tests were performed using the Fast
+          GRFDrv patch.  
+
+          Many thanks to Eddie Kuns  who  got  me  thinking
+          about  adding  buffered  output to the lib and to
+          Bob van der Poel for pointing out an  omission  I
+          made with the _Flush() function.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                             3                             
+
+
+
+
+
+
+
+
+CGFX Reference                              Alarm Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <time.h>
+          
+          int SetAlarm(timbuf)
+          struct sgtbuf *timbuf;
+          
+          int GetAlarm(timbuf)
+          struct sgtbuf *timbuf;
+          
+          int ClrAlarm()
+          
+          int SigAlarm(timbuf,signo)
+          struct sgtbuf *timbuf;
+          int signo;
+
+
+DDeessccrriippttiioonn: 
+
+          _S_e_t_A_l_a_r_m()  sets  the system alarm to the time in
+          _t_i_m_b_u_f.  When the current time equals  the  alarm
+          time, an alarm is sounded for sixteen seconds.  
+
+          _G_e_t_A_l_a_r_m()  get  the system alarm time and places
+          it in the time buffer pointed to by _t_i_m_b_u_f.    If
+          the  alarm  has  not  been set, the time returned
+          will be 00/00/00 00:00.  
+
+          _C_l_r_A_l_a_r_m() will clear the system alarm.  
+
+          _S_i_g_A_l_a_r_m() will set the system alarm to the  time
+          in _t_i_m_b_u_f.    When  the  current  time equals the
+          alarm time, a signal ( _s_i_g_n_o )  is  sent  to  the
+          calling process.  
+
+          Only one alarm can be active at a time.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+                             4                             
+
+
+
+
+
+
+
+
+CGFX Reference                             Button Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          BUp(path,column,row,s,fg,bg)
+          int path,column,row,fg,bg;
+          char *s;
+
+          BDown(path,column,row,s)
+          int path,column,row;
+          char *s;
+
+          RBUp(path,column,row,fg,bg)
+          int path,column,row,fg,bg;
+
+          RBDown(path,column,row,fg,bg)
+          int path,column,row,fg,bg;
+
+
+DDeessccrriippttiioonn: 
+
+          _B_U_p()  and  _B_D_o_w_n() are two functions that handle
+          the placement  of  three-dimensional  rectangular
+          buttons on  the  screen.    The _B_U_p() function is
+          used  to  initially  place  the  button  on   the
+          window.   _S  is  a pointer to the characters that
+          will appear  inside  the  button.      If   these
+          characters  are  not  in the current window font,
+          then the font must be  set  before  calling  this
+          function,  as  it  does  not  distinguish between
+          control characters  and  data.    The  button  is
+          created  with  a  foreground  color  of  _f_g and a
+          background color of _b_g.  A one  character  border
+          (one  line  above and below, one character to the
+          left and right) must be  accounted  for,  as  the
+          button edges  reach into these areas.  Therefore,
+          each button requires 3 window rows  and  2+length
+          of _s columns.  
+
+          The  _B_D_o_w_n()  function is called after a _B_U_p() to
+          push the button down.  This function uses  buffer
+          255  of the current process's G/P buffers to push
+          the button down, and kills it once the  operation
+          is completed.    Note that this function uses the
+          button that was drawn using _B_U_p().  You mmuusstt call 
+          _B_U_p() prior to calling _B_D_o_w_n().  The  button  can
+          be released by calling _B_U_p() again, which redraws 
+
+
+
+
+                             5                             
+
+
+
+
+
+
+
+
+CGFX Reference                             Button Functions
+
+
+
+
+          the original button.  
+
+          _R_B_U_p()  and  _R_B_D_o_w_n()  are  functions which place
+          three dimensional radio  buttons  on  the  window
+          specified by _p_a_t_h.  Unlike _B_U_p() and _B_D_o_w_n(), you 
+          do  not  need  to  call  _R_B_U_p()  prior to calling
+          _R_B_D_o_w_n().  The button is drawn at  column  _c_o_l_u_m_n
+          and  row  _r_o_w with a foreground color of _f_g and a
+          background color of _b_g.  
+
+          FFoorr tthheessee ffuunnccttiioonnss ttoo wwoorrkk  pprrooppeerrllyy,  yyoouu  mmuusstt
+          hhaavvee wwiinnddooww  ssccaalliinngg  ttuurrnneedd ooffff.  Otherwise, the
+          lines that are drawn will not be placed  properly
+          (resulting in a garbled display.) 
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <buffs.h>
+          
+          int BColor(path,prn)
+          int path,prn;
+          
+          int Border(path,prn)
+          int path,prn;
+          
+          int DefColr(path)
+          int path;
+          
+          int FColor(path,prn)
+          int path,prn;
+          
+          int LSet(path,grpnum,bufnum)
+          int path,grpnum,bufnum;
+          
+          int Palette(path,prn,colno)
+          int path,prn,colno;
+          
+          int PSet(path,grpnum,bufnum)
+          int path,grpnum,bufnum;
+          
+          int ScaleSw(path,bsw)
+          int path,bsw;
+          
+          int SetGC(path,grpnum,bufnum)
+
+
+
+
+                             6                             
+
+
+
+
+
+
+
+
+CGFX Reference                      Configuration Functions
+
+
+
+
+          int path,grpnum,bufnum;
+
+
+DDeessccrriippttiioonn: 
+
+          _B_C_o_l_o_r() will set the background color on _p_a_t_h to 
+          _p_r_n.  _B_o_r_d_e_r()  will set the border color on _p_a_t_h
+          to _p_r_n. _D_e_f_C_o_l_r() restores  the  default  palette
+          settings   on   _p_a_t_h.   _F_C_o_l_o_r()   will  set  the
+          foreground color on _p_a_t_h to _p_r_n.  
+
+          _L_S_e_t() sets the point logic for  _p_a_t_h.  _L_o_g_i_c_c_o_d_e
+          can   be   one   of  the  following  (defined  in
+          <bbuuffffss.hh>): 
+
+               /* logic modes */
+               #define LOG_NONE 0 /* no logic - just put
+                                     it there (default) */
+               #define LOG_AND 1  /* AND the contents of
+                                     the screen with the data */
+               #define LOG_OR 2   /* OR the contents of 
+                                     the screen with the data */
+               #define LOG_XOR 3  /* XOR the contents of 
+                                     the screen with the data */
+
+          _P_S_e_t() will set the drawing pattern to be used on 
+          _p_a_t_h.  A number of standard patterns are included 
+          with OS-9.  The  <bbuuffffss.hh>  header  file  defines
+          them as follows: 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                             7                             
+
+
+
+
+
+
+
+
+CGFX Reference                      Configuration Functions
+
+
+
+
+               /* buffer group numbers */
+               #define GRP_PAT2 203 /* Two color patterns */
+               #define GRP_PAT4 204 /* Four color patterns */
+               #define GRP_PAT6 205 /* Sixteen color patterns */
+               
+               /* pattern buffers */
+               #define PAT_SLD 0 /* Solid (default) */
+               #define PAT_DOT 1 /* Dots */
+               #define PAT_VRT 2 /* Vertical lines */
+               #define PAT_HRZ 3 /* Horizontal lines */
+               #define PAT_XHTC 4 /* Crosshatch */
+               #define PAT_LSNT 5 /* Left slanted lines */
+               #define PAT_RSNT 6 /* Right slanted lines */
+               #define PAT_SDOT 7 /* Small dots */
+               #define PAT_BDOT 8 /* BIG dots */
+
+          _P_a_l_e_t_t_e()  will set palette register _p_r_n to _c_o_l_n_o
+          on _p_a_t_h. _P_r_n is any legal  register  number  from
+          0-15.   _C_o_l_n_o  is the palette value, derived from
+          the following: 
+
+                      Bit
+                 5    4    3    2    1    0
+               -------------------------------
+                RED GREEN BLUE red green blue
+               
+          The  operating  system   automatically   converts
+          palette settings when using a composite monitor.  
+
+          _S_c_a_l_e_S_w()  will  turn graphics scaling on or off.
+          If  _b_s_w  is  0,  then  scaling  is  turned   off.
+          Otherwise, scaling  is  turned  on.  Graphics are
+          scaled from 640x192 to the size of the window.  
+
+          _S_e_t_G_C() will set the  current  mouse  pointer  on
+          _p_a_t_h to  _g_r_p_n_u_m,_b_u_f_n_u_m.    The  standard  pointer
+          buffers are defined in <bbuuffffss.hh>: 
+
+               #define GRP_PTR 202 /* Pointer group */
+               
+               /* mouse pointer buffers */
+               #define PTR_ARR 1 /* Arrow */
+               #define PTR_PEN 2 /* Pencil */
+               #define PTR_LCH 3 /* Large Cross Hairs */
+               #define PTR_SLP 4 /* Hourglass (sleep) */
+               #define PTR_ILL 5 /* Illegal (circle with a slash) */
+               #define PTR_TXT 6 /* Text */
+               #define PTR_SCH 7 /* Small Cross Hairs */
+
+
+
+
+                             8                             
+
+
+
+
+
+
+
+
+CGFX Reference                      Configuration Functions
+
+
+
+
+          On error, these functions  return  -1,  with  the
+          error number in _e_r_r_n_o.  
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          int cread(path,s,n)
+          int path,n;
+          char *s;
+
+          int creadln(path,s,n)
+          int path,n;
+          char *s;
+
+          int cwrite(path,s,n)
+          int path,n;
+          char *s;
+
+          int cwriteln(path,s,n)
+          int path,n;
+          char *s;
+
+
+DDeessccrriippttiioonn: 
+
+          These  functions  are  variations of the standard
+          _r_e_a_d(),   _r_e_a_d_l_n(),   _w_r_i_t_e(),   and    _w_r_i_t_e_l_n()
+          functions   for   use   with   C  NULL-terminated
+          strings.  The _c_r_e_a_d() and _c_r_e_a_d_l_n() functions use 
+          the I$ReadLn call to get a string of  characters.
+          The _c_r_e_a_d() function will replace the terminating 
+          carriage  return with a NULL, while the _c_r_e_a_d_l_n()
+          function will append a NULL to  the  end  of  the
+          string.  
+
+          The  _c_w_r_i_t_e() and _c_w_r_i_t_e_l_n() functions will write
+          a maximum of _n characters to the  specified  path
+          using  the  respective  system  call- I$Write for
+          _c_w_r_i_t_e() and I$WriteLn for _c_w_r_i_t_e_l_n().  
+
+
+
+
+
+
+
+
+
+
+                             9                             
+
+
+
+
+
+
+
+
+CGFX Reference                              Dialog Function
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <dialog.h>
+          
+          int Dialog(path,dlgptr,column,row,width,length,fg,bg)
+          int path,column,row,width,length,fg,bg;
+          DIALOG *dlgptr;
+
+
+DDeessccrriippttiioonn: 
+
+          _D_i_a_l_o_g()  is  a  high-level   dialog   management
+          function.   It  creates  an  overlay  on  _p_a_t_h at
+          _c_o_l_u_m_n,_r_o_w with a foreground and background color 
+          of _f_g and _b_g respectively.  _D_l_g_p_t_r is  a  pointer
+          to an  array  of _D_I_A_L_O_G descriptions.  The _D_I_A_L_O_G
+          type is defined in <ddiiaalloogg.hh> as: 
+
+               typedef struct { /* dialog structure */
+                char d_type;    /* type- 0=string, 1=button */
+                char d_column;  /* column position 
+                                   within the overlay */
+                char d_row;     /* row within the overlay */
+                char d_key;     /* key assocated with this 
+                                   button (0 for none) */
+                char d_val;     /* value to return to caller */
+                char *d_string; /* pointer to actual string to 
+                                   be placed in overlay */
+               } DIALOG;        /* call this type DIALOG */
+
+          The <dialog.h> file also provides some  constants
+          for the _d__t_y_p_e field in the _D_I_A_L_O_G structure: 
+
+               #define D_TEXT 0   /* ASCII text */
+               #define D_KEY 1    /* key-binding */
+               #define D_STRING 2 /* ASCII string box
+                                     (accepts text) */
+               #define D_BUTTON 3 /* 3-D text button */
+               #define D_RADIO 4  /* Radio button */
+               #define D_END -1   /* End marker of array */
+
+          The  actions  which  the _D_i_a_l_o_g() functions takes
+          depends greatly on the type of the object that is 
+          being acted on.  
+
+
+
+
+
+                            10                             
+
+
+
+
+
+
+
+
+CGFX Reference                              Dialog Function
+
+
+
+
+          DD_TTEEXXTT 
+
+          The  _D__T_E_X_T  type   of   object   is   a   simple
+          NULL-terminated string.    It  is  placed  in the
+          overlay at _d__c_o_l_u_m_n,_d__r_o_w.  This type  of  object
+          basically lets you place text in the overlay that 
+          you  don't  want  to  change  (i.e. have the user
+          change.) The _d__k_e_y and _d__v_a_l fields should be set 
+          to 0 for this type.  
+
+          DD_KKEEYY 
+
+          The _D__K_E_Y type of object binds a key to  a  value
+          to   be   returned   by  the  _D_i_a_l_o_g()  function.
+          Whenever the user presses that key  (and  is  not
+          editing   a   string-  see  below)  the  _D_i_a_l_o_g()
+          function will return _d__v_a_l.  _D__s_t_r_i_n_g,  _d__c_o_l_u_m_n,
+          and _d__r_o_w should all be set to 0.  
+
+          DD_SSTTRRIINNGG 
+
+          The _D__S_T_R_I_N_G type of object is a string-requester 
+          box.   The  size  of the box is determined by the
+          length of the  string  pointed  to  by  _d__s_t_r_i_n_g.
+          Whenever  the  user selects the string box, he is
+          put into an editing mode where each  keypress  is
+          placed  in  the string, minus control chars which
+          are used for editing.  All  editing  features  of
+          Kevin Darling's  SCF  patch  are available.  When
+          the user presses ENTER, one of  two  things  will
+          happen.   If  the  _d__v_a_l  field  is non-zero, the
+          _D_i_a_l_o_g() function will return that value  to  the
+          calling function.    If  not,  the  string box is
+          un-selected and the user can continue to use  the
+          dialog box.    IItt  iiss hhiigghhllyy rreeccoommmmeennddeedd tthhaatt yyoouu
+          ddyynnaammiiccaallllyy aallllooccaattee mmeemmoorryy ffoorr eeaacchh ssttrriinngg  tthhaatt
+          yyoouu uussee.    One  'feature'  of  the  Microware  C
+          compiler  is  that  it  will  not  copy  constant
+          strings to  your  process's data space.  Instead,
+          it  uses  the  copy(s)  in  the  program   module
+          directly.   This  can  lead to some problems when
+          you run the same program  in  different  windows.
+          See  the  example  below  for the easy way around
+          this.  
+
+          DD_BBUUTTTTOONN 
+
+          The _D__B_U_T_T_O_N type of object is a three  dimension
+
+
+
+
+                            11                             
+
+
+
+
+
+
+
+
+CGFX Reference                              Dialog Function
+
+
+
+
+          rectangular  button  with  text on the top of the
+          button.   Whenever  the  user  presses  the   key
+          associated  with  this  object  or  clicks on it,
+          _d__v_a_l is returned.  
+
+          DD_RRAADDIIOO 
+
+          The _D__R_A_D_I_O type of  object  is  a  simple  radio
+          button.   If  the user presses the key associated
+          with the object or clicks on it, then the  button
+          is toggled.    The current state of the button is
+          held in the _d__v_a_l  field.    The  dd_ssttrriinngg  field
+          holds a list of opposing radio buttons.  That is, 
+          when  you click on a particular button, any other
+          associated  buttons  are  pulled  up   (only   if
+          necessary.)  The  list  MUST be a character array
+          which contains the array indexes of the  opposing
+          buttons.   The  indexes  start  at 1, as the NULL
+          terminator is used to end the list.   The  button
+          being  defined should not be included in the list
+          (in other words, only the  button  numbers  which
+          this  button  opposes.)  If the dd_ssttrriinngg field is
+          NULL, then _D_i_a_l_o_g() assumes there are no opposing 
+          buttons.  
+
+          DD_EENNDD 
+
+          The _D__E_N_D type of object signals the end  of  the
+          array   of   objects   in  the  dialog  box  (pun
+          intended!) This must be the last element  in  the
+          array you send to the _D_i_a_l_o_g() function.  
+
+
+EExxaammppllee: 
+
+          #include <dialog.h>
+          #include <buffs.h>
+          
+          DIALOG temp[]={{D_TEXT,0,0,0,0,"Abort, Retry, Fail?"},
+                         {D_BUTTON,3,2,'A','A',"ABORT"},
+                         {D_BUTTON,10,2,'R','R',"RETRY"},
+                         {D_BUTTON,17,2,'F','F',"FAIL"},
+                         {D_STRING,1,4,0,0,0}, /* set up string
+                                                  later */
+                         {D_RADIO,26,4,'B',0,0},
+                         {D_TEXT,23,4,0,0,"On"},
+                         {D_END,0,0,0,0,0}};
+          
+
+
+
+
+                            12                             
+
+
+
+
+
+
+
+
+CGFX Reference                              Dialog Function
+
+
+
+
+          
+          main()
+          {
+           char ch,s[21];
+          
+           strcpy(s,"                    "); /* put blanks in
+                                                the string */
+          
+           temp[4].d_string=s; /* point to string */
+          
+           SetType(1,5,0,1); /* set screen type to 5 */
+          
+           _ss_mous(1,3,10,1); /* turn mouse on */
+           SetGC(1,GRP_PTR,PTR_ARR); /* ditto for pointer */
+          
+          /* now, call the dialog function... */
+           ch=Dialog(1,temp,20,10,30,8,0,1);
+          
+           if (ch=='A') /* print return code */
+            puts("Abort!");
+           else if (ch=='R')
+            puts("Retry!");
+           else
+            puts("Fail!");
+          
+           _ss_mous(1,0,0,0); /* turn mouse off */
+           SetGC(1,0,0); /* and pointer */
+          
+           _Flush(); /* flush the buffer */
+          }
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            13                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Drawing Functions
+
+
+
+
+          --------------------------------------------
+
+
+UUssaaggee:
+
+          int SetDPtr(path,x,y)
+          int path,x,y;
+          
+          int RSetDPtr(path,xo,yo)
+          int path,xo,yo;
+          
+          int Point(path,x,y)
+          int path,x,y;
+          
+          int RPoint(path,xo,yo)
+          int path,xo,yo;
+          
+          int Line(path,x,y)
+          int path,x,y;
+          
+          int RLine(path,xo,yo)
+          int path,xo,yo;
+          
+          int LineM(path,x,y)
+          int path,x,y;
+          
+          int RLineM(path,xo,yo)
+          int path,xo,yo;
+          
+          int Box(path,x,y)
+          int path,x,y;
+          
+          int RBox(path,xo,yo)
+          int path,xo,yo;
+          
+          int Bar(path,x,y)
+          int path,x,y;
+          
+          int RBar(path,xo,yo)
+          int path,xo,yo;
+          
+          int FFill(path)
+          int path;
+          
+          int Circle(path,radius)
+          int path,radius;
+          
+          int Ellipse(path,xrad,yrad)
+
+
+
+
+                            14                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Drawing Functions
+
+
+
+
+          int path,xrad,yrad;
+          
+          int Arc(path,xrad,yrad,xo1,yo1,xo2,yo2)
+          int path,xrad,yrad,xo1,yo1,xo2,yo2;
+          
+          int PutGC(path,x,y)
+          int path,x,y;
+
+
+DDeessccrriippttiioonn: 
+
+          These  functions  will  perform  various graphics
+          primitives on _p_a_t_h.    Except  for  _P_u_t_G_C(),  the
+          output  is affected by the current logic mode and
+          pattern buffer.    The  functions   perform   the
+          following operations: 
+
+               SetDPtr()  - moves the current draw pointer
+                            to (x,y.)
+               RSetDPtr() - moves the current draw pointer
+                            to (xo,yo) relative to the
+                            current position.
+               Point()    - sets the point at (x,y) to the 
+                            current foreground color.
+               RPoint()   - sets the point (xo,yo) relative
+                            to the current position to the
+                            current foreground color.
+               Line()     - draws a line in the current 
+                            foreground color from the current
+                            position to (x,y.)
+               RLine()    - draws a line in the current 
+                            foreground color from the current
+                            position to the point (xo,yo)
+                            relative to the current position.
+               LineM()    - draws a line as Line(), but then 
+                            moves the current position to (x,y.)
+               RLineM()   - draws a line as RLine(), but then
+                            moves the current position relative
+                            to (xo,yo.)
+               Box()      - draws a rectangular line frame in 
+                            the current foreground color from
+                            the current position to (x,y.)
+               RBox()     - draws a rectangular line frame in
+                            the current foreground color from
+                            the current position to a point
+                            (xo,yo) relative to the current
+                            position.
+               Bar()      - draws a filled rectangle in the
+
+
+
+
+                            15                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Drawing Functions
+
+
+
+
+                            current foreground color from the 
+                            current position to (x,y.)
+               RBar()     - draws a filled rectangle in the
+                            current foregroun color from the
+                            current position to the point
+                            (xo,yo) relative to the current
+                            position.
+               FFill()    - fills a closed region in the current
+                            foreground color starting at the
+                            current position.
+               Circle()   - draws a circle in the current 
+                            foreground color with its center
+                            at the current position.
+               Ellipse()  - draws an ellipse in the current
+                            foreground color with its center
+                            at the current position.
+               Arc()      - draws an arc in the current
+                            foreground color with its center
+                            at the current position. The
+                            size and direction of the arc is
+                            controlled by xrad, yrad, and the
+                            line relative to the current
+                            position (xo1,yo1)-(xo2,yo2.)
+               PutGC()    - Places the mouse pointer at (x,y.)
+                            This function is not compatible
+                            with the auto-follow mouse.
+
+          On  error,  these  functions  return  -1 with the
+          error number in _e_r_r_n_o.  
+
+
+BBuuggss: 
+
+          The _C_i_r_c_l_e(), _E_l_l_i_p_s_e(), and _A_r_c() radii are  not
+          scaled when draw scaling is enabled.  Presumably, 
+          this bug will be fixed in a future release of the 
+          operating system.  
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            16                             
+
+
+
+
+
+
+
+
+CGFX Reference                                         Draw
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          Draw(path,draw_string {,variable args} )
+          int path;
+          char *draw_string;
+
+
+DDeessccrriippttiioonn: 
+
+          _D_r_a_w()  imitates  the DRAW function from EXTENDED
+          BASIC.  _D_r_a_w__s_t_r_i_n_g contains a list  of  commands
+          to be executed by _D_r_a_w().  It can consist of: 
+
+               U{n} Move UP 'n' units.
+               D{n} Move DOWN 'n' units.
+               L{n} Move LEFT 'n' units.
+               R{n} Move RIGHT 'n' units.
+               E{n} Move at a 45 degree angle 'n' units.
+               F{n} Move at a 135 degree angle 'n' units.
+               G{n} Move at a 225 degree angle 'n' units.
+               H{n} Move at a 315 degree angle 'n' units.
+               C{n} Sets the foreground color to 'n.'
+               A{n} Sets the draw angle to 'n', where 'n' is:
+                    0 - 0 degrees
+                    1 - 90 degrees
+                    2 - 180 degrees
+                    3 - 360 degrees
+               Mx,y Moves to (x,y).  If 'x' or 'y' is preceded by
+                    a sign, the move is relative to the current
+                    position.
+               S{n} Sets the current scale to 'n.'  The scale is
+                    figured by 'n' divided by 4 (i.e. 1/4, 2/4, etc.)
+
+               B    This prefix disables drawing for the next command
+                    (blanks output)
+               N    This prefix forces the draw pointer to remain at
+                    its current position after drawing.  Normally,
+                    the draw pointer moves after each command.
+
+          The    draw   string   can   optionally   contain
+          sub-strings  (indicated  by  %s)   and   integers
+          (indicated by %d.) No clipping is done for output 
+          lines.  
+
+BBuuggss: 
+
+
+
+
+                            17                             
+
+
+
+
+
+
+
+
+CGFX Reference                                         Draw
+
+
+
+
+          When  buffering  output, lines which fall outside
+          the  window  will  cause  further  writes  to  be
+          ignored until the buffer is flushed.  
+          
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          char *getenv(var)
+          char *var;
+
+          putenv(var,s)
+          char *var,*s;
+
+          extern char *_ENVFILE;
+
+
+DDeessccrriippttiioonn: 
+
+          _G_e_t_e_n_v()   will   locate   the  variable  _v_a_r  in
+          '/dd/sys/env.file'   and   return   the    string
+          following the  equals  (=)  sign.   If the string
+          does not exist in the file, then a  NULL  pointer
+          is returned.  
+
+          _P_u_t_e_n_v() will set the environment variable _v_a_r to 
+          _s.  If _v_a_r does not exist, then it is appended to 
+          the file.  
+
+          These  functions  will  read the environment file
+          into a buffer  pointed  to  by  __E_N_V_F_I_L_E.    This
+          buffer is  malloc'd  to 1024 bytes.  Future calls
+          to _g_e_t_e_n_v or _p_u_t_e_n_v will  reference  this  buffer
+          unless it is freed and the pointer set to NULL.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            18                             
+
+
+
+
+
+
+
+
+CGFX Reference                       File Picking Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          char *FName(path,title,fg,bg)
+          int path,fg,bg;
+          char *title;
+          
+          char *MVFName(path,title,column,row,fg,bg)
+          int path,fg,bg;
+          char *title;
+          
+          
+DDeessccrriippttiioonn: 
+
+          These functions provide an on-screen file-picking 
+          facility  which  allows a user to choose any file
+          from any disk on the system.  _P_a_t_h  is  the  path
+          number  to  use  (usually  1,  but  it can be any
+          window path that has read-write access.)  _F_g  and
+          _b_g  are  the  foreground and background colors of
+          the overlay that is created by  these  functions.
+          _T_i_t_l_e  is  the  NULL-terminated  character string
+          that is displayed at  the  top  of  the  overlay.
+          _C_o_l_u_m_n  and  _r_o_w are the column and row where the
+          overlay will appear.  In the case of _F_N_a_m_e(), the 
+          overlay  is  centered  on  the  current   window.
+          _M_V_F_N_a_m_e() is the Multi-Vue version of the _F_N_a_m_e() 
+          functions.    Centering   was  omitted  for  this
+          function due to the way overlay  coordinates  are
+          used by  GrfDrv.    _M_V_F_N_a_m_e() requires 22 columns
+          and 11 rows for its overlay,  while  _F_N_a_m_e()  and
+          _F_N_a_m_e_X_Y() require  32 columns and 12 rows.  Mouse
+          sampling must  be  enabled  with  the  __s_s__m_o_u_s()
+          function prior to calling _M_V_F_N_a_m_e().  
+
+          The  filename returned is stored in a static data
+          area.   Future  calls  to  these  functions  will
+          destroy the previous name.  
+
+
+EExxaammppllee: 
+
+          #include <buffs.h>
+          
+          char *p;
+          
+
+
+
+
+                            19                             
+
+
+
+
+
+
+
+
+CGFX Reference                       File Picking Functions
+
+
+
+
+          main()
+          {
+           _ss_mous(1,3,10,1);  /* turn sampling on */
+           SetGC(1,GRP_PTR,PTR_ARR); /* and mouse pointer */
+          
+           do
+            {
+             p=MVFName(1,"Filename?",20,10,0,2); /* get a 
+                                                    filename */
+             if (p!=NULL) /* if there was a valid name read */
+              puts(p);    /* print the name */
+            }
+           while (p!=NULL); /* continue until user clicks
+                               on close box */
+          
+           _ss_mous(1,0,0,0); /* mouse sampling off */
+           SetGC(1,0,0);      /* ditto for mousue pointer */
+          }
+
+
+          --------------------------------------------
+
+
+UUssaaggee:
+
+          int _Flush()
+
+
+DDeessccrriippttiioonn: 
+
+          __F_l_u_s_h()  will  flush  the internal write buffer.
+          It also informs the linker to  include  buffering
+          code.   If  an  error  occurs  during  a __F_l_u_s_h()
+          write, -1 is returned and  the  error  number  is
+          placed in _e_r_r_n_o.  0 is returned on success.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            20                             
+
+
+
+
+
+
+
+
+CGFX Reference                               Font Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <buffs.h>
+          
+          int BoldSw(path,bsw)
+          int path,bsw;
+          
+          int Font(path,grpnum,bufnum)
+          int path,grpnum,bufnum;
+          
+          int PropSw(path,bsw)
+          int path,bsw;
+          
+          int TCharSw(path,bsw)
+          int path,bsw;
+          
+
+
+DDeessccrriippttiioonn: 
+
+          _B_o_l_d_S_w()  will turn boldfacing of text on or off.
+          If _b_s_w is  0,  then  boldfacing  is  turned  off.
+          Otherwise, boldfacing is turned on.  
+
+          _F_o_n_t()  will  set  the  current  font  on _p_a_t_h to
+          _g_r_p_n_u_m, _b_u_f_n_u_m.  The standard fonts  are  defined
+          in <bbuuffffss.hh> as: 
+
+               #define GRP_FONT 200 /* Font group */
+               
+               /* font buffers */
+               #define FNT_S8X8 1 /* Standard 8x8 font 
+                                     (default) */
+               #define FNT_S6X8 2 /* Standard 6x8 font */
+               #define FNT_G8X8 3 /* Standard graphics
+                                     character font */
+               
+               /* special characters for font FNT_G8X8 */
+               #define CHR_RGT 0xc1 /* right arrow */
+               #define CHR_LFT 0xc2 /* left arrow */
+               #define CHR_DN 0xc3  /* down arrow */
+               #define CHR_UP 0xc4  /* up arrow */
+               #define CHR_TRI 0xc5 /* triple bar (for title bar) */
+               #define CHR_RSZ 0xc6 /* resize box (not used) */
+               #define CHR_CLZ 0xc7 /* close box */
+
+
+
+
+                            21                             
+
+
+
+
+
+
+
+
+CGFX Reference                               Font Functions
+
+
+
+
+               #define CHR_MOV 0xc8 /* move box */
+               #define CHR_VBX 0xc9 /* vertical box 
+                                       (for scroll markers) */
+               #define CHR_HBX 0xca /* horizontal box 
+                                       (for scroll markers) */
+               #define CHR_HRG 0xcb /* hourglass (Tandy menu) */
+               #define CHR_TRR 0xcc /* triple bar with 
+                                       open right side */
+               #define CHR_TRL 0xcd /* triple bar with 
+                                       open left side */
+
+          _P_r_o_p_S_w()  will  turn  proportional  spacing on or
+          off, depending on the value of _b_s_w.  
+
+          _T_C_h_a_r_S_w() will turn transparent characters on  or
+          off, depending on the value of _b_s_w.  
+
+          None of these functions has an effect on hardware 
+          text windows.   -1 is returned on error, with the
+          error number in _e_r_r_n_o.  
+          
+          
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          int DfnGPBuf(path,grpnum,bufnum,length)
+          int path,grpnum,bufnum,length;
+          
+          int GPLoad(path,grpnum,bufnum,sty,sizex,sizey,length)
+          int path,grpnum,bufnum,sty,sizex,sizey,length;
+          
+          int GetBlk(path,grpnum,bufnum,x,y,sizex,sizey)
+          int path,grpnum,bufnum,x,y,sizex,sizey;
+          
+          int KilBuf(path,grpnum,bufnum)
+          int path,grpnum,bufnum;
+          
+          int PutBlk(path,grpnum,bufnum,x,y)
+          int path,grpnum,bufnum,x,y;
+          
+          char *_ss_mgpb(path,grpnum,bufnum,mapflag,size)
+          int path,grpnum,bufnum,mapflag,*size;
+
+
+
+
+
+
+                            22                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Get-Put Functions
+
+
+
+
+DDeessccrriippttiioonn: 
+
+          _D_f_n_G_P_B_u_f() will create a get/put buffer  of  size
+          _l_e_n_g_t_h.  _P_a_t_h  mmuusstt be a path to a window device.
+          _G_r_p_n_u_m and _b_u_f_n_u_m are the  group  and  buffer  to
+          define.   If  the  buffer  already  exists or not
+          enough memory is free to grant the request, -1 is 
+          returned  and  the  error  number  is  placed  in
+          _e_r_r_n_o.  Otherwise, 0 is returned.  
+
+          _G_e_t_B_l_k()  will  copy  a  portion  of  the  window
+          specified by _x, _y, _s_i_z_e_x, and _s_i_z_e_y. _P_a_t_h mmuusstt be 
+          a path to a window device.  _G_r_p_n_u_m and _b_u_f_n_u_m are 
+          the group and buffer that will be copied to.   On
+          error,  -1  is  returned  and the error number is
+          placed in _e_r_r_n_o.  
+
+          _G_P_L_o_a_d()  will  generate  the  necessary  loading
+          header to  preload  a  get/put buffer.  _P_a_t_h does
+          not have to point to window device,  although  no
+          load is  done  unless it is a window device.  _S_t_y
+          is the window type of  the  data  (basically  for
+          color   information.)  A  write  should  directly
+          follow this call to  insure  the  buffer  is  not
+          loaded with  garbage.  On error, -1 is return and
+          the error number is placed in _e_r_r_n_o.  
+
+          _P_u_t_B_l_k() places a copy  of  a  previously  loaded
+          get/put buffer  at  _x,_y.  The logic used to place
+          the buffer on the window  is  controlled  by  the
+          current  window  pset  logic  (see  CCoonnffiigguurraattiioonn
+          FFuunnccttiioonnss.) On error,  -1  is  returned  and  the
+          error number is placed in _e_r_r_n_o.  
+
+          _K_i_l_B_u_f()  will  remove  a get/put buffer from the
+          system.  Care should be  taken  when  using  this
+          call  as  no  'link'  count  is maintained by the
+          system.  Deletion of standard get/put buffers  is
+          discouraged, and can cause major problems forcing 
+          a reboot.    If  _b_u_f_f_e_r is 0, then all buffers in
+          group _g_r_p_n_u_m are removed.  
+
+          __s_s__m_g_p_b() will map a  specified  get/put  buffer
+          into/out  of the calling process's address space.
+          The direction of mapping  is  controlled  by  the
+          _m_a_p_f_l_a_g variable.  If it is 0, then the buffer is 
+          mapped  out;  otherwise  the buffer is mapped in.
+          On error, NULL (0)  is  returned  and  the  error
+
+
+
+
+                            23                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Get-Put Functions
+
+
+
+
+          number is placed in _e_r_r_n_o.  
+
+
+BBuuggss: 
+
+          There are several known WindInt bugs which affect 
+          the operation of these functions: 
+             -   Mapping  of  buffers  larger  than  8k  is
+               unpredictable.  
+             - Mapping of multiple buffers smaller than  8k
+               will  confuse  WindInt. The address returned
+               seldom is correct.  
+             -  If  you  attempt  to  kill  a  non-existent
+               buffer,  WindInt  will trash the buffer list
+               forcing you to reboot.  Killing all  buffers
+               with  _b_u_f_n_u_m equal to 0 does work correctly,
+               however.  
+             - As stated above, things  like  killing  font
+               buffers while other processes are using them 
+               do nasty things forcing a reboot.  
+             - _G_e_t_B_l_k() can only get 639 dots across.  
+               
+
+
+               -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          int getstr(path,prompt,s,n,column,row,fg,bg)
+          int path,n,column,row,fg,bg;
+          char *prompt,*s;
+
+
+DDeessccrriippttiioonn: 
+
+          _G_e_t_s_t_r  will  create  an overlay window at _c_o_l_u_m_n
+          and _r_o_w, and  read  a  string  from  _p_a_t_h.    The
+          carriage  return  is  retained  at the end of the
+          string  (_s.)  _G_e_t_s_t_r  will  only  read  up  to  _n
+          characters.   Care should be taken to insure that
+          _s is at least ( _n + 1) characters long.  
+
+
+
+
+
+
+
+
+
+
+                            24                             
+
+
+
+
+
+
+
+
+CGFX Reference                        Key Sensing Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <keysense.h>
+
+          int _ss_ksns(path,keybits)
+          int path,keybits;
+
+          int _gs_ksns(path)
+          int path;
+
+
+DDeessccrriippttiioonn: 
+
+          These functions provide  a  C  interface  to  the
+          Color  Computer OS-9 get/setstat calls to get and
+          set the keyboard status.  The __s_s__k_s_n_s() function 
+          sets  key  sensing  for  the  keys  specified  by
+          _k_e_y_b_i_t_s.   Values  for  _k_e_y_b_i_t_s are combined from
+          the definitions in the <keysense.h> header file: 
+
+               #define SHIFTBIT 1
+               #define CTRLBIT 2
+               #define ALTBIT 4
+               #define UPBIT 8
+               #define DOWNBIT 16
+               #define LEFTBIT 32
+               #define RIGHTBIT 64
+               #define SPACEBIT 128
+
+          When the  appropriate  bit  is  set,  sensing  is
+          enabled for the respective key.  Any keycode that 
+          may  have  been generated by the key is no longer
+          generated.  _T_h_e _s_t_a_t_u_s  _o_f  _s_e_n_s_e_d  _k_e_y_s  _c_a_n  _b_e
+          _o_b_t_a_i_n_e_d _u_s_i_n_g  _t_h_e  __g_s__k_s_n_s()  function.    The
+          return value from this  function  will  show  the
+          status   of  any  key  that  is  currently  being
+          sensed.  A set bit indicates the  respective  key
+          is down.  
+
+          Both functions  return -1 on error.  In the event
+          of an error, the error number will be  stored  in
+          the global variable _e_r_r_n_o.  
+
+
+
+
+
+
+
+                            25                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Menuing Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <menu.h>
+
+          int Menu(path,title,itemptr,fg,bg)
+          int path,fg,bg;
+          char *title;
+          ITEM *itemptr;
+
+          int MenuXY(path,title,itemptr,column,row,fg,bg)
+          int path,column,row,fg,bg;
+          char *title;
+          ITEM *itemptr;
+
+          int MVMenu(path,title,itemptr,fg,bg)
+          int path,fg,bg;
+          char *title;
+          ITEM *itemptr;
+
+          int MVMenuXY(path,title,itemptr,column,row,fg,bg)
+          int path,column,row,fg,bg;
+          char *title;
+          ITEM *itemptr;
+
+
+DDeessccrriippttiioonn: 
+
+          These  functions will create an overlay window on
+          _p_a_t_h and get a menu choice from the  user.    The
+          overlay  will have a foreground color of _f_g and a
+          background color of _b_g.  _T_i_t_l_e is a pointer to  a
+          NULL-terminated  string  of  characters  which is
+          used as the title for the menu.  If it  is  NULL,
+          no title will be displayed.  _I_t_e_m_p_t_r is a pointer 
+          to  an  array of _I_T_E_M structures, which also must
+          be NULL terminated.  SSppeecciiaall ccaarree sshhoouulldd bbee ttaakkeenn 
+          nnoott ttoo ppaassss aa NNUULLLL _i_t_e_m_p_t_r or  an  _i_t_e_m_p_t_r  array
+          with zero active items, as these functions do not 
+          protect against  it.  The _M_V_M_e_n_u() and _M_V_M_e_n_u_X_Y()
+          functions work exactly as the _M_e_n_u() and _M_e_n_u_X_Y() 
+          functions,  and  add  mouse  support   for   item
+          selection.   The  calling program must initialize
+          mouse  sampling  with  the  __s_s__m_o_u_s()   function
+          before calling any of the MV-series functions.  
+
+
+
+
+
+                            26                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Menuing Functions
+
+
+
+
+          The _I_T_E_M structure is defined in <mmeennuu.hh> as: 
+
+               typedef struct {
+                char *itemname;  /* name of the item */
+                char enabled;    /* TRUE=enabled */
+                char (*itemfunc)(); /* function to call */
+                } ITEM;
+
+          When _e_n_a_b_l_e_d equals 1, _i_t_e_m_f_u_n_c is a pointer to a 
+          function to  call when that item is selected.  If
+          this  pointer  is  NULL,  then  no  function   is
+          called.  
+          When  _e_n_a_b_l_e_d  equals 2, _i_t_e_m_f_u_n_c is a pointer to
+          an array of  ITEM  structures.    When  the  user
+          selects   this   item,  a  sub-menu  will  appear
+          containing  the  items  in  the  _i_t_e_m_f_u_n_c  array.
+          Sub-menus  may  call functions or reference other
+          sub-menus.  Submenus return  16  times  the  item
+          number, plus the main item that was selected.  Do 
+          to  16  bit  integers,  sub-menus  are limited to
+          three levels deep.   For  example,  if  the  user
+          selects  the second sub-item under the third main
+          item, a value of 35 (16 * 2 + 3 =  35)  would  be
+          returned.   If  the user should exit the sub-menu
+          without choosing an item, only the  item  numbers
+          gathered  before  the  sub-menu will be returned.
+          That is, the item number for that  sub-menu  will
+          be  0  (so  the  previous example would then only
+          return 3- 16 * 0 + 3.) 
+
+          All of these functions  return  the  item  number
+          selected  or  0  if  no  selection was made (user
+          pressed BREAK or moved mouse pointer off window.) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            27                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Menuing Functions
+
+
+
+
+EExxaammppllee: 
+
+          #include <menu.h>
+          
+          ITEM mainmenu[]={{"Load a file",1,loadfunc},
+                           {"Save a file",1,savefunc},
+                           {"Quit",1,quitfunc},
+                           {NULL,NULL,NULL}};
+          
+          main()
+          {
+           int num;
+          
+           do
+            num=Menu(1,"Main Menu",mainmenu,5,2)
+           while (num==0);
+          }
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <mouse.h>
+          
+          int _ss_mous(path,sample_rate,timeout,follow)
+          int path,sample_rate,timeout,follow;
+          
+          int _ss_msig(path,signo)
+          int path,signo;
+          
+          int _gs_mous(path,mspacket)
+          int path;
+          MSRET *mspacket;
+
+
+DDeessccrriippttiioonn: 
+
+          __s_s__m_o_u_s() _s_e_t_s  _t_h_e  _m_o_u_s_e  _p_a_r_a_m_e_t_e_r_s  _f_o_r  _t_h_e
+          _w_i_n_d_o_w  _o_n  _p_a_t_h.  _S_a_m_p_l_e__r_a_t_e  is  the number of
+          ticks to wait between samples.  A _s_a_m_p_l_e__r_a_t_e  of
+          0  indicates  that  no  sampling  should be done.
+          _T_i_m_e_o_u_t is the number  of  ticks  between  button
+          click timeouts.    If  _t_i_m_e_o_u_t  is  0, then mouse
+          signals are disabled.  Otherwise,  mouse  signals
+          are  processed,  regardless  of  the _s_a_m_p_l_e__r_a_t_e.
+          _F_o_l_l_o_w  is  a  flag  that  enables/disables   the
+
+
+
+
+                            28                             
+
+
+
+
+
+
+
+
+CGFX Reference                              Mouse Functions
+
+
+
+
+          auto-follow mouse  cursor.  When _f_o_l_l_o_w is 1, any
+          mouse movements  also  move  the  mouse  pointer.
+          This value is ignored if _s_a_m_p_l_e__r_a_t_e is 0.  
+
+          __s_s__m_s_i_g()  tells  the  windnow manager to send a
+          signal _s_i_g_n_o to the current process when the user 
+          clicks one  of  the  mouse   buttons.      Unlike
+          __s_s__s_s_i_g(),  this function does not automatically
+          send the signal if  a  button  has  already  been
+          clicked.  
+
+          __g_s__m_o_u_s()   will   get   an  information  packet
+          containing the current state of the mouse.    The
+          packet is defined in <mmoouussee.hh> as: 
+
+               typedef struct mousin {
+                char pt_valid,  /* is info valid? */
+                     pt_actv,   /* active side */
+                     pt_totm,   /* timeout initial value */
+                     pt_rsrv0[2],/* reserved */
+                     pt_tto,    /* time till timeout */
+                     pt_tsst[2],/* time since start counter */
+                     pt_cbsa,   /* current button state button A */
+                     pt_cbsb,   /* current button state button B */
+                     pt_ccta,   /* click count button A */
+                     pt_cctb,   /* click count button B */
+                     pt_ttsa,   /* time this state button A */
+                     pt_ttsb,   /* time this state button B */
+                     pt_tlsa,   /* time last state button A */
+                     pt_tlsb,   /* time last state button B */ 
+                     pt_rsrv1[6],/* reserved */
+                     pt_stat,   /* window pointer location type */
+                     pt_res;    /* resolution */
+                int  pt_acx,    /* actual x value */
+                     pt_acy,    /* actual y value */
+                     pt_wrx,    /* window relative x value */
+                     pt_wry;    /* window relative y value */
+               } MSRET;
+               
+               /* window regions for mouse */
+               
+               #define WR_CNTNT 0 /* content region */
+               #define WR_CNTRL 1 /* control region */
+               #define WR_OFWIN 2 /* off window */
+               
+
+
+
+
+
+
+
+                            29                             
+
+
+
+
+
+
+
+
+CGFX Reference                                     MouseKey
+
+
+
+
+               --------------------------------------------
+
+
+UUssaaggee:
+
+          int MouseKey(path)
+          int path;
+
+
+DDeessccrriippttiioonn: 
+
+          _M_o_u_s_e_K_e_y()  checks  the  current mouse button and
+          keyboard status and returns a value based on  its
+          findings.   If  the  left  mouse  button has been
+          pressed, -1 is returned.    If  the  right  mouse
+          button has  been  pressed,  -2 is returned.  If a
+          key has been pressed, the key code  is  returned.
+          _M_o_u_s_e_K_e_y()  waits until a key or mouse button has
+          been pressed.  
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          int MouseXY(path,x,y)
+          int path;
+          int *x,*y;
+
+
+DDeessccrriippttiioonn: 
+
+          _M_o_u_s_e_X_Y() is a function  which  will  return  the
+          current mouse  character position to _x and _y.  If
+          the mouse pointer is currently off the window, or 
+          the window is not the current one, then _M_o_u_s_e_X_Y() 
+          returns -1.  
+
+          NNOOTTEE:  this  function   only   returns   accurate
+          coordinates on hardware text screens and graphics 
+          screens using an 8 by 8 font.  
+
+
+
+
+
+
+
+
+
+
+                            30                             
+
+
+
+
+
+
+
+
+CGFX Reference                                      Movemem
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          movemem(d,s,n)
+          char *d,*s;
+          int n;
+
+
+DDeessccrriippttiioonn: 
+
+          _M_o_v_e_m_e_m is a memory moving function which handles 
+          overlapping source  and  destination  areas.    _N
+          bytes are copied from _s to _d.  
+
+          The algorithm that is used employs 2  byte  moves
+          when possible to increase its speed.  
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <wind.h>
+          
+          int _ss_wset(path,wintype,windat)
+          int path,wintype
+          WNDSCR *windat;
+          
+          int _gs_msel(path,itemno)
+          int path,*itemno;
+          
+          int _ss_umba(path)
+          int path;
+          
+          int _ss_sbar(path,horbar,verbar)
+          int path,horvar,verbar;
+
+
+DDeessccrriippttiioonn: 
+
+          __s_s__w_s_e_t()  will  set  the current window type to
+          _w_i_n_t_y_p_e. _W_i_n_t_y_p_e values are defined  in  <wwiinndd.hh>
+          as: 
+
+
+
+
+
+
+                            31                             
+
+
+
+
+
+
+
+
+CGFX Reference                          Multi-Vue Functions
+
+
+
+
+               /* window type defs */
+               #define WT_NBOX 0 /* No box- default window type */
+               #define WT_FWIN 1 /* Framed window with menus */
+               #define WT_FSWIN 2 /* Framed window with
+                                     menus and scroll bars */
+               #define WT_SBOX 3 /* Shadowed window- form menus */
+               #define WT_DBOX 4 /* Double border- for dialog boxes */
+               #define WT_PBOX 5 /* Plain border- anything */
+
+          For  framed  windows,  _w_i_n_d_a_t  points  to  a menu
+          structure.  The menu structures  are  defined  in
+          <wwiinndd.hh> as: 
+
+               #define MNENBL 1
+               #define MNDSBL 0
+               #define WINSYNC 0xc0c0
+               
+               /* default menu id's */
+               #define MN_MOVE 1
+               #define MN_CLOS 2
+               #define MN_GROW 3
+               #define MN_USCRL 4
+               #define MN_DSCRL 5
+               #define MN_RSCRL 6
+               #define MN_LSCRL 7
+               #define MN_TNDY 20
+               #define MN_FILE 21
+               #define MN_EDIT 22
+               #define MN_STYL 23
+               #define MN_FONT 24
+               
+               /* window - menu data structures */
+               typedef struct mistr {  /* menu item descriptor */
+                char _mittl[15];       /* name of item */
+                char _mienbl;          /* is item available? */
+                char _mires[5];        /* reserved */
+                } MIDSCR;              /* item descriptor */
+               
+               typedef struct mnstr {
+                char _mnttl[15];       /* name of menu */
+                char _mnid,            /* menu id number */
+                     _mnxsiz,          /* width of menu */
+                     _mnnits,          /* number of items */
+                     _mnenabl;         /* is menu available? */
+                char _mnres[2];        /* reserved bytes */
+                struct mistr* _mnitems; /* pointer to items */
+                } MNDSCR;              /* menu descriptor */
+
+
+
+
+
+                            32                             
+
+
+
+
+
+
+
+
+CGFX Reference                          Multi-Vue Functions
+
+
+
+
+               
+               typedef struct wnstr {  /* window descriptor */
+                char _wnttl[20];       /* title of window */
+                char _nmens;           /* number of menus on window */
+                char _wxmin,           /* min. window width */
+                     _wymin;           /* min. window height */
+                short _wnsync;         /* synch bytes $C0C0 */
+                char _wnres[7];        /* reserved */
+                struct mnstr* _wnmen;  /* pointer to menu descriptor's array */
+                } WNDSCR;
+
+          Consult  the  programmer's guide in the Multi-Vue
+          manual for details on framed window menus.  
+
+          __g_s__m_s_e_l() will attempt to get a  menu  selection
+          from the  user.    If  the  user  makes  a  valid
+          selection, then the item number is placed in  the
+          variable  pointed to by _i_t_e_m_n_o and the menu id is
+          returned.  Othrwise, 0 is returned.  
+
+          __s_s__u_m_b_a() will update the window menus on _p_a_t_h.  
+
+          __s_s__s_b_a_r()  sets  the  scroll  bar  positions  on
+          windows  using  a framed window with scroll bars.
+          The vertical scroll bar is set to _v_e_r_b_a_r and  the
+          horizontal scroll bar is set to _h_o_r_b_a_r.  
+
+BBuuggss: 
+
+          There  are many bugs in WindInt that affect these
+          functions.   The  easiest  to  overcome  is   the
+          __s_s__w_s_e_t()  bug-  WindInt  forgets  to  erase the
+          cursor  before  displaying  the  window  borders,
+          resulting in  a  garbled  display.    This can be
+          overcome  by  turning  the  cursor  off  manually
+          before calling  __s_s__w_s_e_t().   Scroll bars also do
+          not work properly on windows that do not  lie  on
+          the lefthand  side  of  the  window.   These bugs
+          should be corrected in the next  release  of  the
+          operating system.  
+
+
+
+
+
+
+
+
+
+
+
+
+                            33                             
+
+
+
+
+
+
+
+
+CGFX Reference                    Object (Sprite) Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <object.h>
+          
+          OBJECT *Objects=NULL; /* global object list pointer */
+          
+          OBJECT *AddObj(path,group,buffer,xcor,ycor,border)
+          int path,group,buffer,xcor,ycor,(*buffer)();
+          
+          (void) MoveObj(path)
+          int path;
+          
+          (void) DelObj(path,objptr)
+          int path;
+          OBJECT *objptr;
+
+
+DDeessccrriippttiioonn: 
+
+          These  functions  provide  simple sprite handling
+          functions that use XOR logic.  _A_d_d_O_b_j() will  add
+          an object to the list and place the object at its 
+          initial position.  If _g_r_o_u_p or _b_u_f_f_e_r is equal to 
+          0,  then the _P_o_i_n_t() function is used in place of
+          a _P_u_t_B_l_k() call.  _A_d_d_O_b_j() only  sets  the  _x_c_o_r,
+          _y_c_o_r,  _g_r_o_u_p,  _b_u_f_f_e_r,  and  _b_o_r_d_e_r fields in the
+          OBJECT structure (see below.) The _d_e_l_t_a_x, _d_e_l_t_a_y, 
+          _x_a_c_c_e_l, and _y_a_c_c_e_l are initialized  to  0.    The
+          OBJECT structure is declared in <object.h> as: 
+
+               typedef struct OBJSTR {
+                char group;          /* G/P group */
+                char buffer;         /* G/P buffer */
+                int xcor;            /* xcor * 32 */
+                int ycor;            /* ycor * 32 */
+                int deltax;          /* +/- xcor */
+                int deltay;          /* +/- ycor */
+                int xaccel;          /* xcor acceleration */
+                int yaccel;          /* ycor acceleration */
+                int (*border)();     /* boundary function */
+                struct OBJSTR *next; /* next object */
+                struct OBJSTR *prev; /* previous object */
+                } OBJECT;            /* call this type OBJECT */
+
+
+
+
+
+
+                            34                             
+
+
+
+
+
+
+
+
+CGFX Reference                    Object (Sprite) Functions
+
+
+
+
+          Note  that  aallll ccoooorrddiinnaatteess aanndd aacccceelleerraattiioonnss aarree
+          ffiixxeedd ppooiinntt nnuummbbeerrss.  That is,  position  320  on
+          the screen  would  be represented as 10240.  This
+          is done to provide smoother movement with  higher
+          precision at  the  lowest cost.  The lower 5 bits
+          of each number are the fractional portion of  the
+          number, giving  an  accuracy  of  1/32.    Higher
+          accuracy  could  be  achieved  by  changing   the
+          library code to use floats or longs.  
+
+          _M_o_v_O_b_j()   is  the  function  that  performs  the
+          movement of each  object  that  has  been  added.
+          First,  the  object  is  erased by re-putting the
+          object at its present position (remember, we  are
+          using  XOR  logic.)  Then, the _b_o_r_d_e_r function is
+          called to move the object.  The  border  function
+          is  passed  one argument- a pointer to the object
+          that must be moved.    The  border  function  you
+          specify  can  change  any  of  the objects fields
+          except for the _n_e_x_t and  _p_r_e_v  fields.    If  the
+          _b_o_r_d_e_r  field is NULL, then a bounce algorithm is
+          used, where objects will bounce off the sides  of
+          the screen.   The _b_o_r_d_e_r function must return a 0
+          on success, or a  -1  if  the  object  should  be
+          deleted.   If  the _b_o_r_d_e_r _f_u_n_c_t_i_o_n _i_s _s_u_c_c_e_s_s_f_u_l,
+          _t_h_e _M_o_v_e_O_b_j() function puts the object at its new 
+          position.  
+
+          The _D_e_l_O_b_j()  function  will  delete  the  object
+          pointed to  by  _o_b_j_p_t_r.   If _p_a_t_h is equal to -1,
+          then the object  will  not  be  erased  from  the
+          screen.   This  is  most  useful  from within the
+          _M_o_v_e_O_b_j()  function,  as  the  object  will  have
+          already been  erased.    _D_e_l_O_b_j()  also frees any
+          memory used to hold the object in memory that the 
+          _A_d_d_O_b_j() function has allocated.  
+
+
+EExxaammpplleess: 
+
+          Look in the main archive 'CGFXLib.ar' to find the 
+          example program 'Balls.c' 
+
+
+
+
+
+
+
+
+
+
+                            35                             
+
+
+
+
+
+
+
+
+CGFX Reference                                         Play
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          Play(path,play_string {,variable args})
+          int path;
+          char *play_string;
+
+
+DDeessccrriippttiioonn: 
+
+          _P_l_a_y() is a C function which  imitates  the  PLAY
+          function of  EXTENDED  BASIC.    _P_l_a_y__s_t_r_i_n_g is a
+          string of play 'commands' which can consist of: 
+
+               A-G The corresponding note is played in  the
+                    current octave.    The  note letter can
+                    optionally be followed by a sequence of 
+                    symbols to modify the note: 
+                    #,+      Indicates a sharp
+                    -        Indicates a flat
+                    <        Lowers the note an octave.
+                    >        Raises the note an octave.
+                    number   Sets the length of the note to 
+                             'number.' (periods can be added
+                             to indicate dotted length.)
+               P{n} This will add a rest (or pause) of  the
+                    current note   length.      It  can  be
+                    followed  optionally   by   a   numeric
+                    length.  
+               L{n}  This  sets  the current note length to
+                    the number following it.  
+               V{n} This sets the  current  volume  to  the
+                    number following it.  The volume can be 
+                    between 0 and 63.  
+               O{n}  This  sets  the  current octave to the
+                    number following it.  The octave can be 
+                    between 0 and 7.  
+               MS   This makes notes play staccato.
+               MN   This makes notes play normally.
+               ML   This makes notes play legato.
+               T{n} This  sets  the  tempo  to  the  number
+                    following it.  
+
+          Additionally,   the   play   string  can  contain
+          substrings  (indicated  by   %s)   and   integers
+          (indicated by %d) for variable arguments, much as 
+
+
+
+
+                            36                             
+
+
+
+
+
+
+
+
+CGFX Reference                                         Play
+
+
+
+
+          can be done with _p_r_i_n_t_f().  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            37                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Polygon Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          #include <polygon.h>
+          
+          int PolyFill(path,polygon)
+          int path;
+          VERTEX *polygon;
+          
+          int PolyLine(path,polygon)
+          int path;
+          VERTEX *polygon;
+          
+          int PolyRot(polygon,cx,cy,angle)
+          VERTEX *polygon;
+          int cx,cy,angle;
+          
+          int PolyScal(polygon,cx,cy,xmult,ymult,div)
+          VERTEX *polygon;
+          int cx,cy,xmult,ymult,div;
+          
+          int PolyTran(polygon,xoff,yoff)
+          VERTEX *polygon;
+          int xoff,yoff;
+          
+
+
+DDeessccrriippttiioonn: 
+
+          These  functions  will  draw  closed  polygons on
+          _p_a_t_h.  _P_o_l_y_g_o_n  is  a  pointer  to  an  array  of
+          vertices   containing   the   endpoints   of  the
+          polygon.  The first and  last  elements  of  this
+          array  must  be equal; otherwise, these functions
+          will search through  all  of  memory  until  they
+          funally come back to the original pointer.  There 
+          is  no limit (other than memory) to the number of
+          sides the polygon may have.  The VERTEX  type  is
+          defined in <ppoollyyggoonn.hh> as: 
+
+               typedef struct {    /* polygon endpoint structure */
+                int p_xcor,p_ycor; /* x and y coordinates */
+                } VERTEX;
+
+          _P_o_l_y_F_i_l_l()   will   fill   the   polygon,   while
+          _P_o_l_y_L_i_n_e() only draws the polygon's outline.  
+
+
+
+
+                            38                             
+
+
+
+
+
+
+
+
+CGFX Reference                            Polygon Functions
+
+
+
+
+          _P_o_l_y_R_o_t() will rotate  a  polygon  about  (_c_x,_c_y)
+          _a_n_g_l_e degrees.  
+
+          _P_o_l_y_S_c_a_l()  will  scale  a  polygon from (_c_x,_c_y).
+          _X_m_u_l_t and _y_m_u_l_t are the x and y axis multipliers, 
+          respectively.     The     result     from     the
+          multiplications is divided by _d_i_v. 
+
+          _P_o_l_y_T_r_a_n() will translate (move) a polygon.  _X_o_f_f 
+          and  _y_o_f_f  are  the  x and y offsets to move each
+          vertex of the polygon.  
+          
+          
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          SetType(path,stype,fg,bg)
+          int path,stype,fg,bg;
+
+
+DDeessccrriippttiioonn: 
+
+          _S_e_t_T_y_p_e() is a short function  which  will  check
+          the  current window type of _p_a_t_h and change it to
+          type _s_t_y_p_e if necessary.  
+
+          This function is dumb enough  with  text  windows
+          not  to  take advantage of the patch to GRFDrv to
+          allow 25 lines.  On return,  the  foreground  and
+          background  colors  will  be  set  to  _f_g  and _b_g
+          respectively.  In the case where a new window  is
+          opened,  the  border  is  set  to  the background
+          color.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            39                             
+
+
+
+
+
+
+
+
+CGFX Reference                                       Shadow
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          Shadow(path,width,length,fg,bg)
+          int path,width,length,fg,bg;
+
+
+DDeessccrriippttiioonn: 
+
+          _S_h_a_d_o_w() will create an overlay centered  on  the
+          current window, with a foreground color of _f_g and 
+          a background  color  of  _b_g.  The overlay created
+          will be _w_i_d_t_h columns wide and _l_e_n_g_t_h rows long.  
+
+          Note: due to  the  way  overlay  coordinates  are
+          computed,   multiple   overlays  may  not  appear
+          centered on the  window.    This  function  calls
+          __F_l_u_s_h()  to  flush  any  pending  output  before
+          creating the overlay (this does not automatically 
+          include buffering code, however!) 
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          _gs_scsz(path,horsiz,versiz)
+          int path,*horsiz,*versiz;
+          
+          _gs_palt(path,palbuf)
+          int path;
+          char *palbuf;
+          
+          _gs_styp(path,type)
+          int path,*type;
+          
+          _gs_fbrg(path,fore,back,bord)
+          int path,*fore,*back,*bord;
+          
+          _ss_gip(path,msres,msport,kbdstrt,kbdrpt)
+          int path,msres,msport,kbdstrt,kbdrpt;
+          
+          _ss_dfpl(path,palbuf)
+          int path;
+          char *palbuf;
+
+
+
+
+                            40                             
+
+
+
+
+
+
+
+
+CGFX Reference                    GETSTAT-SETSTAT Functions
+
+
+
+
+          
+          _ss_mtyp(path,montype)
+          int path,montype;
+
+
+DDeessccrriippttiioonn: 
+
+          __g_s__s_c_s_z() will get the width and length of  _p_a_t_h
+          and  place  it  in  the  variables  pointed to by
+          _h_o_r_s_i_z and _v_e_r_s_i_z.  If  the  device  in  question
+          does  not  support  the  SSSS.SSccSSiizz  call, then the
+          function returns -1 (the  values  of  _h_o_r_s_i_z  and
+          _v_e_r_s_i_z are undefined.) 
+
+          __g_s__p_a_l_t()  will get the current palette register
+          settings  for  _p_a_t_h  and  place  them  in  a   16
+          character buffer pointed to by _p_a_l_b_u_f.  
+
+          __g_s__s_t_y_p()  will  get the window type of _p_a_t_h and
+          place it in the integer pointed to by _t_y_p_e.    -1
+          is returned if _p_a_t_h is not a window device.  
+
+          __g_s__f_b_r_g()   will  get  the  current  foreground,
+          background, and border colors for _p_a_t_h and  place
+          them  into the integers pointed to by _f_o_r_e, _b_a_c_k,
+          and _b_o_r_d respectively.  
+
+          __s_s__g_i_p()  will  set   the   global   information
+          parameters.  _M_s_r_e_s  is  the mouse resolution.  If
+          it is 0, then a low  resolution  mouse  is  used.
+          Otherwise,  the  high  resolution  mouse  code is
+          used.  _m_s_p_o_r_t is the mouse port to use.  1 is the 
+          left port, and 2 is the right port.   _k_b_d_s_t_r_t  is
+          the keyboard  repeat start delay.  If 0, keyboard
+          repeat is turned off.  Otherwise,  the  delay  is
+          set  to _k_b_d_s_t_r_t ticks (60ths of a second.) _k_b_d_r_p_t
+          is the keyboard repeat speed.    If  0,  keyboard
+          repeat is  turned  off.   Otherwise, the speed is
+          set to one  repeat  every  _k_b_d_r_p_t  ticks.    This
+          function should not generally be called from user 
+          programs as it affects system-wide resources.  
+
+          __s_s__d_f_p_l()  sets the default palette settings for
+          windows.  _P_a_l_b_u_f is a pointer to a  16  character
+          palette buffer.      This   function  should  not
+          generally be called  from  user  programs  as  it
+          affects system-wide  resources.    If  a  program
+          needs different  palette  settings  for  its  own
+
+
+
+
+                            41                             
+
+
+
+
+
+
+
+
+CGFX Reference                    GETSTAT-SETSTAT Functions
+
+
+
+
+          window,   then   it   should  use  the  _P_a_l_e_t_t_e()
+          function.  
+
+          __s_s__m_t_y_p() will set the current monitor  type  to
+          _m_o_n_t_y_p_e,   where   0   =   composite  monitor  or
+          television, 1 =  analog  RGB  monitor,  and  2  =
+          monochrome composite   monitor.    This  function
+          should not generally be called from user programs 
+          as it affects system-wide resources.  
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          int _ss_tone(path,duration,volume,frequency)
+          int path,duration,volume,frequency;
+
+
+DDeessccrriippttiioonn: 
+
+          The __s_s__t_o_n_e() function provides a C interface to 
+          the SS.Tone setstat call on the Color Computer  3
+          running Level  II  OS-9.    _P_a_t_h is any path to a
+          window or VDG screen.  _D_u_r_a_t_i_o_n is  the  duration
+          of  the  tone,  measured  in  1/60ths of seconds.
+          _V_o_l_u_m_e is the volume of  the  tone,  where  0  is
+          silence and 63 is maximum volume.  _F_r_e_q_u_e_n_c_y is a 
+          number  from  0  to  4095 representing the actual
+          frequency (not equal to Hz!) 
+
+          Due to an error in the system code, specifying  a
+          volume  of  0  will force an immediate return, so
+          rests (silence delays) must be done  using  sleep
+          calls.  __s_s__t_o_n_e() returns -1 on error, where the 
+          error  code  is  placed  in  the  global variable
+          _e_r_r_n_o.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            42                             
+
+
+
+
+
+
+
+
+CGFX Reference                          Tandy Menu Function
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          int TandyMN(path,inum,fg,bg)
+          int path,inum,fg,bg;
+
+
+DDeessccrriippttiioonn: 
+
+          _T_a_n_d_y_M_N()  is  a  function  which  will  run  the
+          appropriate  program  selected  from  the default
+          Tandy menu.  _I_n_u_m is the item number chosen  from
+          the Tandy menu.  _F_g and _b_g are the foreground and 
+          background  colors for the overlay window created
+          for the appropriate program.  If _p_a_t_h is <3, then 
+          the function creates an overlay  on  the  current
+          window.   Otherwise,  the  function  assumes that
+          _p_a_t_h points to a new window.  
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          int Bell(path)
+          int path;
+          
+          int BlnkOff(path)
+          int path;
+          
+          int BlnkOn(path)
+          int path;
+          
+          int Clear(path)
+          int path;
+          
+          int CrRtn(path)
+          int path;
+          
+          int CurDwn(path)
+          int path;
+          
+          int CurLft(path)
+          int path;
+          
+
+
+
+
+                            43                             
+
+
+
+
+
+
+
+
+CGFX Reference                               Text Functions
+
+
+
+
+          int CurOff(path)
+          int path;
+          
+          int CurOn(path)
+          int path;
+          
+          int CurRgt(path)
+          int path;
+          
+          int CurUp(path)
+          int path;
+          
+          int CurXY(path,x,y)
+          int path,x,y;
+          
+          int DelLine(path)
+          int path;
+          
+          int ErEOLine(path)
+          int path;
+          
+          int ErEOScrn(path)
+          int path;
+          
+          int ErLine(path)
+          int path;
+          
+          int InsLin(path)
+          int path;
+          
+          int ReVOff(path)
+          int path;
+          
+          int ReVOn(path)
+          int path;
+          
+          int UndlnOff(path)
+          int path;
+          
+          int UndlnOn(path)
+          int path;
+
+
+DDeessccrriippttiioonn: 
+
+          All of these functions perform  an  operation  on
+          the cursor or window on _p_a_t_h.  For _C_u_r_X_Y(), _x and 
+          _y  are  the column and row to position the cursor
+
+
+
+
+                            44                             
+
+
+
+
+
+
+
+
+CGFX Reference                               Text Functions
+
+
+
+
+          to.  These coordinates are zero-based (the origin 
+          is  0,0.)  The   remaining   functions   do   the
+          following: 
+               Bell()     - sounds the bell.
+               BlnkOff()  - turns blinking off (hardware text
+                            windows only.)
+               BlnkOn()   - turns blinking on (hardware text windows
+                            only.)
+               Clear()    - clears the screen and homes the cursor.
+               CrRtn()    - moves the cursor to column zero.
+               CurDown()  - moves the cursor down 1 row.
+               CurLft()   - moves the cursor left 1 column.
+               CurOff()   - turns the cursor off.
+               CurOn()    - turns the cursor on.
+               CurRgt()   - moves the cursor right 1 column.
+               CurUp()    - moves the cursor up 1 row.
+               DelLine()  - deletes the current line and moves the
+                            lines below the current one upward.  The
+                            last line is blanked.
+               ErEOLine() - erases from the current column to
+                            the end of the line.
+               ErEOScrn() - erases from the current column to
+                            the end of the screen.
+               ErLine()   - erases the current line.
+               InsLin()   - inserts a blank line at the current row.
+                            Lines below the current one are moved
+                            downward.
+               ReVOff()   - turns reverse video off.
+               ReVOn()    - turns reverse video on.
+               UndlnOff() - turns underlining off.
+               UndlnOn()  - turns underlining on.
+
+          On error these functions return -1 with the error 
+          number in _e_r_r_n_o.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            45                             
+
+
+
+
+
+
+
+
+CGFX Reference                             Window Functions
+
+
+
+
+          -------------------------------------------- 
+
+
+UUssaaggee: 
+
+          int CWArea(path,cpx,cpy,szx,szy);
+          int path,cpx,cpy,szx,szy;
+          
+          int DWEnd(path)
+          int path;
+          
+          int DWProtSw(path,bsw)
+          int path,bsw;
+          
+          int DWSet(path,sty,cpx,cpy,szx,szy,fprn,bprn,bdprn)
+          int path,sty,cpx,cpy,szx,szy,fprn,bprn,bdprn;
+          
+          int DWSet(path,sty=0,cpx,cpy,szx,szy,fprn,bprn)
+          int path,sty,cpx,cpy,szx,szy,fprn,bprn;
+          
+          int MVOWEnd(path)
+          int path;
+          
+          int OWEnd(path)
+          int path;
+          
+          int OWSet(path,svs,cpx,cpy,szx,szy,fprn,bprn)
+          int path,svs,cpx,cpy,szx,szy,fprn,bprn;
+          
+          int Select(path)
+          int path;
+          
+          int UnShadow(path)
+          int path;
+
+
+DDeessccrriippttiioonn: 
+
+          _D_W_S_e_t()  will create a new window on _p_a_t_h of type
+          _s_t_y.  If _s_t_y is 0, then the window is created  on
+          the process's  current  window.  The valid values
+          for _s_t_y are: 
+
+
+
+
+
+
+
+
+
+
+                            46                             
+
+
+
+
+
+
+
+
+CGFX Reference                             Window Functions
+
+
+
+
+                SSTTYY  WWiinnddooww SSiizzee  CCoolloorrss  MMeemmoorryy     TTyyppee
+               -------------------------------------------
+                 0            current window
+                 1    40x24(25*)   8&8   2000 bytes  Text
+                 2    80x24(25*)   8&8   4000 bytes  Text
+                 5      80x24       2   16000 bytes  Graphics
+                 6      40x24       4   16000 bytes  Graphics
+                 7      80x24       4   32000 bytes  Graphics
+                 8      40x24      16   32000 bytes  Graphics
+
+          _D_W_E_n_d() will remove a window on _p_a_t_h.  
+
+          _D_W_P_r_o_t_S_w() will allow new windows to  be  created
+          over the  window on _p_a_t_h if _b_s_w is 1.  Otherwise,
+          it will disallow any new windows  to  be  created
+          over the window.  
+
+          _O_W_S_e_t()  will  create  an overlay window over the
+          window on _p_a_t_h.  If _s_v_s is 1, then the area under 
+          the overlay is saved  and  the  overlay  area  is
+          cleared.   Otherwise,  the  overlay  area is left
+          untouched.  
+
+          _O_W_E_n_d() and _U_n_S_h_a_d_o_w() will remove  a  previously
+          created overlay.  If the overlay was created with 
+          the  _s_v_s  flag  set to 1, then the area under the
+          overlay is restored.  
+
+          _M_V_O_W_E_n_d() will reset the current Multi-Vue window 
+          type to the 'no  box'  and  remove  a  previously
+          created overlay.  If the overlay was created with 
+          the  _s_v_s  flag  set to 1, then the area under the
+          overlay is restored.  
+
+          _C_W_A_r_e_a() will change the  current  window/overlay
+          working  area  to that specified in the parameter
+          list.  The coordinates specified are relative  to
+          the window or overlay that is active.  
+
+          _S_e_l_e_c_t()  will  select  the  window on _p_a_t_h to be
+          displayed.  If the calling process does  not  own
+          the keyboard (is not the current active process), 
+          then the call is ignored.  
+
+          In  all  cases,  _p_a_t_h  refers  to the path to the
+          window in  question,  _c_p_x  refers  to  the  upper
+          left-hand  corner  column position, _c_p_y refers to
+          the upper  left-hand  corner  row  position,  _s_z_x
+
+
+
+
+                            47                             
+
+
+
+
+
+
+
+
+CGFX Reference                             Window Functions
+
+
+
+
+          refers  to the character column width, _s_z_y refers
+          to the character row height, _f_p_r_n refers  to  the
+          foreground  color,  _b_p_r_n refers to the background
+          color, and _b_d_p_r_n refers to the border color.  
+          These  functions  call  __F_l_u_s_h()  to  flush   any
+          pending  output  before proceeding (this does not
+          automatically include buffering, however!) 
+          On error, -1 is returned.  The error code may  be
+          found in the _e_r_r_n_o variable.  
+
+
+          -------------------------------------------- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            48                             
+
+
+
+

@@ -1,0 +1,149 @@
+*********************************************
+*
+* Buffering routines for CGFX library.
+* These are included by including a call to
+* '_CGFXBuf()' in your program.  This function
+* just initializes the buffer used and returns.
+*
+* Any output to a path is buffered until
+* one of the following conditions is met:
+*
+*  - you write to a different path
+*  - you call _ss_mgpb(), _ss_wset(), GetBlk(),
+*    writeln(), cwriteln(), read(), readln(),
+*    cread(), creadln(), GPLoad(), or KilBuf().
+*  - you call the _Flush() function to flush
+*    the buffer.
+*
+* The _Flush() function call be called whether
+* or not buffering is used.  If you have a set
+* of functions that you regularly use that do
+* screen output, the _Flush() call can be used
+* safely (it is a NULL function without
+* buffering.)
+*
+* Many thanks to Eddie Kuns, who suggested
+* transparent buffering for this lib and
+* kept me thinking about it.
+* Also, thanks to Bob van der Poel for reminding
+* me to return an error if _Flush() is unsuccessful....
+*
+* CGFX replacement lib buffering routines
+* by Mike Sweet 5/10/90,8/11/90
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect cbuffer,0,0,0,10,0
+
+ vsect
+_CBuffer: rmb 256 this is the buffer for all output
+_CUsed: fdb 0 this is 'how much is used' in the buffer
+_CPath: fcb -1 the path all of this has to go to
+ endsect
+
+_Flush:
+ clra
+ clrb
+ pshs d,x,y,u save important registers
+
+ tfr y,u
+ lda _CPath,y
+ bmi noerror1
+ leax _CBuffer,y
+ ldy _CUsed,y
+ beq noerror1
+ os9 I$WRITE
+ bcc noerror1 thanks Bob!
+ clra
+ std errno,u
+ ldd #-1
+ std ,s
+
+noerror1
+ clra
+ clrb
+ std _CUsed,u
+ puls d,x,y,u,pc
+
+
+*********************************
+* Previously (version 5), you
+* had to call _CGFXBuf() to init
+* the buffer data structure.  No
+* longer, tho....
+*
+
+_CGFXBuf:
+ rts
+
+
+**************************************
+* write function- used for all other
+* functions to write to a path-
+* unbuffered version just calls I$WRITE.
+*
+* A=path
+* X=address
+* U=byte count
+*
+
+_write:
+ cmpa _CPath,y writing to a different path?
+ beq noflush1 no, don't flush yet...
+
+* fix for version 7! 
+ pshs a save old path (_Flush will overwrite...)
+
+ bsr _Flush ok, flush everything
+
+*fix for version 7!
+ puls a restore old path....
+ sta _CPath,y set new path
+
+noflush1 tfr u,d byte count to D
+ addd _CUsed,y
+ cmpd #256 buffer going to fill up?
+ blo noflush2 nope
+ bsr _Flush flush the buffer if so...
+
+noflush2 cmpu #256 writing more than 256 bytes?
+ blo bufferit nope, stick it in the buffer
+ pshs y otherwise, write it directly
+ lda _CPath,y get the path
+ tfr u,y y=byte count
+ os9 I$WRITE write it
+ puls y
+ bcc noerror2 no error...
+ clra
+ std errno,y save the error number
+ ldd #-1 return -1
+return rts
+
+noerror2 clra
+ clrb
+ rts return 0
+
+
+bufferit ldd _CUsed,y
+ pshs u save byte count
+ leau _CBuffer,y
+ leau d,u get offset into buffer
+ ldd ,s and byte count
+
+bloop lda ,x+
+ sta ,u+
+ decb only sending <256 bytes...
+ bne bloop loop till all bytes copied
+
+ puls d get byte count
+ addd _CUsed,y update used count
+ std _CUsed,y
+
+ clra
+ clrb
+ rts return 0
+
+ endsect

@@ -1,0 +1,49 @@
+***************************************
+* Mouse Handling Functions            *
+* Copyright (c) 1989 by Mike Sweet    *
+***************************************
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect mouse,0,0,0,0,0
+
+_ss_mous:
+ lda 5,s
+ ldb 7,s
+ tfr d,x
+ pshs y
+ ldy 10,s
+ lda 5,s
+ ldb #$89
+ os9 I$SETSTT
+ puls y
+
+os9err0 bcc noerr0
+ clra
+ std errno,y
+ ldd #-1
+ rts
+noerr0 clra
+ clrb
+ rts
+
+_ss_msig:
+ ldx 4,s
+ lda 3,s
+ ldb #$8a
+ os9 I$SETSTT
+ bra os9err0
+
+_gs_mous:
+ pshs y
+ ldx 6,s
+ lda 5,s
+ ldy #0
+ ldb #$89
+ os9 I$GETSTT
+ puls y
+ bra os9err0
+
+ endsect

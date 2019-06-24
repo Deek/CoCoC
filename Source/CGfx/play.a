@@ -1,0 +1,385 @@
+****************************************************
+* Play(path,s [,s1,s2,...,sn])
+* int path;
+* char *s [,*s1,*s2,...,*sn];
+*
+* A 'play' function similar to RS-BASIC's PLAY command, with a
+* few exceptions:
+*   - volumes are valid from 0-63 instead of 1-31
+*   - the 'X' operation is replaced with %s or %d.  %s will insert
+*     a string to be interpreted, and %d will insert an integer.
+*     All % substitutions are taken from the s1..sn parameters.
+*
+* By Mike Sweet 7/24/90
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect play,0,0,0,50,0
+
+ vsect
+tempo fcb 100 tempo (beats per minute)
+length fcb 4 length (1/n beats)
+dots fcb 0 # dots for length
+style fcb 0 note style- -1 is stacato, 0 is normal, and 1 is legato
+octave fcb 3 note octave
+volume fcb 32 note volume
+
+remainder fdb 0 time remainder (for extra precision)
+
+* constant values for note frequencies
+notes fdb 3038,2871,2707,2554,2411,2273,2150,2027,1914,1806,1704,1610
+
+notetbl fcb 9,11,0,2,4,5,7 offsets into the above table for notes A-G
+
+curdots rmb 1 current note's dots
+path rmb 1 path to send notes to
+strings rmb 2 pointer to variable # of strings following the initial string
+
+ endsect
+
+
+Play:
+ pshs u
+ lbsr _Flush
+
+ lda 5,s
+ sta path,y
+
+ leax 6,s
+ stx strings,y
+
+ ldx ,x get the first string
+
+ leau notetbl,y and point to the note table
+
+ bsr parse and now parse the first string
+
+ puls u,pc and return
+
+
+parse lda ,x+ get a char
+ cmpa #$20
+ beq parse
+ cmpa #$3b
+ beq parse
+ cmpa #$5f
+ bls p00
+ anda #$5f convert lower to uppercase
+
+p00 cmpa #$41
+ blo p10 check for A-G
+ cmpa #$47
+ bhi p10 not A-G
+ suba #$41
+ lda a,u and look up the appropriate note
+ pshs a save it...
+p01 lda ,x+ check next chars...
+ cmpa #$2f 
+ bhi p03 no
+ cmpa #$2d
+ bne p02
+ dec ,s
+ bra p01
+p02 anda #$03
+ cmpa #3
+ bne p05
+ inc ,s
+ bra p01
+p03 cmpa #$3c
+ bne p04
+ lda ,s
+ suba #12
+ sta ,s
+ bra p01
+p04 cmpa #$3e
+ bne p05
+ lda ,s
+ adda #12
+ sta ,s
+ bra p01
+p05 leax -1,x
+ ldb dots,y
+ stb curdots,y
+ ldb length,y
+ cmpa #$30
+ blo p08
+ cmpa #$39
+ bhi p08
+ clr curdots,y
+ lbsr getnum
+p06 lda ,x+
+ cmpa #$2e
+ bne p07
+ inc curdots,y
+ bra p06
+p07 leax -1,x
+p08 puls a
+ lbsr playnote
+ bra parse
+
+p10 cmpa #$25
+ bne p20
+ lda ,x+
+ anda #$5f
+ cmpa #$53
+ lbne parse
+ pshs x
+ ldx strings,y
+ leax 2,x
+ stx strings,y
+ ldx ,x
+ lbsr parse
+ puls x
+ lbra parse
+
+p20 cmpa #$54
+ bne p30
+ ldb tempo,y
+ lbsr getnum
+ stb tempo,y
+ lbra parse
+
+p30 cmpa #$4c
+ bne p40
+ ldb length,y
+ lbsr getnum
+ stb length,y
+ clr dots,y
+p31 lda ,x+
+ cmpa #$2e
+ bne p32
+ inc dots,y
+ bra p31
+p32 leax -1,x
+ lbra parse
+
+p40 cmpa #$4f
+ bne p50
+ ldb octave,y
+ lbsr getnum
+ stb octave,y
+ lbra parse
+
+p50 cmpa #$56
+ bne p60
+ ldb volume,y
+ bsr getnum
+ stb volume,y
+ lbra parse
+
+p60 cmpa #$50
+ bne p70
+ ldb dots,y
+ stb curdots,y
+ ldb length,y
+ lda ,x+
+ cmpa #$30
+ blo p62
+ cmpa #$39
+ bhi p62
+ bsr getnum
+ clr curdots,y
+p61 cmpa #$2e
+ bne p62
+ inc curdots,y
+ lda ,x+
+ bra p61
+p62 leax -1,x
+ lbsr playrest
+ lbra parse
+
+p70 cmpa #$5d
+ bne prts
+ lda ,x+
+ anda #$5f
+ cmpa #$53
+ bne p71
+ lda #-1
+ sta style,y
+ lbra parse
+p71 cmpa #$4e
+ bne p72
+ clr style,y
+ lbra parse
+p72 cmpa #$4c
+ lbne parse
+ lda #1
+ sta style,y
+ lbra parse
+
+prts rts
+
+
+getnum lda ,x+
+ cmpa #$20
+ beq getnum
+ cmpa #$30
+ blo g00
+ cmpa #$39
+ bhi g00
+ suba #$30
+ tfr a,b
+gloop0 lda ,x+
+ cmpa #$30
+ blo gnext0
+ cmpa #$39
+ bhi gnext0
+ suba #$30
+ pshs a
+ lda #10
+ mul
+ addb ,s+
+ bra gloop0
+gnext0 leax -1,x
+grts rts
+
+g00 cmpa #$25
+ bne g10
+ lda ,x+
+ anda #$5f
+ cmpa #$44
+ bne g01
+ pshs x
+ ldx strings,y
+ leax 2,x
+ ldd ,x
+ stx strings,y
+ puls x,pc
+g01 cmpa #$53
+ bne grts
+ pshs x
+ ldx strings,y
+ leax 2,x
+ stx strings,y
+ ldx ,x
+ bsr getnum
+ puls x,pc
+
+g10 cmpa #$2b
+ bne g20
+ incb
+ bra getnum
+
+g20 cmpa #$2d
+ bne g30
+ decb
+ bra getnum
+
+g30 cmpa #$3c
+ bne g40
+ lsrb
+ bra getnum
+
+g40 cmpa #$3e
+ bne gnext0
+ lslb
+ bra getnum
+
+
+calctime inc curdots,y
+ lda tempo,y
+ mul
+ pshs d
+ ldd #14400
+ addd remainder,y
+ pshs d
+cloop0 dec curdots,y
+ bmi cnext0
+ lslb
+ rola
+ lsl 3,s
+ rol 2,s
+ bra cloop0
+cnext0 subd ,s++
+ ldx #0
+cloop1 subd ,s
+ bmi cnext1
+ leax 1,x
+ bra cloop1
+cnext1 addd ,s++
+ std remainder,y
+ rts
+
+
+playnote tst volume,y
+ beq playrest
+ pshs a,x,y
+ bsr calctime
+ puls a
+ cmpx #0
+ beq playret
+ ldb octave,y
+ploop0 cmpa #0
+ bge ploop1
+ adda #12
+ decb
+ bra ploop0
+ploop1 cmpa #12
+ blt pnext1
+ suba #12
+ incb
+ bra ploop1
+pnext1 lsla
+ pshs b
+ suba #24
+ ldd a,u
+ploop2 dec ,s
+ bmi pnext2
+ lsra
+ rorb
+ bra ploop2
+pnext2 coma
+ comb
+ addd #4097
+ std ,-s
+ pshs x
+ lda volume,y
+ sta 0,s
+ ldb 1,s
+ tst style,y
+ bmi playstac
+ bgt playleg
+playnorm lsrb
+ lsrb
+ lsrb
+ pshs b
+ beq playit
+ clra
+ tfr d,x
+ os9 F$SLEEP
+ bra playit
+
+playstac lsrb
+ lsrb
+ pshs b
+ beq playit
+ clra
+ tfr d,x
+ os9 F$SLEEP
+ bra playit
+
+playleg clr ,-s
+
+playit puls b
+ negb
+ addb 1,s
+ stb 1,s
+ lda path,y
+ puls x,y
+ ldb #$98
+ os9 I$SETSTT
+
+playret puls x,y,pc
+
+
+playrest pshs x
+ lbsr calctime
+ cmpx #0
+ beq playret2
+ os9 F$SLEEP
+playret2 puls x,pc
+
+ endsect

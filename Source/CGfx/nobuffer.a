@@ -1,0 +1,33 @@
+***********************************
+*
+* Unbuffered write and flush
+* code in the absense of buffering.
+*
+* by Mike Sweet 5/10/90
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+ 
+ psect nobuffer,0,0,0,10,0
+
+_write:
+ pshs y save y
+ tfr u,y byte count to y
+ os9 I$WRITE write it
+ bcs error
+ puls y
+_Flush:
+ clra
+ clrb
+ rts
+
+error puls y
+ clra
+ std errno,y
+ ldd #-1
+ rts return -1 on error
+
+
+ endsect

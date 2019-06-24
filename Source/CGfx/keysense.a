@@ -1,0 +1,57 @@
+******************************
+* Keysense functions for
+* MW C.  Include file is
+* called "keysense.h"
+* by Mike Sweet 8/31/89
+*
+
+
+ psect keysense,0,0,0,0,0
+ use /dd/defs/os9defs.a
+ 
+
+***********************************
+* int _ss_ksns(path,keybits)
+* int path,keybits;
+*
+* Set key sensing according to
+* 'keybits' for the path 'path'
+*
+
+
+_ss_ksns:
+ ldx 4,s get 'keybits'
+ lda 3,s get 'path'
+ ldb #$27 SS.KYSNS call
+ os9 I$SETSTT
+ bcs os9err error, return -1 and leave error code in 'errno'
+ clra
+ clrb
+ rts else return 0 (success)
+ 
+os9err
+ clra
+ std errno,y store the error number in 'errno'
+ ldd #-1
+ rts return -1 (error/failure)
+ 
+**********************************
+* _gs_ksns(path)
+* int path;
+* 
+* Returns key sense info from
+* 'path' or -1 on error.
+*
+
+
+_gs_ksns:
+ lda 3,s get 'path'
+ ldb #$27 SS.KYSNS call
+ os9 I$GETSTT
+ bcs os9err
+ tfr a,b
+ clra
+ rts return key status in D
+ 
+ endsect
+ 
