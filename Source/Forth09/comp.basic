@@ -1,0 +1,17 @@
+echo 'basic_functions.c'
+-x
+echo c.prep:
+C.PREP basic_functions.c >ctmp.3.m
+x
+echo c.pass1:
+C.PASS1 ctmp.3.m -o=ctmp.3.i
+del ctmp.3.m
+echo c.pass2:
+C.PASS2 ctmp.3.i -o=ctmp.3.a
+del ctmp.3.i
+echo c.opt:
+C.OPT ctmp.3.a ctmp.3.o
+del ctmp.3.a
+echo c.asm:
+C.ASM ctmp.3.o -o=basic_functions.r
+del ctmp.3.o
