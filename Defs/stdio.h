@@ -25,6 +25,7 @@ extern FILE _iob[_NFILE];
 #define _INIT       0x8000    /* _iob initialized */
 
 #define EOF (-1)
+#define ERROR (-1)
 #define EOL 13
 #define NULL 0
 
@@ -43,3 +44,6 @@ extern FILE _iob[_NFILE];
 #define fileno(p)   ((p)->_fd)
 
 long ftell();
+
+#define FALSE 0
+#define TRUE 1

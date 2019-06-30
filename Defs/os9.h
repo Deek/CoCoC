@@ -1,7 +1,7 @@
 struct registers {
     char rg_cc,rg_a,rg_b,rg_dp;
     unsigned rg_x,rg_y,rg_u;
-    } ;
+};
 
 #define F_LINK      0x00 /* Link to Module */
 #define F_LOAD      0x01 /* Load Module from File */
@@ -122,3 +122,4 @@ struct registers {
 #define SS_ELOG     0x19 /* Read Error Log */
 #define SS_SSIG     0x1a /* Send signal on data ready */
 #define SS_RELEA    0x1b /* Release device */
+#define SS_COMST    0x28 /* Comm port set */

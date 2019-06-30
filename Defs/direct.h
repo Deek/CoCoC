@@ -1,7 +1,7 @@
 struct dirent {
      char dir_name[29];
      char dir_addr[3];
-     };
+};
 
 struct fildes {
      char      fd_att;
@@ -13,8 +13,8 @@ struct fildes {
      struct {
           char     addr[3];
           unsigned size;
-          } fdseg[48];
-     };
+     } fdseg[48];
+};
 
 struct ddsect {
      char      dd_tot[3];
@@ -32,4 +32,4 @@ struct ddsect {
      unsigned  dd_bsz;
      char      dd_date[5];
      char      dd_name[32];
-     };
+};

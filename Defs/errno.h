@@ -55,7 +55,9 @@
 #define E_DEADLK    0xfe /* I/O Deadlock error */
 
 /* errors from arithmetic routines */
-#define EFPOVR  40      /* floating point overflow or underflow */
+#define EFPOVR  40      /* floating point overflow */
 #define EDIVERR 41      /* division by zero */
 #define EINTERR 42      /* overflow on conversion of floating point to
                            long integer */
+#define EFPUND  43      /* floating point underflow */
+#define EILLARG 44      /* illegal function argument, sqrt(-1) */

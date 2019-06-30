@@ -19,6 +19,7 @@ extern  char    _chcodes[];      /* in chcodes.r */
 #define isalnum(c)      (_chcodes[c]&(_UPPER|_LOWER|_DIGIT))
 #define isprint(c)      (_chcodes[c]&(_PUNCT|_UPPER|_LOWER|_DIGIT))
 #define iscntrl(c)      (_chcodes[c]&_CONTROL)
+#define isgraph(c)      (isprint(c)&&c!=' ')
 #define _toupper(c)     ((c)&0xdf)
 #define _tolower(c)     ((c)|0x20)
 #define toascii(c)      ((c)&0x7f)
