@@ -48,7 +48,7 @@ static char curlinebuf[32];
 
 errexit(n)
 {
-#if defined(OSK) || defined(OS9)
+#if defined(OSK)
 	if (devptr)
 		detach(devptr);
 #endif
@@ -253,7 +253,7 @@ done: ;
 		fatal("missing #endif");
 	}
 
-#if defined(OSK) || defined(OS9)
+#if defined(OSK)
 	if (devptr)
 	{
 		detach(devptr);
@@ -332,7 +332,7 @@ char *s;
 }
 
 
-#if defined(OSK) || defined(OS9)
+#if defined(OSK)
 char *
 sysdrive()
 {

@@ -40,6 +40,9 @@ extern int errno;
 #define MAXARGS     32      /* maximum number of macro arguments */
 #define MAXLIBS		32		/* maximum number of include libraries */
 
+/* stdio defines ERROR as something we don't want it to be */
+#undef ERROR
+
 #define ESCHAR      '#'     /* compiler escape character */
 #define ERROR       '0'     /* error */
 #define FATERR      '1'     /* fatal error */

@@ -72,5 +72,7 @@
 #ifdef OSK
 @_sysedit: equ 24
 #else
+#ifndef OS9
 static char *_xx = "@_sysedit=24";
+#endif
 #endif
