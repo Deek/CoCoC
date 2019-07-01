@@ -93,7 +93,7 @@ char kanjtbl[] = {						/* kanji first byte table */
 
 static char namebuf[NAMESIZE + 1];
 
-/*static*/ dobslash();
+static dobslash();
 
 
 getsym()
@@ -436,7 +436,7 @@ qstr()
 }
 
 
-/*static*/ int
+static int
 dobslash()
 {
 	register int	c, n;

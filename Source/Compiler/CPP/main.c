@@ -40,11 +40,11 @@ cmdstruct cmds[] =
 cmdstruct *endcmds = cmds + (sizeof cmds) / (sizeof(cmdstruct));
 
 #ifdef DEBUG
-/*static*/ direct int dflag;
+static direct int dflag;
 #endif
 
 char mtemp[NAMESIZE+1];
-/*static*/ char curlinebuf[32];
+static char curlinebuf[32];
 
 errexit(n)
 {
