@@ -93,10 +93,10 @@ char kanjtbl[] = {						/* kanji first byte table */
 
 static char namebuf[NAMESIZE + 1];
 
-static
-dobslash();
+/*static*/ dobslash();
 
-void getsym(void)
+
+getsym()
 {
 	register int		numtype;
 	auto long			n;
@@ -300,7 +300,10 @@ donum:
 	return;
 }
 
-int number(long *np)
+
+int
+number(np)
+long *np;
 {
 	auto long		n;
 	register char	*cp;
@@ -369,7 +372,8 @@ static direct FILE	*sfile;
 #endif
 direct int			stringlen;           /* for inits */
 
-void pstr(void)
+
+pstr()
 {
 	gch(0);
 	if (cch != '\\')
@@ -393,7 +397,7 @@ void pstr(void)
 }
 
 
-void qstr(void)
+qstr()
 {
 #ifdef KANJI
 	static int kanji_flg;
@@ -432,7 +436,8 @@ void qstr(void)
 }
 
 
-static int dobslash(void)
+/*static*/ int
+dobslash()
 {
 	register int	c, n;
 
@@ -485,25 +490,33 @@ static int dobslash(void)
 }
 
 
-int isoct(int c)
+int
+isoct(c)
+int c;
 {
 	return (c <= '7' && c >= '0');
 }
 
 
-int ishex(int c)
+int
+ishex(c)
+int c;
 {
 	return (ISDIGIT(c) || ((c &= 0x5f) >='A' && c <= 'F')) ? c : 0;
 }
 
 
-int an(int c)
+int
+an(c)
+int c;
 {
 	return (chartab[c] == LETTER || chartab[c] == DIGIT);
 }
 
 
-int need(char key)
+int
+need(key)
+char key;
 {
 	register int i;
 	static char	exptmsg[] = "expected X";

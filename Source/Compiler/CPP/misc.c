@@ -8,7 +8,8 @@
 #include <errno.h>
 #include <string.h>
 
-void fatal(char *errstr)
+fatal(errstr)
+char *errstr;
 {
 	extern int errno;
 
@@ -17,18 +18,23 @@ void fatal(char *errstr)
 }
 
 
-void error(char *s)
+error(s)
+char *s;
 {
 	doerr(symptr-lbase,s,lineno,ERROR);
 }
 
 
-void lerror(char s[])
+lerror(s)
+char s[];
 {
 	doerr(lptr-lbase,s,lineno,ERROR);
 }
 
-void doerr(int n, char errstr[], int lno, int ertype)
+
+doerr(n, errstr, lno, ertype)
+int n, lno, ertype;
+char errstr[];
 {
 	register char *tmp;
 
@@ -48,7 +54,7 @@ void doerr(int n, char errstr[], int lno, int ertype)
 }
 
 
-void putesc(type, arg, arg1)
+putesc(type, arg, arg1)
 {
 	if (!aflag)
 	{
@@ -70,7 +76,9 @@ void putesc(type, arg, arg1)
 }
 
 
-int hash(char *word)
+int
+hash(word)
+char *word;
 {
 	register int n = 0, c;
 
@@ -80,7 +88,9 @@ int hash(char *word)
 }
 
 
-char *grab(unsigned size)
+char *
+grab(size)
+unsigned size;
 {
     register char *p;
 
@@ -95,7 +105,11 @@ char *grab(unsigned size)
     return p;
 }
 
-char *copystr(char *p, char *s, int n)
+
+char *
+copystr(p, s, n)
+char *p, *s;
+int n;
 {
     while (n-- > 0)
 	{
@@ -105,7 +119,10 @@ char *copystr(char *p, char *s, int n)
     return p;
 }
 
-char *savestr(char *s)
+
+char *
+savestr(s)
+char *s;
 {
     return (char *)strcpy(grab(strlen(s) + 1), s);
 }

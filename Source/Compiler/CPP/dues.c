@@ -2,13 +2,17 @@
 	$Id$
 */
 #include "prep.h"
+#ifdef UNIX
 #include <strings.h>
+#endif
 #include <errno.h>
 
 
 #define MAXIFS 32
 
-//extern char *defdev;
+#if defined(OS9) || defined(OSK)
+extern char *defdev;
+#endif
 
 static short nextncnt;
 
@@ -38,7 +42,7 @@ char delimiter;
 }
 
 
-void doinclude(void)
+doinclude()
 {
 	register char c, *nameptr;
 	char fname[64], *last;
@@ -111,7 +115,8 @@ void doinclude(void)
 }
 
 
-void dodefine(int func)
+dodefine(func)
+int func;
 {
 	char name[NAMESIZE];
 	
@@ -162,7 +167,7 @@ static struct
 } ifstack[MAXIFS];
 
 
-void docond(void)
+docond()
 {
 	if (iftop < MAXIFS)
 	{
@@ -190,7 +195,7 @@ void docond(void)
 }
 
 
-void doifdef(int _bool)
+doifdef(_bool)
 {
 	char name[NAMESIZE];
 	
@@ -222,7 +227,7 @@ void doifdef(int _bool)
 }
 
 
-void doelif(void)
+doelif()
 {
 	if (elseflag)
 	{
@@ -243,7 +248,7 @@ void doelif(void)
 }
 
 
-void doelse(void)
+doelse()
 {
 	if (elseflag)
 	{
@@ -257,7 +262,7 @@ void doelse(void)
 }
 
 
-void unstack(void)
+unstack()
 {
 	if (iftop)
 	{
@@ -271,7 +276,7 @@ void unstack(void)
 }
 
 
-void doliner(void)
+doliner()
 {
 	register int i;
 	char name[NAMESIZE];

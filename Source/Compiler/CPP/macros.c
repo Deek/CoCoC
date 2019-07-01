@@ -4,7 +4,8 @@
 #include "prep.h"
 #include <string.h>
 
-macdef *revlist(p)
+macdef *
+revlist(p)
 register macdef *p;
 {
     register macdef *prev,*next;
@@ -21,7 +22,8 @@ register macdef *p;
 }
 
 
-macro *addmac(name,string)
+macro *
+addmac(name,string)
 register char *name,*string;
 {
     register int n;
@@ -200,7 +202,8 @@ register char *name,*string;
 }
 
 
-macro *findmac(name)
+macro *
+findmac(name)
 register char *name;
 {
     register macro *ptr;
@@ -220,8 +223,8 @@ register char *name;
     return 0;
 }
 
-
-void delmac(char *name)
+delmac(name)
+char *name;
 {
     register macro *p;
     char nameb[NAMESIZE];
@@ -232,7 +235,7 @@ void delmac(char *name)
 }
 
 
-void nxtch(void)
+nxtch()
 {
     while(isspace(cch))
 	{

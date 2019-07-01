@@ -220,7 +220,7 @@ skipsp(skflag)
 				else
 				if (lptr[1] == '/')
 				{
-					// C++ style comment (like this)
+					/* C++ style comment (like this // ) */
 					flag = 1;
 					while (*lptr != 0)
 					{

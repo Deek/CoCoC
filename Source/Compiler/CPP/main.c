@@ -40,13 +40,13 @@ cmdstruct cmds[] =
 cmdstruct *endcmds = cmds + (sizeof cmds) / (sizeof(cmdstruct));
 
 #ifdef DEBUG
-static direct int dflag;
+/*static*/ direct int dflag;
 #endif
 
 char mtemp[NAMESIZE+1];
-static char curlinebuf[32];
+/*static*/ char curlinebuf[32];
 
-void errexit(n)
+errexit(n)
 {
 #if defined(OSK) || defined(OS9)
 	if (devptr)
@@ -58,7 +58,10 @@ void errexit(n)
 
 int		nxtlno = 1;
 
-int main(int argc, char **argv)
+int
+main(argc,argv)
+int argc;
+char **argv;
 {
 	register char	*p, *q;
 	register int	c;
@@ -269,7 +272,8 @@ done: ;
 	exit(SUCCESS);
 }
 
-void setline(int n)
+setline(n)
+int n;
 {
 	sprintf(curlinebuf, "%d", n);
 }
@@ -313,7 +317,9 @@ dumpmac()
 #endif
 
 
-int findcmd(char *s)
+int
+findcmd(s)
+char *s;
 {
 	register cmdstruct *p;
 

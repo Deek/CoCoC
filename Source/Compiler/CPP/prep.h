@@ -25,6 +25,8 @@ extern int errno;
 
 #ifndef OS9
 #define direct
+#else
+# define void
 #endif
 
 #define TRUE		1
