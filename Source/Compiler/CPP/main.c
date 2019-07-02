@@ -161,7 +161,7 @@ char **argv;
 					}
 					goto done;
 				default:
-					fprintf(stderr, "prep: unknown option -%c\n", *p);
+					fprintf(stderr, "cpp: unknown option -%c\n", *p);
 					errexit(FAILURE);
 				}
 			}
@@ -169,7 +169,7 @@ done: ;
 		}
 		else if (fname != NULL)
 		{
-			fprintf(stderr, "prep: only one file allowed\n");
+			fprintf(stderr, "cpp: only one file allowed\n");
 			errexit(FAILURE);
 		}
 		else
