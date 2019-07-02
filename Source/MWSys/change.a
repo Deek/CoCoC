@@ -12,7 +12,7 @@ Bufsize equ 16 FD info bytes
 
 * chown(fname,owner)
 chown:
- pshs y,u save registers
+ pshs u,y save registers
  leas -Bufsize,s reserve buffer space
  os9 F$ID get user ID
  bcs chexit bra if error
@@ -59,13 +59,13 @@ openf10
 
 * chmod(fname,perm)
 chmod:
- pshs y,u save registers
+ pshs u,y save registers
  leas -Bufsize,s reserve buffer space
 
  bsr openfile open file and read FD
  bcs chexit bra if error
 
- pshs a,y save regs
+ pshs y,a save regs
  os9 F$ID get user id
  cmpy #0 super-user?
  beq chmod10 yes, he can do it

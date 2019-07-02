@@ -43,15 +43,15 @@ _os9: pshs u,y save register variable & data ptr
  ldy R$Y,u
  ldu R$U,u
  jsr 0,s execute system call
- pshs cc,u save regs
+ pshs u,cc save regs
  ldu 15,s get user register ptr
  leau R$U,u copy regs to user struct
- pshu a,b,dp,x,y
+ pshu y,x,dp,b,a
  puls a,x
  sta ,-u
  stx R$U,u
  leas 4,s junk the system call code
- puls u,y restore regs
+ puls y,u restore regs
  bita #carry carry on?
  beq os9.a bra if not
  ldd #-1 return error
