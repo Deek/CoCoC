@@ -12,7 +12,7 @@ abort: pshs d,x,y,u
  cmpd #-1
  bne abort10
  ldd errno,y
- os9 F$EXIT
+ os9 F$Exit
 
 abort10 leas 4,s
  pshs b
@@ -36,7 +36,7 @@ abort10 leas 4,s
  bsr doabort
 
  ldb #255
- os9 F$EXIT
+ os9 F$Exit
 
 core fcc "core "
  fcb $0d
@@ -45,18 +45,18 @@ doabort pshs d,x
  lda 6,s
  leax 2,s
  ldy #2
- os9 I$WRITE
+ os9 I$Write
 
  leax 0,s
  lda 6,s
  ldy #2
- os9 I$WRITE
+ os9 I$Write
 
  puls y
  puls x
  cmpy #0
  beq abort20
  lda 2,s
- os9 I$WRITE
+ os9 I$Write
 abort20 rts
  endsect

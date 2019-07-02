@@ -9,7 +9,7 @@
 chdir: lda #1 read permission
 
 chgdir10 ldx 2,s
- os9 I$CHGDIR
+ os9 I$ChgDir
  lbra _sysret
 
 * chxdir(dirname)

@@ -13,17 +13,17 @@ pmode equ $0b r/w for owner, r for others
 access: ldx 2,s
  lda 5,s
 
- os9 I$OPEN
+ os9 I$Open
 
  bcs access10
- os9 I$CLOSE
+ os9 I$Close
 access10 lbra _sysret
 
 * open(name,mode)
 open: ldx 2,s
  lda 5,s
 
- os9 I$OPEN
+ os9 I$Open
  lbcs _os9err
 
  tfr a,b
@@ -32,13 +32,13 @@ open: ldx 2,s
 
 * close(fd)
 close: lda 3,s
- os9 I$CLOSE
+ os9 I$Close
  lbra _sysret
 
 * mknod(name,mode)
 mknod: ldx 2,s
  ldb 5,s
- os9 I$MAKDIR
+ os9 I$MakDir
  lbra _sysret
 
 * creat(fname,mode)
@@ -47,7 +47,7 @@ creat: ldx 2,s
  tfr a,b proto attr
  andb #%00100100 save exec bits
  orb #pmode default modes
- os9 I$CREATE
+ os9 I$Create
  bcs creat10
 crret tfr a,b
  clra
@@ -62,30 +62,30 @@ creat10 cmpb #E$CEF already there?
 
  anda #7 access mode bits
  ldx 2,s get the name again
- os9 I$OPEN try to open it
+ os9 I$Open try to open it
  lbcs _os9err
 
  pshs a,u
  ldx #0
  leau ,x
  ldb #2
- os9 I$SETSTT set the file size to zero
+ os9 I$SetStt set the file size to zero
  puls a,u
  bcc crret
 
  pshs b
- os9 I$CLOSE
+ os9 I$Close
  puls b
  lbra _os9err
 
 * unlink(fname)
 unlink: ldx 2,s
- os9 I$DELETE
+ os9 I$Delete
  lbra _sysret
 
 * dup(fildes)
 dup: lda 3,s
- os9 I$DUP
+ os9 I$Dup
  lbcs _os9err
  tfr a,b
  clra
