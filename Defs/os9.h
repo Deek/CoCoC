@@ -1,6 +1,6 @@
 struct registers {
-    char rg_cc,rg_a,rg_b,rg_dp;
-    unsigned rg_x,rg_y,rg_u;
+    char rg_cc, rg_a, rg_b, rg_dp;
+    unsigned rg_x, rg_y, rg_u;
 };
 
 #define F_LINK      0x00 /* Link to Module */
