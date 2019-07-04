@@ -1,0 +1,34 @@
+
+This ipatch file will convert c_prep into c.prep.  This way users have a
+choice of completely replacing the original c.prep or patching cc, cc1,
+or cc2 to use c_prep.
+
+To patch cc, cc1, or cc2 to use c_prep:
+
+You need a disk editor such as DED.
+
+    1) (OPTIONAL) Locate the name of the C executive in the file header.
+       Change the name.  (For example: if it is CC2 make it CC3)  When doing
+       this remember that the last character in the name must have the
+       sign bit (bit 7) set. (So to change 2 to 3 in the above example
+       you would change the number $B2 to $B3)
+    2) Search the file for each occurrence of the name:   c.prep
+    3) Change the . to a _ character to produce this:     c_prep
+    4) Once all occurrences have been changed then
+       recalculate the CRC
+    5) Exit disk editor
+
+Option #1 allows you to have two versions of your C executive.  One for using
+c.prep and one for c_prep.  If you use CC2 for c.prep you might patch it to
+use c_prep then call it CC3.  This way you can invoke either preprocessor
+at will.
+
+This method will eliminate the need to produce patchfiles for each of the
+available C executive programs.
+
+If you have any questions or need help patching your files please contact
+me (JMLSOFT) through E-Mail or the OS9 forum.
+
+
+
+

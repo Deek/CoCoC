@@ -3,12 +3,15 @@ Defs/* filter=crtext
 Lib/* binary
 Sys/* filter=crtext
 
+*.ipc binary
+
 *.a filter=crtext
 *.c filter=crtext
 *.h filter=crtext
 *.hlp filter=crtext
 *.lsp filter=crtext
 *.man filter=crtext
+*.README filter=crtext
 comp.* filter=crtext
 make.* filter=crtext
 [Mm]akefile* filter=crtext
