@@ -28,6 +28,7 @@ register char *lnptr;   /* pv,kv,bv must match pcnt,kcnt,bcnt for exit */
     do                  /* Returns pos of first char in token or -1 (fails) */
     {
         mflag=0;    /* no match */
+/*      fprintf(stderr,"TOKSRCH: b4 gettoken\n");   */
         if ((c=gettoken(ln,b))==ERROR)
             return ERROR;   /* no match */
         ++*tcnt;    /* inc token counter */
@@ -74,6 +75,10 @@ int b;
         if (*(ptr++)==' ')
             ++b;    /* # of spaces = # of args */
     }
+ /*
+    fprintf(stderr,"TSTARGS aft: defarg=|%s|\n",defarg[i]);
+    fprintf(stderr,"TSTARGS aft: b=%d\n",b);
+*/
     return b;
 }
 
@@ -137,6 +142,7 @@ register int i;
             doerr(5,i);     /* $trng table full -- FATAL ERROR */
     }
     *dptr++=0;      /* NULL terminate $trng */
+/*  fprintf(stderr,"dtbl bytes=%d\n",dptr-dstrtbl); */
 }
 
 putiddtbl(b,d)
@@ -166,6 +172,8 @@ int c,d;        /* Returns NULL if no errors */
         return (doerr(1,b));     /* Return if invalid identifier */
     defnam[defcntr]=dptr;   /* Put identifier addr in def name tbl */
     putiddtbl(b,d);           /* Put def name in $trng table */
+/*  fprintf(stderr,"DODEFINE: line[c+1]=|%c|\n",line[c+1]);
+    fprintf(stderr,"DODEFINE: line=%s\n",line); */
     if (line[c+1]=='(')     /* if def is macro... */
     {
         d=b=skpbl(line,c+2);     /* Allign to 1st non-space char in macro */
@@ -175,17 +183,22 @@ int c,d;        /* Returns NULL if no errors */
             defarg[defcntr]=dptr;
             do                  /* Scan argument format */
             {
+/*              fprintf(stderr,"DODEF (): b=|%d|\n",b); */
                 ++b;
                 b=skpbl(line,b);
+/*              fprintf(stderr,"DODEF (2): b=|%d|\n",b); */
                 if ((c=getident(line,b))==ERROR)  /* Get identifier (args) */
                     return (doerr(2,b));    /* return if any args missing */
                 putdtbl(b,c);     /* put args in $trng table */
+/*              fprintf(stderr,"DODEF (): dfarg=|%s|\n",defarg[defcntr]);*/
                 *(dptr-1)=' ';
                 b=skpbl(line,c+1);   /* Should now point at , or ) */
+/*              fprintf(stderr,"DODEF (3): b=|%d|\n",b);    */
                 if (line[b]!=',' && line[b]!=')')  /* If not ) or , error */
                     return (doerr(3,b));    /* so return */
             } while (line[b]!=')');
             *dptr++=0;
+/*          fprintf(stderr,"DODEF: dfarg=|%s|\n",defarg[defcntr]);  */
         }
         else
         {
@@ -201,8 +214,12 @@ int c,d;        /* Returns NULL if no errors */
         b=c;
         defarg[defcntr]=NULL;
     }
-    if (line[b+1]!=' ')     /* Check for space delimeter */
-        return (doerr(4,b+1));
+    if (line[b+1]=='\n')     /* If EOL then define = 1 */
+    {
+        line[b+1]=' ';
+        line[b+2]='1';      /* This does not test LINE to see if it is full */
+        line[b+3]='\n';
+    }
     b+=2;   /* locate 1st char of token-sequence */
     c=rskpbl(line,a-1);    /* locate last char of token-sequence */
     deftok[defcntr++]=dptr;     /* Put token addr in tok table */
@@ -247,6 +264,7 @@ char *ln;
             c=getident(ln,7)+2;  /* get end of identifier */
             splittok(ln,c);    /* tokenize rest of line */
             dodefine(strlen(line),&ln[7]-line);     /* store #define info */
+/*          fprintf(stderr,"PREP (after dodef): line=|%s|\n",line); */
             tstdupdef();    /* Check for def duplication and fix */
             return (killine());    /* Discard #define line */
         }

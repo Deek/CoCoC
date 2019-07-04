@@ -97,11 +97,17 @@ char *ln;
 {
 unsigned x;
 
+/*  fprintf(stderr,"IFCALC: ln=|%s|\n",ln); */
     splittok(ln,0);     /* tokenize if expression */
+/*  fprintf(stderr,"IFCALC: (aft split) ln=|%s|\n",ln); */
     dodfined(ln);       /* replace defined commands with 0 or 1 */
+/*  fprintf(stderr,"IFCALC: (aft dfned) ln=|%s|\n",ln); */
     expand(ln,NULL,NULL);         /* macro expand line */
+/*  fprintf(stderr,"IFCALC: (aft exp) ln=|%s|\n",ln);   */
     zeroident(ln);      /* replace leftover identifiers with 0 */
+/*  fprintf(stderr,"IFCALC: (aft zero) ln=|%s|\n",ln);  */
     x=solve(ln);
+/*  fprintf(stderr,"IFCALC: x=%u\n",x); */
     if (x)
         return TRUE;
     else
@@ -143,6 +149,7 @@ char *ln;
 int b,c,d;
 
     b=skpbl(ln,0);
+/*  fprintf(stderr,"ZERO: ln[b]=%c\n",ln[b]);   */
     while (ln[b])
     {
         c=b;

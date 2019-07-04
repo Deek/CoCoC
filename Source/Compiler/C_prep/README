@@ -1,6 +1,6 @@
 
 
-                    C_PREP - Documentation Version 1.5
+                    C_PREP - Documentation Version 1.8
 
 
                             by Jim McDowell
@@ -12,7 +12,7 @@ Microware's c.prep.  It contains all of the features of c.prep plus some
 extras.  It follows the grammar set out in the ANSI C standard by the X3J11
 committee.
 
-Version 1.5 runs 1.4 times the speed of c.prep.  This should be an acceptable
+Version 1.8 runs 1.4 times the speed of c.prep.  This should be an acceptable
 speed tradeoff for the extra flexability that C_PREP offers.  Preprocessing
 is a small part of the compiling process.  C_PREP took 55 seconds to process
 a 16K source file.  C.PREP took 38 seconds.
@@ -26,7 +26,7 @@ ANY BUGS PLEASE REPORT THEM TO ME SO I CAN FIX THEM.
                       ****  C_PREP COMMANDS  ****
                       ***************************
 
-Version 1.5 supports the following preprocessor commands:
+Version 1.8 supports the following preprocessor commands:
 (Braces {} enclose required information, Brackets [] optional information.)
 
     #define {identifier} {token sequence}
@@ -48,13 +48,14 @@ Version 1.5 supports the following preprocessor commands:
     #
     defined [(] {identifier} [)]
 
-Version 1.5 also supports the predefined names:
+Version 1.8 also supports the predefined names:
 
     __LINE__                   (Returns current line number)
     __FILE__                   (Returns current file name)
     __DATE__                   (Returns compile date: Mmm dd yyyy)
     __TIME__                   (Returns compile time: hh:mm:ss)
-    __STDC__                   (Returns 1 to indicate ANSI compatibility)
+    __STDC__                   (Returns 1 if in ANSI mode; otherwise it is
+                                undefined)
 
 This version also has the following ANSI compatible features:
 
@@ -88,7 +89,7 @@ The following features are included also:
     alters the line as it goes.  So when an error is encountered the line
     printed with the error code may reflect preprocessor changes.
 
-Version 1.5 has the following limitations:
+Version 1.8 has the following limitations:
 
   * Maximum line length is 250 characters.  This is less than the ANSI
     recommendation but cuts in half the needed memory.  It should suit
@@ -107,16 +108,6 @@ Version 1.5 has the following limitations:
   * Maximum number of definitions allowed is 300.  This can be changed by
     MAX_DEFS in cp.h.
   * #include <> statements look for files in /DD/DEFS directory.
-  * The #pragma asm command (only for full ANSI operation) requires an *
-    if there is no label in the command.  For example:
-    #pragma asm LOOP lda #20                (with label)
-    #pragma asm *lda #20                    (without label)
-    The need for the * is to preserve the mnemonic column properly.  It's a
-    bit of a pain but shouldn't be a problem until a full ANSI compiler is
-    available.  Then I will try to simplify it.
-
-Version 1.5 has the following limitations:
-
 
 
 C_PREP's usage syntax is as follows:
@@ -144,9 +135,6 @@ other options include:
     c_prep -c file.c -l   (process with ANSI line codes & copy source lines to 
                           output for inclusion in the assembly listing)
 
-The file krtest.c contains the example preprocessor commands given in the
-K&R book.
- 
 
 
 
@@ -163,7 +151,7 @@ following is valid:
                 #       ifdef       MAIN
  
 The following is a detailed description of the new preprocessor commands
-found in C_PREP Version 1.5:
+found in C_PREP Version 1.8:
 (Braces {} enclose required information, Brackets [] optional information.)
 
 #define {identifier}( {identifier-list} ) {token sequence}
@@ -334,15 +322,15 @@ __TIME__
         This is a string literal containing the time of compilation.  It is
         in the form of: hh:mm:ss
 
-__STDC__                   (Returns 1 to indicate ANSI compatibility)
+__STDC__                   (Indicates whether compiler is ANSI compatible)
 
         Example: #if __STDC__ == 1
                      puts("This is an ANSI preprocessor");
                  #else
                      puts("This is not ANSI!!");
 
-        This is a constant 1.  This indicates that C_PREP is an ANSI
-        conforming preprocessor.
+        __STDC__ will return a constant 1 if in ANSI mode.  Otherwise
+        it will leave __STDC__ undefined.
 
 
 

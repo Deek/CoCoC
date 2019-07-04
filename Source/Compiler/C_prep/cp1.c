@@ -30,6 +30,7 @@ int c;
         {
             strncpy(&ifnbuf[fptr][9],&ln[1],&ln[c]-ln);
             ifnbuf[fptr][&ln[c]-ln+9]=0;
+/*          fprintf(stderr,"ERR:buf=%s\n",ifnbuf[fptr]);  */
             if ((fpath[fptr]=open(ifnbuf[fptr],1))==ERROR)
                 doerr(6,ln-line);     /* Bad file */
         }
@@ -40,6 +41,7 @@ int c;
     {
         splittok(ln,0);   /* split end of line into tokens */
         expln(ln,NULL,0);
+/*      fprintf(stderr,"ERR:ln=%s\n",ln);   */
         if (*ln=='\"' || *ln=='<')  /* If now in proper format... */
             doinclude(ln);       /* open include file */
         else
@@ -127,6 +129,7 @@ int b;
 int c,d;
 char tmp[LINEMAX+3],*tptr,*lnptr;
 
+ /* fprintf(stderr,"START:b=%d line=|%s|\n",b,ln);  */
     d=b;
     lnptr=ln+b;
     strcpy(tmp,ln);
@@ -143,6 +146,7 @@ char tmp[LINEMAX+3],*tptr,*lnptr;
         if (!(*tptr))
         {
             *lnptr=0;
+/*          fprintf(stderr,"line2=|%s|\n",ln);  */
             return;
         }
         if (*tptr=='L' && (*(tptr+1)=='"' || *(tptr+1)=='\''))
@@ -160,6 +164,7 @@ char tmp[LINEMAX+3],*tptr,*lnptr;
         strncpy(lnptr,tptr,&tmp[b]-tptr);
         lnptr+=(&tmp[b]-tptr);
         *lnptr=NULL;
+/*      fprintf(stderr,"b=%d ln=|%s|\n",b,ln);  */
         if (tmp[b]!=' ')
             *(lnptr++)=' ';
     }
@@ -199,6 +204,7 @@ int c,d,e;
     c=ln[b];
     d=ln[b+1];
     e=ln[b+2];
+/*  fprintf(stderr,"TOKOPR: b=%d c=%c d=%c e=%c\n",b,c,d,e);    */
     if (((c=='<' && d=='<') || (c=='>' && d=='>')) && e=='=')
         b+=2;
     else if (c=='.' && d=='.' && e=='.')
@@ -213,12 +219,17 @@ int c,d,e;
         ++b;
     else if(!findchar("()[].!~+-*&/%<>^|?:=,{};#",c))
             return ERROR;
+/*  fprintf(stderr,"TOKOPR: (final) b=%d\n",b); */
     return b;
 }
 
 toknum(ln,lnptr)
 char *ln,*lnptr;
 {
+    if (*lnptr=='.')    /* screen out . as a struct operator */
+        if (lnptr>ln && (IDNT_TYPE((*(lnptr-1)))))
+            return (++lnptr-ln);
+
     for (;;)
     {
         do
@@ -236,7 +247,7 @@ initstdefs()
     defnam[1]="__FILE__ ";
     defnam[2]="__DATE__ ";
     defnam[3]="__TIME__ ";
-    defnam[4]="__STDC__ ";
+    defnam[4]="__LINE__ ";  /* blank out STDC slot unless ANSI selected */
     defarg[0]=NULL;
     defarg[1]=NULL;
     defarg[2]=NULL;

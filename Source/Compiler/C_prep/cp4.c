@@ -40,13 +40,24 @@ int mname,mname2,idcntr;
 
     for (x=0;x<idcntr;++x)  /* loop for each identifier */
     {
+/*      fprintf(stderr,"EXPAND: idptr[%d]=|%s|\n",x,idptr[x]);  */
     for (i=0;i<defcntr;++i) /* loop for each definition name */
     {
+/*
+        fprintf(stderr,"EXPAND: defnam=|%s|\n",defnam[i]);
+        if (defarg[i])
+            fprintf(stderr,"EXPAND: defarg=%s\n",defarg[i]);
+        fprintf(stderr,"EXP: deftok=|%s|\n",deftok[i]);
+        fprintf(stderr,"EXP: line=%s\n",ln);
+*/
         if (strcmp2(idptr[x],defnam[i]))  /* returns 1 if match else 0 */
         {
             lpflag=FALSE;
             for (n=0;n<*lpcntr;++n)
             {
+/*
+                fprintf(stderr,"loop[%d]=%d i=%d\n",n,loop[n],i);
+*/
                 if (loop[n]==i)
                 {
                     lpflag=TRUE;
@@ -72,6 +83,9 @@ int mname,mname2,idcntr;
                 f+=2;   /* point to 1st arg */
                 do      /* loop for each arg */
                 {
+/*
+            fprintf(stderr,"EXPAND : b4 toksrch 1\n");
+*/
                     l=toksrch(ln,",",0,99,99,f,&tcnt);
                     if (l==ERROR)
                     {   /* either get , separator or ) arg terminator */
@@ -95,8 +109,17 @@ int mname,mname2,idcntr;
                 } while (ln[l]==',');
                 for (j=0;j<e;++j)   /* loop to expand each arg */
                 {
+/*
+                    fprintf(stderr,"EXPAND (b4 exp(exmac))\n");
+*/
                     expln(exmacargs[j],NULL,NULL);
+/*
+                    fprintf(stderr,"EXPAND (aft for): mc[%d]=|%s| ex[%d]=|%s|\n",j,macargs[j],j,exmacargs[j]);
+*/
                 }
+/*
+        fprintf(stderr,"EXPAND (e tst): e=%d tst=%d\n",e,tstargs(i));
+*/
                 if (tstargs(i)!=e)
                 {
                     doerr(14,d);    /* wrong # of args */
@@ -112,17 +135,29 @@ int mname,mname2,idcntr;
                     {       /* token found is arg */
                         if (!strcmp(getoknum(deftok[i],tptr,k-2),"#"))
                         {
+/*
+                    fprintf(stderr,"EXP pre#\n");
+*/
                             addqmac(macargs[tcnt-1]);
+/*
+                fprintf(stderr,"EXP addqmac: macarg=|%s|\n",macargs[tcnt-1]);
+*/
                             strcat(buf,macargs[tcnt-1]);
                             strcat(buf," ");
                         }
                         else if (!strcmp(getoknum(deftok[i],tptr,k-2),"##") || !strcmp(getoknum(deftok[i],tptr,k),"##"))
                         {
+/*
+                    fprintf(stderr,"EXP pre/post##\n");
+*/
                             strcat(buf,macargs[tcnt-1]);
                             strcat(buf," ");
                         }
                         else
                         {
+/*
+                    fprintf(stderr,"EXP not#or##\n");
+*/
                             strcat(buf,exmacargs[tcnt-1]);
                             strcat(buf," ");    /* use expanded args */
                         }
@@ -139,6 +174,9 @@ int mname,mname2,idcntr;
                             strcat(buf," ");
                         }
                     }
+/*
+            fprintf(stderr,"EXPAND (after if): buf=%s\n",buf);
+*/
                 }
                 /* substitute entire macro into ln[] */
                 buf[strlen(buf)-1]=0;   /* drop final space */
@@ -153,6 +191,10 @@ int mname,mname2,idcntr;
 
                 strcat(lnptr,dtok);   /* replace end of ln */
 
+/*
+                fprintf(stderr,"EXPAND (ln): |%s|\n",ln);
+                fprintf(stderr,"EXPAND :mn=%d mn2=%d x=%d ic=%d\n",mname,mname2,x,idcntr);
+*/
     os=0;
     for (m=x+1;m<idcntr;++m)    /* adjust idptr */
     {
@@ -162,6 +204,11 @@ int mname,mname2,idcntr;
             idptr[m-os]=idptr[m]+mname2-mname;
     }
     idcntr-=os;
+/*
+                fprintf(stderr,"EXPAND (ln): |%s|\n",ln);
+                fprintf(stderr,"EXPAND2:mn=%d mn2=%d x=%d ic=%d\n",mname,mname2,x,idcntr);
+        fprintf(stderr,"EXPAND (b4 exp2): ln=%s\n",ln);
+*/
             }
             else    /* Not a macro */
             {
@@ -185,6 +232,9 @@ int mname,mname2,idcntr;
                 for (l=x+1;l<idcntr;++l)   /* adjust idptr */
                     idptr[l]+=mname2-mname;
             }
+/*
+            fprintf(stderr,"lpcntr=%d\n",*lpcntr);
+*/
             if (*lpcntr)
                 --*lpcntr;
             break;
@@ -202,7 +252,9 @@ char buf[LINEMAX+3];
     *buf=' ';
     strcpy(&buf[1],ln);
     strcat(buf," ");
+/*  fprintf(stderr,"EXPLN (buf): |%s|\n",buf);  */
     expand(buf,l,lc);
+/*  fprintf(stderr,"EXPLN (buf)2: |%s|\n",buf); */
     buf[strlen(buf)-1]=0;   /* Kill final space in line */
     strcpy(ln,&buf[1]);
 }

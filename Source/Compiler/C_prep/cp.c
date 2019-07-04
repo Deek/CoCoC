@@ -46,6 +46,7 @@ char edition[5];
                 case 'c':   /* Compiler select */
                 case 'C':
                     cflag=TRUE; /* select Microware C compatible */
+                    defnam[4]="__STDC__";
                 break;
                 case 'e':   /* Edition # */
                 case 'E':   /* Format: -e[=<decimal number>] */
@@ -155,12 +156,14 @@ int a;          /* terminates */
 {
 register char *lnptr;
     lnptr=&line[a];
+/*  fprintf(stderr,"GETLN:fpath=%d errno=%d\n",fpath[fptr],errno); */
     if ((a=lnread(fpath[fptr],lnptr,LINEMAX-a))==ERROR)
     {
         eflag=TRUE;     /* exit at next opportunity */
         return NULL;   /* EOF on blank line */
     }
     ++_line_;
+/*  fprintf(stderr,"a=%d line=|%s|\n",a,line);  */
     return a;  /* returns number of bytes read */
 }
 
