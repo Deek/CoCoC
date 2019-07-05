@@ -11,8 +11,8 @@
 #define NEWLINE 13
 #define SPACE 32
 #define DEAD 3
-#define IDNT_INIT(x) isalpha(x) || x=='_'
-#define IDNT_TYPE(x) IDNT_INIT(x) || (x>='0' && x<='9')
+#define IDNT_INIT(x) ((isalpha(x)) || ((x)=='_'))
+#define IDNT_TYPE(x) (IDNT_INIT(x) || (x>='0' && x<='9'))
 #define STRNG_TBL_MAX 6500
 #define MAX_ARGS 4
 #define MAX_LENGTH 120

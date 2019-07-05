@@ -1,5 +1,16 @@
 #include "cp.h"
 
+/*5/2x/2011
+ *found a bug!
+ *splittok goes to toknum on . since a fp const can start with a .
+ *and then checks to see if it's a stuct operator by looking at the 
+ *previous token's last char.  If the last char was an identifier char
+ *then the token can't be a number.  This failed on arrays of structs
+ *
+ *standard also allows (expression).element
+ *these work now
+ */
+
 doinclude(ln)  /* open include files and place in file path stack */
 char *ln;
 {
@@ -165,8 +176,10 @@ char tmp[LINEMAX+3],*tptr,*lnptr;
             b=getident(tmp,tptr-tmp)+1;    /* point to char after ident. */
         else if (*tptr=='"' || *tptr=='\'') /* chars or strings */
             b=qa2(tmp,*tptr,tptr-tmp)+1; /* point to char after string */
-        else if (isdigit(*tptr) || *tptr=='.') /* test for number */
+        else if (isdigit(*tptr) || *tptr=='.') { /* test for number */
             b=toknum(tmp,tptr);      /* point to char after number */
+/*fprintf(stderr,"found a number?\n"); */
+         }
         else if ((c=tokopr(tmp,tptr-tmp))!=ERROR) /* Check for legal operators */
             b=c+1;  /* point to char after operator */
         else
@@ -237,8 +250,9 @@ toknum(ln,lnptr)
 char *ln,*lnptr;
 {
     if (*lnptr=='.')    /* screen out . as a struct operator */
-        if (lnptr>ln && (IDNT_TYPE((*(lnptr-1)))))
-            return (++lnptr-ln);
+        if (lnptr>ln)   /*5/26/2011 struct arrays bug */
+            if(IDNT_TYPE((*(lnptr-1)))||(*(lnptr-1)==']')||(*(lnptr-1)==')'))
+               return (++lnptr-ln);
 
     for (;;)
     {

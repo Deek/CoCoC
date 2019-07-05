@@ -3,6 +3,11 @@
 /*set this to work around Kreider ctime's Y2K bug*/
 #define Y2K 1
 
+/*5/24/2011 fix _date and _time_
+ *5/25/2011 work around Y2K issue for _date_
+ *5/28/2011 add \d<decimal constant> for Microware C
+ */
+
 #define ishex(x) ((x)>='0' && (x)<='9') || ((x)>='a' && (x)<='f') || ((x)>='A' && (x)<='F')
 #define isoctal(x) (x)>='0' && (x)<='7'
 
@@ -493,6 +498,12 @@ char *l,*ln;           /* ln must point to first \ in escape sequence */
                 ++ln;
             } while (ishex(*ln));
             return --ln;
+        break;
+        case 'd': /*Microware addition for CoCo 5/28/2011 */
+             do {
+               ++ln;
+             } while(isdigit(*ln));
+             return --ln;
         break;
         case '0':
         case '1':
