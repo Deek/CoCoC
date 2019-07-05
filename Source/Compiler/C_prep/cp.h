@@ -155,7 +155,7 @@ long clock;
 #ifndef MAIN
 extern
 #endif
-char *timdat,_date_[12],_time_[9];
+char *timdat,_date_[14],_time_[11]; /*5/24/2011 room for double-quotes*/
 
 #ifndef MAIN
 extern

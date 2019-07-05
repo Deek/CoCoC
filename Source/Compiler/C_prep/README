@@ -8,6 +8,14 @@
 
                           With 1.9 updates by
                    Gene Heskett, CE@WDTV, delphi WOAY
+                          And 1.9A updates by
+                   Willard Goosey, goosey@sdc.org
+
+C_PREP 1.9A has three more bugs fixed:  __FILE__, __DATE__, and __TIME__
+macros now output double-quote enclosed strings like the ANSI standard
+and this file says they should, a Y2K bug in __DATE__ was worked 
+around (the real fix would go in clib), and __STDC__ now has the proper
+value of 1 in ANSI mode.
 
 C_PREP Version 1.9 has had two bugs fixed, and one error printout re-enabled
 that the 1.8 version didn't do, and its array sizes for defines increased

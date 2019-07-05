@@ -1,5 +1,7 @@
 #define MAIN 1
 #include "cp.h"
+/*set this to work around Kreider ctime's Y2K bug*/
+#define Y2K 1
 
 #define ishex(x) ((x)>='0' && (x)<='9') || ((x)>='a' && (x)<='f') || ((x)>='A' && (x)<='F')
 #define isoctal(x) (x)>='0' && (x)<='7'
@@ -13,11 +15,20 @@ char edition[5];
 
     clock=time((long *)0);
     timdat=ctime(&clock);        /* produce time/date string */
-    strncpy(_date_,&timdat[4],7);
-    strncpy(&_date_[7],&timdat[20],4);
-    _date_[11]=0;               /* copy date string into _date_ */
-    strncpy(_time_,&timdat[11],8);
-    _time_[8]=0;                /* copy time string into _time_ */
+/*5/24/2011 _date_ and _time_ need to have quotes included in them*/
+    strcpy(_date_,"\"");
+    strncat(_date_,&timdat[4],7);
+    strncat(&_date_[7],&timdat[20],4);
+    strcat(_date_,"\"");
+    _date_[13]=0;               /* copy date string into _date_ */
+#ifdef Y2K   /*5/25/2011 overwrite the 19 in the year string with 20*/
+    _date_[8]='2';
+    _date_[9]='0';
+#endif
+    strcpy(_time_,"\"");
+    strncat(_time_,&timdat[11],8);
+    strcat(_time_,"\"");
+    _time_[10]=0;                /* copy time string into _time_ */
     initstdefs();   /* Initialize standard definitions */
     edition[0]='0';
     edition[1]=0;
@@ -45,8 +56,8 @@ char edition[5];
                 break;
                 case 'c':   /* Compiler select */
                 case 'C':
-                    cflag=TRUE; /* select Microware C compatible */
-                    defnam[4]="__STDC__";
+                    cflag=TRUE; /* select ANSI C compatible */
+                    defnam[4]="__STDC__ "; /*space afer __ needful 2011*/
                 break;
                 case 'e':   /* Edition # */
                 case 'E':   /* Format: -e[=<decimal number>] */

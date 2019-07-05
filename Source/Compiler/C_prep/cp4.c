@@ -227,8 +227,10 @@ int mname,mname2,idcntr;
                     case 0: /* __LINE__ */
                         itoa(_line_-1,lptr);
                     break;
-                    case 1: /* __FILE__ */
-                        strcpy(lptr,ifnbuf[fptr]);
+                    case 1: /* __FILE__ */ /*should be quoted 5/22/2011*/
+                        strcpy(lptr,"\"");
+                        strcat(lptr,ifnbuf[fptr]);
+                        strcat(lptr,"\"");
                     break;
                     default:
                         strcpy(lptr,deftok[i]);   /* copy tok-seq into line */

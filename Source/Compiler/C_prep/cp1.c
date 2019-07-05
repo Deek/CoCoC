@@ -267,7 +267,7 @@ initstdefs()
     deftok[1]=NULL;
     deftok[2]=_date_;
     deftok[3]=_time_;
-    deftok[4]="1";      /* Indicates ANSI compatible */
+    deftok[4]="1 ";      /* Indicates ANSI compatible */
 }
 
 cncatstr(ln)

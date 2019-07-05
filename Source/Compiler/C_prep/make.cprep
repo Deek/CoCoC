@@ -1,6 +1,0 @@
-cc3 cp.c -r
-cc3 cp1.c -r
-cc3 cp2.c -r
-cc3 cp3.c -r
-cc3 cp4.c -r
-cc3 cp.r cp1.r cp2.r cp3.r cp4.r solve.r findstr.r -m=19k -f=c_prep
