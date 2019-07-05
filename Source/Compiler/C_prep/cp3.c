@@ -350,8 +350,13 @@ lnread:
  leax d,x    (add # of bytes read to &s and get end of string)
  lda ,x
  cmpa #13    (check for CR)
- lbne os9er1 (no CR terminator)
- clr ,x      (change CR to NULL)
+ lbeq clrbyt (good to go)
+ leay 1,y    (restore original length of read bytes)
+ cmpy 8,s    (is # of bytes read value less then n)
+ lbeq os9er1 (no terminator and no room to add null)
+ leax 1,x    (point x passed end of read string)
+ leay -1,y   (decrement # of bytes read value)
+clrbyt clr ,x (change CR or trash to NULL)
  tfr y,d     (return # of bytes read)
  puls y,pc
 

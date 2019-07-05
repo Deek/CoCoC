@@ -3,6 +3,16 @@
 #include <ctype.h>
 #include <memory.h>
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+#ifndef ERROR
+#define ERROR -1
+#endif
+
 #define LINEMAX 250  /* Max # of chars allowed + CR and EOF and NULL */
 #define HTAB 9
 #define LINEFEED 10

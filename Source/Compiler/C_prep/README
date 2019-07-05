@@ -1,6 +1,6 @@
 
 
-                    C_PREP - Documentation Version 1.8
+                    C_PREP - Documentation Version 1.9C
 
 
                             by Jim McDowell
@@ -10,6 +10,13 @@
                    Gene Heskett, CE@WDTV, delphi WOAY
                           And 1.9A updates by
                    Willard Goosey, goosey@sdc.org
+                          And 1.9C updates by
+                    Walter Zambotti zambotti@iinet.net.au
+
+C_PREP 1.9C Fixed an error in readln where the last line of a file was not
+terminated by a NL character would cause the last line to be ignored.
+Added definitions for TRUE, FALSE, ERROR in cp.h which are not defined by the 
+Microware version of <stdio.h>.
 
 C_PREp 1.9B fixes two more errors:  Arrays of structs and struct expressions
 now would break element names if the element name contained an '_', and
