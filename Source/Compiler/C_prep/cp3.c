@@ -311,13 +311,17 @@ int i,xflag;
             case 20:
                 fprintf(stderr,"Syntax error - Illegal escape sequence");
             break;
+            case 21:
+                fprintf(stderr,"Define arrays full - more than %d\n",MAX_DEFS);
+                xflag=TRUE;
+            break;
         }
         fprintf(stderr," ***\n%s\n",line);
- /*
+
         for (i=0;i<errptr;++i)
             fprintf(stderr," ");
         fprintf(stderr,"^\n");
-*/
+
         if (xflag)
             exit(0);
         return ERROR;
@@ -396,12 +400,4 @@ os9er2
  ldd #-1
  rts
 #endasm
-
-
-
-
-
-
-
-
 

@@ -14,8 +14,16 @@ char *idptr[80];
 int mname,mname2,idcntr;
 
 /* SETUP LOOP AND LPCNTR */
-
-    if (!*lpcntr)
+/* the following test USED to have a * between the ! and lpcntr which
+   resulted in one of the most dificult, time consuming bugs I've ever
+   traced. It was ok if the caller had a "0" in the third argument
+   position, but crashed if the caller used a "NULL". The problem then
+   was that the data at address $0000 was not zero at times which resulted
+   if the vars loop and lpcntr being left at $0000. The input file pathtable
+   lived near $0000, and got trashed because the writes this routine did
+   were then at or near $0000. Gene Heskett, WDTV5CE.
+*/
+    if (!lpcntr)
     {
         lpc=0;
         lpcntr=&lpc;

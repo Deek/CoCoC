@@ -150,7 +150,7 @@ int b,d;
 {
 register int i;
     if (d-b>30)     /* If identifier length is >31 ... */
-        d=b+30;     /* set identifier lenght = 31 */
+        d=b+30;     /* set identifier length = 31 */
     for (i=b;i<=d;++i)  /* Put def name in $trng table */
     {
         if (dptr<&dstrtbl[STRNG_TBL_MAX-2])    /* test $trng table */
@@ -163,20 +163,28 @@ register int i;
 }
 
 
-dodefine(a,b)   /* Given B: pos. of char. after 1st space */
+dodefine(a,b)   /* Given A:strlen, B: pos. of char. after 1st space */
 int a,b;        /* This rtn places define parms into proper tables */
 {               /* for reading during macro expansion */
 int c,d;        /* Returns NULL if no errors */
 
     if ((d=c=getident(line,b))==ERROR)  /* Get identifier */
         return (doerr(1,b));     /* Return if invalid identifier */
+/*    fprintf(stderr,"In dodef, defining '%s'\n",&line[b]); */
+
+/* Lets convert a crashed program into an error exit here folks, by
+   checking to see if we've run out of deftbl room regardless of the
+   status of the string table checked on later. Gene Heskett WDTV5CE. */
+
+    if((defcntr+1)>=MAX_DEFS)
+        doerr(21,b); /* doerr() will exit(0) on this one */
     defnam[defcntr]=dptr;   /* Put identifier addr in def name tbl */
     putiddtbl(b,d);           /* Put def name in $trng table */
 /*  fprintf(stderr,"DODEFINE: line[c+1]=|%c|\n",line[c+1]);
     fprintf(stderr,"DODEFINE: line=%s\n",line); */
     if (line[c+1]=='(')     /* if def is macro... */
     {
-        d=b=skpbl(line,c+2);     /* Allign to 1st non-space char in macro */
+        d=b=skpbl(line,c+2);     /* Align to 1st non-space char in macro */
         if (line[b]!=')')   /* if more than 0 arguments in macro */
         {
             --b;
@@ -237,8 +245,10 @@ char *ln;
         ;
     if (!*ln)      /* NULL directive */
         return (killine());
+ /* fprintf(stderr,"prep - line=%s\n",ln); */
     if (strcmp2(ln,"if ") || strcmp2(ln,"ifdef ") || strcmp2(ln,"ifndef "))
     {
+     /* fprintf(stderr,"prep - calling doif(%s)\n",ln); */
         doif(ln);
         return (killine());
     }
@@ -275,7 +285,9 @@ char *ln;
         }
         if (strcmp2(ln,"undef "))
         {
+	 /* fprintf(stderr,"prep - undef found %s\n",ln); */
             doundef(&ln[6]);    /* remove undef identifier from def table */
+	 /* fprintf(stderr,"prep - doundef done\n"); */
             return (killine());    /* Discard #undef line */
         }
         if (strcmp2(ln,"error "))

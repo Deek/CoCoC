@@ -123,7 +123,7 @@ char edition[5];
             if (a && procsw && tstline(a))
             {
                 splittok(line,0);    /* Split non # line into tokens */
-                expand(line,NULL,0);
+                expand(line,NULL,NULL);
                 cncatstr(line);     /* Concatenate adjacent strings */
                 convert(VTAB,SPACE);
                 lnprint(0,&lnflag[0]);

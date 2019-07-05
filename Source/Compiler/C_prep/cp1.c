@@ -40,7 +40,7 @@ int c;
     else    /* Check for token-sequence */
     {
         splittok(ln,0);   /* split end of line into tokens */
-        expln(ln,NULL,0);
+        expln(ln,NULL,NULL);
 /*      fprintf(stderr,"ERR:ln=%s\n",ln);   */
         if (*ln=='\"' || *ln=='<')  /* If now in proper format... */
             doinclude(ln);       /* open include file */
@@ -81,8 +81,16 @@ char *ln;
 {
 int c,d,i,j;
 char *sptr, *eptr;
-
-    splittok(ln,0);     /* tokenize identifier */
+/* Unforch, Jims code didn't work because the 'ln' passed didn't have
+	any spaces attached until the splittok(ln,0) had been done, at
+	which point it had spaces on BOTH ends. The defnam array holds
+	each name with an ending space only, therefore none of the strcmp
+	utilitys ever found a match. The undef was never done as no match
+	was ever found. However, PLEASE give Jim credit for the well
+	organized code thats easy to fix. Gene Heskett, CE@WDTV
+*/
+    splittok(ln,0); /* tokenize identifier */
+    ln++; 		/* this the fix */
     if (strlen(ln)>33)  /* Adjust ident. length if exceeds 31 + 2 spaces */
     {
         ln[32]=' ';
@@ -92,6 +100,7 @@ char *sptr, *eptr;
     {
         if (!strcmp(defnam[i],ln))  /* Undef name found */
         {
+/*          fprintf(stderr,"%s, defnmbr %d is being undefined as %s\n",ln,i,defnam[i]); */
             if (i==defcntr-1)   /* last name in table */
             {
                 dptr=defnam[i];
@@ -99,24 +108,25 @@ char *sptr, *eptr;
             }
             else
             {
-                sptr=defnam[i];
-                eptr=defnam[i+1];
-                d=eptr-sptr;
-                do      /* Adjust $trng table */
+                sptr=defnam[i]; 	/* where to start removal */
+                eptr=defnam[i+1]; 	/* where to get next define name */
+                d=eptr-sptr;     	/* num of chars to remove */
+                do      		/* Adjust $tring table */
                 {
-                    *sptr++=*eptr++;
-                } while (eptr!=dptr);
-                dptr-=d;
-                for (j=i+1;j<defcntr;++j)   /* Adjust def arrays */
+                    *sptr++=*eptr++; 	/* copy remainder of table over it */
+                } while (eptr!=dptr); 	/* till end of table + next char */
+                dptr-=d; 		/* and fix dptr back that far too */
+                for (j=i+1;j<defcntr;++j)   	/* Adjust def arrays */
                 {
-                    defnam[j-1]=defnam[j]-d;
-                    deftok[j-1]=deftok[j]-d;
-                    if (defarg[j])
-                        defarg[j-1]=defarg[j]-d;
+                    defnam[j-1]=defnam[j]-d; 	/* fix each pointer to equal */
+                    deftok[j-1]=deftok[j]-d; 	/* next pointer -d */
+                    if (defarg[j]) /* if it had a defined value, move it */
+                        defarg[j-1]=defarg[j]-d; /* down the list too */
                     else
                         defarg[j-1]=NULL;
                 }
-                --defcntr;
+                --defcntr;		/* and remove it from the count */
+                return (killine());
             }
         }
     }

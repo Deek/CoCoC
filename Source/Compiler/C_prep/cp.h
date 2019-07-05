@@ -13,12 +13,12 @@
 #define DEAD 3
 #define IDNT_INIT(x) isalpha(x) || x=='_'
 #define IDNT_TYPE(x) IDNT_INIT(x) || (x>='0' && x<='9')
-#define STRNG_TBL_MAX 5000
+#define STRNG_TBL_MAX 6500
 #define MAX_ARGS 4
 #define MAX_LENGTH 120
 #define MAX_NEST_IF 9   /* This value+1 = total # of nested #ifs allowed */
 #define MAX_INCLUDE 8
-#define MAX_DEFS 300
+#define MAX_DEFS 400
 #define killine() *line=0
 
 char *skipbl();
