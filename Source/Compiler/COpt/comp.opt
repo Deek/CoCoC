@@ -1,0 +1,1 @@
+cc2 -s main.c parse.c labels.c inst.c optim.c misc.c ../rasm/rels/ctype.r -f=t.opt -m=2k -e=3 -q

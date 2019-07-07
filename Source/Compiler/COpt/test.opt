@@ -1,0 +1,59 @@
+-x      del /h0/cmds/t.opt.bk
+-x      del /h0/cmds/t.opt.new
+x t     tmode .1 -pause
+c.prep main.c ! c.comp -s >main.a
+c.prep parse.c ! c.comp -s >parse.a
+c.prep labels.c ! c.comp -s >labels.a
+c.prep inst.c ! c.comp -s >inst.a
+c.prep optim.c ! c.comp -s >optim.a
+c.prep misc.c ! c.comp -s >misc.a
+c.opt main.a main.o
+c.opt parse.a parse.o
+c.opt labels.a labels.o
+c.opt inst.a inst.o
+c.opt optim.a optim.o
+c.opt misc.a misc.o
+c.asm main.o -o=main.r
+c.asm parse.o -o=parse.r
+c.asm labels.o -o=labels.r
+c.asm inst.o -o=inst.r
+c.asm optim.o -o=optim.r
+c.asm misc.o -o=misc.r
+cc2 main.r parse.r labels.r inst.r optim.r misc.r ../rma/rels/ctype.r -f=t.opt -m=2k -q -e=2
+load t.opt
+t.opt main.a main.o
+t.opt parse.a parse.o
+t.opt labels.a labels.o
+t.opt inst.a inst.o
+t.opt optim.a optim.o
+t.opt misc.a misc.o
+unlink t.opt
+c.asm main.o -o=main.r
+c.asm parse.o -o=parse.r
+c.asm labels.o -o=labels.r
+c.asm inst.o -o=inst.r
+c.asm optim.o -o=optim.r
+c.asm misc.o -o=misc.r
+rename /h0/cmds/t.opt t.opt.bk
+cc2 main.r parse.r labels.r inst.r optim.r misc.r ../rma/rels/ctype.r -f=t.opt -m=2k -q -e=2
+load t.opt
+t.opt main.a main.o
+t.opt parse.a parse.o
+t.opt labels.a labels.o
+t.opt inst.a inst.o
+t.opt optim.a optim.o
+t.opt misc.a misc.o
+unlink t.opt
+c.asm main.o -o=main.r
+c.asm parse.o -o=parse.r
+c.asm labels.o -o=labels.r
+c.asm inst.o -o=inst.r
+c.asm optim.o -o=optim.r
+c.asm misc.o -o=misc.r
+rename /h0/cmds/t.opt t.opt.new
+cc2 main.r parse.r labels.r inst.r optim.r misc.r ../rma/rels/ctype.r -f=t.opt -m=2k -q -e=2
+d-e /h0/cmds/*.opt*
+wait
+del main.a parse.a labels.a inst.a optim.a misc.a
+del main.o parse.o labels.o inst.o optim.o misc.o
+tmode .1 pause

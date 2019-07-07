@@ -1,0 +1,2 @@
+cc2 -rs optim.c
+cc2 rels/main.r rels/parse.r rels/labels.r rels/inst.r optim.r misc.r ../rma/rels/ctype.r -f=t.opt -m=2k -e=2 -q
