@@ -1,6 +1,6 @@
 #include "op.h"
 #include "actions.h"
-#include <ctype.h>
+#include "ctype.h"
 
 direct int opsdone;
 int labelnum = 0;
