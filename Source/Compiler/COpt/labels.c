@@ -93,6 +93,7 @@ char *lblp;
 {
     static int labnum = 0;
 
-    return sprintf(lblp,"_$%d",++labnum);
+    sprintf(lblp,"_$%d",++labnum);
+    return lblp;
 }
 
