@@ -1,5 +1,4 @@
 #include "op.h"
-#define NULL ((char*)0)
 
 chain ltable[128];
 direct label *lfree;

@@ -1,5 +1,5 @@
 #include "op.h"
-#include "../rma/ctype.h"
+#include <ctype.h>
 
 parse(type,s,p,globflag)
 int type,*globflag;

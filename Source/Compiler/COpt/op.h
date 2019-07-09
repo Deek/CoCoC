@@ -21,8 +21,10 @@
 #define CODEBRK     0x0100
 #define DESTPTR     0x0200
 
+#ifndef TRUE
 #define TRUE    1
 #define FALSE   0
+#endif
 
 #define FORWARD 4
 #define BACK    5
