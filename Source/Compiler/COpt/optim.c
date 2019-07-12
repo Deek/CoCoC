@@ -85,7 +85,7 @@ loop:   if (i == &ilist || (i2 = i->succ) == &ilist)
             i = i2;
             c = 0;
             for (ap = a->actp; ap; ap = ap->nxtins) {
-                if (i == &ilist || i->llist) break;
+                if (i == &ilist) break; /* || i->llist -- i has labels */
                 if (ap->mnp && match(i->mnem,ap->mnp) == 0) break;
                 if (ap->opp) {
                     if (ap->opp == 1) {
@@ -120,6 +120,7 @@ loop:   if (i == &ilist || (i2 = i->succ) == &ilist)
             --c;
         }
         while (c > 0) {
+            if (i->llist) movlab(i,i2); // move any labels in i to i2
             i2 = i->pred;
             remins(i);
             ++opsdone;
