@@ -30,12 +30,12 @@ typedef struct ins {
 
 static instr
     act1b = {NULL,      std,    NULL},
-    act1a = {&act1b,    ldd,    1},     rep1a = {NULL,      std,    NULL},
+    act1a = {&act1b,    ldd,    1},     rep1a = {NULL,      2,      NULL},
 
     act2f = {NULL,      clra,   NULL},
     act2e = {&act2f,    clrb,   NULL},
-    act2d = {&act2e,    pshs,   d},     rep2d = {NULL,      clra,   NULL},
-    act2c = {&act2d,    clra,   NULL},  rep2c = {&rep2d,    clrb,   NULL},
+    act2d = {&act2e,    pshs,   d},     rep2d = {NULL,      clra,   ""},
+    act2c = {&act2d,    clra,   NULL},  rep2c = {&rep2d,    clrb,   ""},
     act2b = {&act2c,    clrb,   NULL},  rep2b = {&rep2c,    pshs,   d},
     act2a = {&act2b,    pshs,   d},     rep2a = {&rep2b,    pshs,   d},
 
@@ -43,34 +43,34 @@ static instr
     act3a = {&act3b,    pshs,   d},     rep3a = {NULL,      std,    zs},
 
     act4b = {NULL,      leas,   p2s},
-    act4a = {&act4b,    std,    m2s},   rep4a = {NULL,      std,    ",s++"},
+    act4a = {&act4b,    std,    m2s},   rep4a = {NULL,      1,    ",s++"},
 
     act5b = {NULL,      leau,   p1u},
-    act5a = {&act5b,    ldb,    m1u},   rep5a = {NULL,      NULL,   ",u+"},
+    act5a = {&act5b,    ldb,    m1u},   rep5a = {NULL,      1,      ",u+"},
 
     act6b = {NULL,      sex,    NULL},
-    act6a = {&act6b,    cmpd,   litnum},rep6a = {NULL,      cmpb,   NULL},
+    act6a = {&act6b,    cmpd,   litnum},rep6a = {NULL,      cmpb,   1},
 
     act7b = {NULL,      sex,    NULL},
-    act7a = {&act7b,    clra,   NULL},  rep7a = {NULL,      clra,   NULL},
+    act7a = {&act7b,    clra,   NULL},  rep7a = {NULL,      1,      1},
 
     act8b = {NULL,      clra,   NULL},
-    act8a = {&act8b,    cmpd,   litnum},rep8a = {NULL,      cmpb,   NULL},
+    act8a = {&act8b,    cmpd,   litnum},rep8a = {NULL,      cmpb,   1},
 
     act9b = {NULL,      pshs,   d},
-    act9a = {&act9b,    pshs,   x},     rep9a = {NULL,      pshs,   dx},
+    act9a = {&act9b,    pshs,   x},     rep9a = {NULL,      2,      dx},
 
     act10b = {NULL,     pshs,   d},
-    act10a = {&act10b,  pshs,   y},     rep10a = {NULL,     pshs,   dy},
+    act10a = {&act10b,  pshs,   y},     rep10a = {NULL,     2,      dy},
 
     act11b = {NULL,     pshs,   u},
-    act11a = {&act11b,  leas,   m2s},   rep11a = {NULL,     pshs,   du},
+    act11a = {&act11b,  leas,   m2s},   rep11a = {NULL,     2,      du},
 
     act12b = {NULL,     pshs,   u},
-    act12a = {&act12b,  leas,   "-4,s"},rep12a = {NULL,     pshs,   dxu},
+    act12a = {&act12b,  leas,   "-4,s"},rep12a = {NULL,     2,      dxu},
 
     act13b = {NULL,     pshs,   u},
-    act13a = {&act13b,  leas,   "-6,s"},rep13a = {NULL,     pshs,   dxyu};
+    act13a = {&act13b,  leas,   "-6,s"},rep13a = {NULL,     2,      dxyu};
 
 typedef struct act {
     struct act *nxtact;

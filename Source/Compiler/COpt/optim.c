@@ -14,21 +14,37 @@ optinit()
     register action *a,**slot;
 #ifdef DEBUG
     instr *ap,*rp;
+    static char *one = "<curr>", *two = "<prev>";
+    char *tmp, *tmp2;
 #endif
 
     for(a = actions; a->nxtact; a++) {
 #ifdef DEBUG
-        debug("    %-17s  %s\n","action","replacement");
+        debug("\n    %-17s  %s\n","action","replacement");
         rp = a->repp;
         for (ap = a->actp; ap; ap = ap->nxtins) {
-          debug("    %-8s %-8s",(ap->mnp ? ap->mnp : "<any>"),
-                                (ap->opp ? ap->opp : "<any>"));
-          if (rp) {
-            debug(", %-8s %-8s",(rp->mnp ? rp->mnp : "<same>"),
-                                (rp->opp ? rp->opp : "<same>"));
-            rp = rp->nxtins;
-          }
-          debug("\n");
+            if (ap->opp) {
+                if (ap->opp == 0x1) tmp = two;
+                else tmp = ap->opp;
+            }
+            debug("    %-8s %-8s",(ap->mnp ? ap->mnp : "<any>"),
+                                  (ap->opp ? tmp : "<any>"));
+            if (rp) {
+                if (rp->mnp) {
+                    if (rp->mnp == 0x1) tmp = one;
+                    else if (rp->mnp == 0x2) tmp = two;
+                    else tmp = rp->mnp;
+                }
+                if (rp->opp) {
+                    if (rp->opp == 0x1) tmp2 = one;
+                    else if (rp->opp == 0x2) tmp2 = two;
+                    else tmp2 = rp->opp;
+                }
+                debug(", %-8s %-8s",(rp->mnp ? tmp : "<same>"),
+                                    (rp->opp ? tmp2 : "<same>"));
+                rp = rp->nxtins;
+            }
+            debug("\n");
         }
 #endif
         slot = &acslots[hash(a->actp->mnp)];
@@ -114,8 +130,16 @@ loop:   if (i == &ilist || (i2 = i->succ) == &ilist)
         /* all matched - replace */
         i = i2;
         for (ap = a->repp; ap; ap = ap->nxtins) {
-            if (ap->mnp) strcpy(i->mnem,ap->mnp);
-            if (ap->opp) strcpy(i->args,ap->opp);
+            if (ap->mnp) {
+                if (ap->mnp == 1) /* do nothing, same as NULL */;
+                else if (ap->mnp == 2) strcpy(i->mnem,i->pred->mnem);
+                else strcpy(i->mnem,ap->mnp);
+            }
+            if (ap->opp) {
+                if (ap->opp == 1) /* do nothing, same as NULL */;
+                else if (ap->opp == 2) strcpy(i->args,i->pred->args);
+                else strcpy(i->args,ap->opp);
+            }
             i = i->pred;
             --c;
         }
