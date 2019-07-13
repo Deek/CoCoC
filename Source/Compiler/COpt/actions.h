@@ -29,48 +29,86 @@ typedef struct ins {
 } instr;
 
 static instr
-    act1b = {NULL,      std,    NULL},
-    act1a = {&act1b,    ldd,    1},     rep1a = {NULL,      2,      NULL},
+    /* All of these use the same replacement pattern */
+    act01b = {NULL,     stb,    NULL},
+    act01a = {&act01b,  ldb,    1},
+    act02b = {NULL,     std,    NULL},
+    act02a = {&act02b,  ldd,    1},
+    act03b = {NULL,     stx,    NULL},
+    act03a = {&act03b,  ldx,    1},     rep01 = {NULL,      2,      NULL},
 
-    act2f = {NULL,      clra,   NULL},
-    act2e = {&act2f,    clrb,   NULL},
-    act2d = {&act2e,    pshs,   d},     rep2d = {NULL,      clra,   ""},
-    act2c = {&act2d,    clra,   NULL},  rep2c = {&rep2d,    clrb,   ""},
-    act2b = {&act2c,    clrb,   NULL},  rep2b = {&rep2c,    pshs,   d},
-    act2a = {&act2b,    pshs,   d},     rep2a = {&rep2b,    pshs,   d},
+    act04f = {NULL,     clra,   NULL},
+    act04e = {&act04f,  clrb,   NULL},
+    act04d = {&act04e,  pshs,   d},     rep04c = {NULL,     clra,   ""},
+    act04c = {&act04d,  clra,   NULL},  rep04b = {&rep04c,  clrb,   ""},
+    act04b = {&act04c,  clrb,   NULL},  rep04a = {&rep04b,  pshs,   d},
+    act04a = {&act04b,  pshs,   d},     rep04 = {&rep04a,   pshs,   d},
 
-    act3b = {NULL,      leas,   p2s},
-    act3a = {&act3b,    pshs,   d},     rep3a = {NULL,      std,    zs},
+    act05b = {NULL,     leas,   p2s},
+    act05a = {&act05b,  pshs,   d},     rep05 = {NULL,      std,    zs},
 
-    act4b = {NULL,      leas,   p2s},
-    act4a = {&act4b,    std,    m2s},   rep4a = {NULL,      1,    ",s++"},
+    act06b = {NULL,     leas,   p2s},
+    act06a = {&act06b,  NULL,   m2s},   rep06 = {NULL,      1,      ",s++"},
 
-    act5b = {NULL,      leau,   p1u},
-    act5a = {&act5b,    ldb,    m1u},   rep5a = {NULL,      1,      ",u+"},
+    act07b = {NULL,     leau,   m2u},
+    act07a = {&act07b,  NULL,   zu},    rep07 = {NULL,      1,      ",--u"},
 
-    act6b = {NULL,      sex,    NULL},
-    act6a = {&act6b,    cmpd,   litnum},rep6a = {NULL,      cmpb,   1},
+    act08b = {NULL,     leau,   m1u},
+    act08a = {&act08b,  NULL,   zu},    rep08 = {NULL,      1,      ",-u"},
 
-    act7b = {NULL,      sex,    NULL},
-    act7a = {&act7b,    clra,   NULL},  rep7a = {NULL,      1,      1},
+    act09b = {NULL,     leau,   p1u},
+    act09a = {&act09b,  NULL,   m1u},   rep09 = {NULL,      1,      ",u+"},
 
-    act8b = {NULL,      clra,   NULL},
-    act8a = {&act8b,    cmpd,   litnum},rep8a = {NULL,      cmpb,   1},
+    act10b = {NULL,     leau,   p2u},
+    act10a = {&act10b,  NULL,   m2u},   rep10 = {NULL,      1,      ",u++"},
 
-    act9b = {NULL,      pshs,   d},
-    act9a = {&act9b,    pshs,   x},     rep9a = {NULL,      2,      dx},
+    act11b = {NULL,     leax,   m2x},
+    act11a = {&act11b,  NULL,   zx},    rep11 = {NULL,      1,      ",--x"},
 
-    act10b = {NULL,     pshs,   d},
-    act10a = {&act10b,  pshs,   y},     rep10a = {NULL,     2,      dy},
+    act12b = {NULL,     leax,   m1x},
+    act12a = {&act12b,  NULL,   zx},    rep12 = {NULL,      1,      ",-x"},
 
-    act11b = {NULL,     pshs,   u},
-    act11a = {&act11b,  leas,   m2s},   rep11a = {NULL,     2,      du},
+    act13b = {NULL,     leax,   p1x},
+    act13a = {&act13b,  NULL,   m1x},   rep13 = {NULL,      1,      ",x+"},
 
-    act12b = {NULL,     pshs,   u},
-    act12a = {&act12b,  leas,   "-4,s"},rep12a = {NULL,     2,      dxu},
+    act14b = {NULL,     leax,   p2x},
+    act14a = {&act14b,  NULL,   m2x},   rep14 = {NULL,      1,      ",x++"},
 
-    act13b = {NULL,     pshs,   u},
-    act13a = {&act13b,  leas,   "-6,s"},rep13a = {NULL,     2,      dxyu};
+    act15b = {NULL,     leay,   m2y},
+    act15a = {&act15b,  NULL,   zy},    rep15 = {NULL,      1,      ",--y"},
+
+    act16b = {NULL,     leay,   m1y},
+    act16a = {&act16b,  NULL,   zy},    rep16 = {NULL,      1,      ",-y"},
+
+    act17b = {NULL,     leay,   p1y},
+    act17a = {&act17b,  NULL,   m1y},   rep17 = {NULL,      1,      ",y+"},
+
+    act18b = {NULL,     leay,   p2y},
+    act18a = {&act18b,  NULL,   m2y},   rep18 = {NULL,      1,      ",y++"},
+
+    act19b = {NULL,     sex,    NULL},
+    act19a = {&act19b,  cmpd,   litnum},rep19 = {NULL,      cmpb,   1},
+    act20b = {NULL,     clra,   NULL},
+    act20a = {&act20b,  cmpd,   litnum},
+
+    act21b = {NULL,     sex,    NULL},
+    act21a = {&act21b,  clra,   NULL},  rep21 = {NULL,      1,      1},
+
+    act22b = {NULL,     pshs,   d},
+    act22a = {&act22b,  pshs,   x},     rep22 = {NULL,      2,      dx},
+
+    act23b = {NULL,     pshs,   d},
+    act23a = {&act23b,  pshs,   y},     rep23 = {NULL,      2,      dy},
+
+    act24b = {NULL,     pshs,   u},
+    act24a = {&act24b,  leas,   m2s},   rep24 = {NULL,      2,      du},
+
+    act25b = {NULL,     pshs,   u},
+    act25a = {&act25b,  leas,   "-4,s"},rep25 = {NULL,      2,      dxu},
+
+    act26b = {NULL,     pshs,   u},
+    act26a = {&act26b,  leas,   "-6,s"},rep26 = {NULL,      2,      dxyu};
+
 
 typedef struct act {
     struct act *nxtact;
@@ -78,19 +116,32 @@ typedef struct act {
 } action;
 
 action actions[] = {
-    {1,     &act1a,     &rep1a},
-    {1,     &act2a,     &rep2a},
-    {1,     &act3a,     &rep3a},
-    {1,     &act4a,     &rep4a},
-    {1,     &act5a,     &rep5a},
-    {1,     &act6a,     &rep6a},
-    {1,     &act7a,     &rep7a},
-    {1,     &act8a,     &rep8a},
-    {1,     &act9a,     &rep9a},
-    {1,     &act10a,    &rep10a},
-    {1,     &act11a,    &rep11a},
-    {1,     &act12a,    &rep12a},
-    {1,     &act13a,    &rep13a},
+    {1,     &act01a,    &rep01},
+    {1,     &act02a,    &rep01},
+    {1,     &act03a,    &rep01},
+    {1,     &act04a,    &rep04},
+    {1,     &act05a,    &rep05},
+    {1,     &act06a,    &rep06},
+    {1,     &act07a,    &rep07},
+    {1,     &act08a,    &rep08},
+    {1,     &act09a,    &rep09},
+    {1,     &act10a,    &rep10},
+    {1,     &act11a,    &rep11},
+    {1,     &act12a,    &rep12},
+    {1,     &act13a,    &rep13},
+    {1,     &act14a,    &rep14},
+    {1,     &act15a,    &rep15},
+    {1,     &act16a,    &rep16},
+    {1,     &act17a,    &rep17},
+    {1,     &act18a,    &rep18},
+    {1,     &act19a,    &rep19},
+    {1,     &act20a,    &rep19},
+    {1,     &act21a,    &rep21},
+    {1,     &act22a,    &rep22},
+    {1,     &act23a,    &rep23},
+    {1,     &act24a,    &rep24},
+    {1,     &act25a,    &rep25},
+    {1,     &act26a,    &rep26},
     {0,     NULL,       NULL},
 };
 
