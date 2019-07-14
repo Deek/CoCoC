@@ -111,7 +111,7 @@ int estimate(n)
 int percent(x,y)
 unsigned x,y;
 {
-    return y ? x / ((y + 50) / 100 ) : 0;
+    return (y>50) ? x / ((y + 50) / 100) : 0;
 }
 
 
