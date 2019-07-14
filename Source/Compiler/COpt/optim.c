@@ -9,52 +9,99 @@ action *acslots[128];
 extern direct chain *freeins;
 extern char *bratab[];
 
-optinit()
-{
-    register action *a,**slot;
 #ifdef DEBUG
-    instr *ap,*rp;
+dbgaction (act)
+action *act;
+{
+    register instr *ap, *rp;
     static char *one = "<curr>", *two = "<prev>";
     char *tmp, *tmp2;
+
+    debug("\n    %-17s  %s\n","action","replacement");
+    for (ap = act->actp, rp = act->repp; ap; ap = ap->nxtins) {
+        if (ap->opp) {
+            if (ap->opp == 0x1) tmp = two;
+            else tmp = ap->opp;
+        }
+        debug("    %-8s %-8s",(ap->mnp ? ap->mnp : "<any>"),
+                              (ap->opp ? tmp : "<any>"));
+        if (rp) {
+            tmp2 = NULL;
+            if (rp->mnp) {
+                if (rp->mnp == 0x1) tmp = one;
+                else if (rp->mnp == 0x2) tmp = two;
+                else tmp = rp->mnp;
+            }
+            if (rp->opp) {
+                if (rp->opp == 0x1) tmp2 = one;
+                else if (rp->opp == 0x2) tmp2 = two;
+                else tmp2 = rp->opp;
+            }
+            debug(", %-8s %-8s",(rp->mnp ? tmp : "<same>"),
+                                (rp->opp ? tmp2 : "<same>"));
+            rp = rp->nxtins;
+        }
+        debug("\n");
+    }
+}
 #endif
 
-    for(a = actions; a->nxtact; a++) {
+addsimpl(s)
+simplact *s;
+{
+    register action *a, **slot;
+    instr *i, *i2, *r;
+    simplact    *sa;
+
+    for (sa = s; sa, *sa; sa++) {
+        if (!(i = malloc(3 * (sizeof instr)))) error ("malloc\n");
+        if (!(a = malloc((sizeof action)))) error ("malloc\n");
+        i2 = (char *) i + (sizeof instr);
+        r = (char *) i2 + (sizeof instr);
+
+        i->nxtins = NULL;
+        i->mnp = sa->amn1;
+        i->opp = sa->aop1;
+        i2->nxtins = i;
+        i2->mnp = sa->amn2;
+        i2->opp = sa->aop2;
+        r->nxtins = NULL;
+        r->mnp = sa->rmnm;
+        r->opp = sa->rop;
+
+        a->actp = i2; a->repp = r;
+
 #ifdef DEBUG
-        debug("\n    %-17s  %s\n","action","replacement");
-        rp = a->repp;
-        for (ap = a->actp; ap; ap = ap->nxtins) {
-            if (ap->opp) {
-                if (ap->opp == 0x1) tmp = two;
-                else tmp = ap->opp;
-            }
-            debug("    %-8s %-8s",(ap->mnp ? ap->mnp : "<any>"),
-                                  (ap->opp ? tmp : "<any>"));
-            if (rp) {
-                if (rp->mnp) {
-                    if (rp->mnp == 0x1) tmp = one;
-                    else if (rp->mnp == 0x2) tmp = two;
-                    else tmp = rp->mnp;
-                }
-                if (rp->opp) {
-                    if (rp->opp == 0x1) tmp2 = one;
-                    else if (rp->opp == 0x2) tmp2 = two;
-                    else tmp2 = rp->opp;
-                }
-                debug(", %-8s %-8s",(rp->mnp ? tmp : "<same>"),
-                                    (rp->opp ? tmp2 : "<same>"));
-                rp = rp->nxtins;
-            }
-            debug("\n");
-        }
+        dbgaction(a);
 #endif
+
         slot = &acslots[hash(a->actp->mnp)];
         a->nxtact = *slot;
         *slot = a;
     }
 }
 
-#define isconbra(a) (((a) & BRAMASK) > (BRANCH|SUBR))
 
+optinit()
+{
+    register action *a,**slot;
+
+    for(a = actions; a->nxtact; a++) {
+
+#ifdef DEBUG
+        dbgaction(a);
+#endif
+
+        slot = &acslots[hash(a->actp->mnp)];
+        a->nxtact = *slot;
+        *slot = a;
+    }
+
+    addsimpl(simple);
+}
+
+
+#define isconbra(a) (((a) & BRAMASK) > (BRANCH|SUBR))
 optim(i)
 register instruction *i;
 {
@@ -62,7 +109,7 @@ register instruction *i;
     action *a;
     instr *ap;
     label *l;
-    int found,c;
+    int found,c,fallback = FALSE;
     char *m;
 
     i = i->pred;
@@ -93,7 +140,12 @@ loop:   if (i == &ilist || (i2 = i->succ) == &ilist)
 #ifdef DEBUG
         debug("actions search:\n");
 #endif
-        a = acslots[hash(i2->mnem)];
+        if (!(a = acslots[hash(i2->mnem)])) {
+            a = acslots[0];
+            fallback = TRUE;
+        }
+
+restart:
         for (found = FALSE; a ; a = a->nxtact) {
 #ifdef DEBUG
             debug("  matching action %04x.\n",a);
@@ -123,7 +175,14 @@ loop:   if (i == &ilist || (i2 = i->succ) == &ilist)
             }
         }
 
-        if (!found) return;
+        if (!found) {
+            if (!fallback) {
+                fallback = TRUE;
+                a = acslots[0];
+                goto restart;
+            }
+            return;
+        }
 #ifdef DEBUG
         debug("  all matched action %04x.\n",a);
 #endif
