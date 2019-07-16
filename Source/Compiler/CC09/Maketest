@@ -1,0 +1,16 @@
+RDIR = rels.y
+ODIR = /h0/cmds
+CFLAGS = -ccy09 -dPROF -S
+
+PROG = cz09
+FILES = cmain.r misc.r build.r optim.r stats.r longs.r floats.r\
+		inits.r get.r codgen.r local.r lex.r tranexp.r regscont.r\
+		declare.r bool.r printf.r
+
+$(PROG): $(FILES)
+	chd $(RDIR) rlink /h0/lib.new/cstart.r $(FILES)\
+		-l=/h0/lib.new/clib.l -l=/dd/lib/sys.l -o=$(PROG) -M=6 -e=13
+
+$(FILES): cj.h
+	cc3 $(CFLAGS) -f$(RDIR) $*
+

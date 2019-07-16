@@ -1,0 +1,21 @@
+#	makefile for 6809 C compiler
+RDIR = rels.debug
+ODIR = /h0/cmds
+CFLAGS = -ccc09 -dPROF -S
+
+PROG = cd09
+FILES = cmain.r misc.r build.r optim.r stats.r longs.r floats.r\
+		inits.r get.r codgen.r local.r lex.r tranexp.r regscont.r\
+		declare.r bool.r printf.r prtree.r
+
+$(PROG): $(FILES)
+	chd $(RDIR) rlink /h0/lib.new/cstart.r $(FILES)\
+		-l=/h0/lib.new/clib.l -l=/dd/lib/sys.l -o=$(PROG) -M=6 -e=13
+
+cmain.r stats.r tranexp.r regscont.r prtree.r: cj.h
+	cc3 $(CFLAGS) -dDEBUG -dPTREE -f$(RDIR) $*
+
+misc.r build.r optim.r longs.r floats.r inits.r get.r codgen.r local.r \
+lex.r declare.r bool.r printf.r: cj.h
+	cc3 $(CFLAGS) -f$(RDIR) $*
+
