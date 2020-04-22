@@ -34,6 +34,7 @@
 
 #ifdef unix
 #define direct
+#define register
 #define INTTYPE     short
 #define LONGTYPE    long
 #define FLOATYPE    float
