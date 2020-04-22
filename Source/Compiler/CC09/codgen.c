@@ -36,7 +36,7 @@ extern char *getrel(),regname();
 
 
 gen(op,rtype,arg,val)
-register op,rtype;
+register int op,rtype;
 register expnode *val;
 register int arg;
 {

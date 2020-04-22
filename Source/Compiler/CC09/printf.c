@@ -8,7 +8,7 @@
 /* DO NOT USE FOR ANYTHING ELSE */
 
 #include <stdio.h>
-#ifdef UNIX
+#ifdef unix
 #define direct
 #endif
 
@@ -36,7 +36,7 @@ static direct int leftflag,pad,flag;
 #define file    1
 #define string  2
 
-#ifndef UNIX
+#ifndef unix
 printf(fmt,args)
 char *fmt;
 int args;

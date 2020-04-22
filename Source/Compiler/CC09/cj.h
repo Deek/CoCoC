@@ -1,4 +1,11 @@
+#ifdef unix
+# define getline UNIX_getline
+# include <errno.h>
+# include <string.h>
+#endif
 #include <stdio.h>
+
+#undef getline
 
 #ifdef MAIN
 #define global
@@ -25,7 +32,7 @@
 #define DBLETYPE    double
 #endif
 
-#ifdef UNIX
+#ifdef unix
 #define direct
 #define INTTYPE     short
 #define LONGTYPE    long
@@ -323,6 +330,10 @@ typedef struct initstruct {
 #define UNKN        0
 #define UNDECL      0
 
+#ifdef TRUE
+#undef TRUE
+#undef FALSE
+#endif
 
 #define TRUE        1
 #define FALSE       0

@@ -10,7 +10,11 @@
 
 char *dumname = sdummy.sname;
 
+#if defined (OS9) || defined (OSK)
 char strname[] = "cstr.XXXXX";
+#else
+char strname[] = "cstr.XXXXXX";
+#endif
 
 #ifdef  SPLIT
 direct char *infile;
@@ -21,7 +25,7 @@ direct int eflag;
 #ifndef PASS2
 /* pass1 only */
 direct  int     *inclptr;       /* include stack pointer */
-#endif      <<<- inserted to match preceeding "ifndef PASS2"
+#endif     // <<<- inserted to match preceeding "ifndef PASS2"
 
 main(argc,argv)
 char **argv;
@@ -30,7 +34,7 @@ char **argv;
 
         int tidy();
 
-#ifdef UNIX
+#ifdef unix
         signal(2,tidy);
 #else
         intercept(tidy);

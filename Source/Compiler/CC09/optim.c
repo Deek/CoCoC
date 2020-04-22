@@ -187,7 +187,7 @@ makezero:           tree->op=CONST;
                 if(lhs->op==CONST) {
 doop:               tree->op=CONST;
                     tree->sux = 0;
-                    tree->val.num=constop(op,lhs->val.num,rhs->val.num);
+                    tree->val.num=constop(op,lhs->val.num,rhs ? rhs->val.num : 0);
                     tree->left=tree->right=NULL;
                     release(lhs);
                     release(rhs);

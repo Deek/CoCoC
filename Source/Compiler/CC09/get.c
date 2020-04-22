@@ -144,7 +144,7 @@ getline()
 }
 
 
-#ifndef UNIX
+#ifndef unix
 atoi(s)
 register char *s;
 {

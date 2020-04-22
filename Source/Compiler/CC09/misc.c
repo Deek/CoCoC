@@ -230,7 +230,7 @@ incref(t)
 
 
 isbin(op)
-register op;
+register int op;
 {
     return (op>=UMOD && op<=UGT);
 }

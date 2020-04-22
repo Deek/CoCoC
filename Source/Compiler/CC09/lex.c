@@ -564,7 +564,9 @@ fraction:
         getch();
 longint:
 #ifdef DEBUG
+# if defined (OS9) || defined (OSK)
     pflinit();
+# endif
     fprintf(stderr,"number: n=%08lX%08lX\n",*((long*)&n),*((long*)&n+1));
 #endif
         *np.lp = *((long*)&n+1);
