@@ -1,6 +1,7 @@
+#ifdef NEWPTREE
 #include "cj.h"
 
-int kw[200];
+char *kw[200];
 
 
 getkeys()
@@ -13,8 +14,8 @@ getkeys()
 
     for (i=0;i<200; kw[i++]="UNKN") ;
 
-    if((in1=fopen("/h0/lib/ckeys","r")) == NULL) {
-        fprintf(stderr,"no keys file\n",0);
+    if((in1=fopen(CKEYSFILE,"r")) == NULL) {
+        fprintf(stderr,"keys file '%s' not found\n", CKEYSFILE);
         errexit();
     }
     for(i=c=0; ++i<200 && c!=EOF ;){
@@ -28,7 +29,7 @@ getkeys()
 
 
 prtree(node,title)
-int *node;
+expnode *node;
 {
     if (dflag) {
         fflush(stdout);
@@ -40,7 +41,7 @@ int *node;
 
 
 ptree(node)
-register int *node;
+register expnode *node;
 {
     if (node) {
         pnode(node);
@@ -51,7 +52,7 @@ register int *node;
 
 
 pnode(node)
-register int *node;
+register expnode *node;
 {
     int op,val,i;
 
@@ -72,3 +73,4 @@ register int *node;
     printf(" %-8s %4d %2d  %04x  %04x\n",kw[val & BASICT],node->size,
                       node->sux, node->left,node->right);
 }
+#endif	// PTREE

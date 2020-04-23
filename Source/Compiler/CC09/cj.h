@@ -409,7 +409,14 @@ global symnode  *hashtab[128],  /* main hash table */
                 *mostab[128];   /* structure hash table */
 
 #ifdef PTREE
-extern int  kw[200];        /* pointers to symbol names */
+global char *kw[200];           /* pointers to symbol names */
+#ifndef CKEYSFILE
+# if defined(OS9) || defined(OSK) || defined(_OSK) ||defined(_OS9000)
+#   define CKEYSFILE "/dd/lib/ckeys"
+#  else
+#   define CKEYSFILE "/usr/local/share/cc09/ckeys"
+#  endif
+# endif
 #endif
 
 global direct int   dflag,  /* debug flag; if set causes tree prints */

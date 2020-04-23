@@ -150,9 +150,11 @@ register expnode *tree;
 {
     if (tree) {
 #ifdef DEBUG
-        printf("reltree: %04x\n",&tree);
-        pnode(tree);
-        fflush(stdout);
+        if (dflag) {
+            printf("reltree: releasing %x\n",&tree);
+            pnode(tree);
+            fflush(stdout);
+        }
 #endif
         reltree(tree->left);
         reltree(tree->right);
@@ -281,11 +283,39 @@ junk()
 
 
 #ifdef PTREE
-prtree(node)
-expnode *node;
+getkeys()
 {
-    puts("\naddress op        value     type        size sux left   right");
-    ptree(node);
+    char kname[20];
+    register char *p;
+    FILE *in1;
+    int c;
+    int i;
+
+    for (i=0;i<200; kw[i++]="UNKN") ;
+
+    if((in1=fopen(CKEYSFILE,"r")) == NULL) {
+        fprintf(stderr,"keys file '%s' not found\n", CKEYSFILE);
+        errexit();
+    }
+    for(i=c=0; ++i<200 && c!=EOF ;){
+        for (p=kname; (c=getc(in1))!='\n' && c!=EOF ; *p++=c) ;
+        *p='\0';
+//		fprintf (stderr, "read string: %d[%s]\n", i, kname);
+        if(*kname)
+            kw[i] = strcpy(grab(strlen(kname)+1),kname);
+    }
+    fclose(in1);
+}
+
+prtree(node,title)
+expnode *node;
+char *title;
+{
+    if (dflag) {
+        fflush(stdout);
+        printf("%s\naddress  op        value           type     size sux left     right\n",title);
+        ptree(node);
+	}
 }
 
 
@@ -306,10 +336,10 @@ register expnode *node;
     int op,val,i;
 
     op=node->op;
-    printf("%04x    ",node);
+    printf("%08x ",node);
     if (op == NAME)
-        printf("%-10.8s %04x  ",node->val.sp->sname,node->modifier);
-    else printf("%-10s%5d  ",kw[op],node->val.num);
+        printf("%-10.8s$%-8x",node->val.sp->sname,node->modifier);
+    else printf("%-10s$%-8x",op>0?kw[op]:"EVIL",node->val.num);
     val=node->type;
     for (i=14; i>=4 ; i-=2) {
         switch ((val>>i)  & 3) {
@@ -319,7 +349,7 @@ register expnode *node;
             case 0: putchar(' ');
         }
     }
-    printf(" %-8s%4d %2d  %04x   %04x\n",kw[val & BASICT],node->size,
+    printf(" %-8s %-4d %2d  %-8x %-8x\n",kw[val & BASICT],node->size,
                                       node->sux, node->left,node->right);
 }
 #endif
