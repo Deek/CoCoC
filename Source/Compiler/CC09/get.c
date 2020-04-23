@@ -1,6 +1,10 @@
 #include "cj.h"
 
-#define        ESCHAR          '#'
+#ifdef ERROR
+# undef ERROR
+#endif
+
+#define        ESCHAR         '#'
 #define        ERROR          '0'
 #define        FATERR         '1'
 #define        ASSLINE        '2'
