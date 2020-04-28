@@ -1,0 +1,43 @@
+ opt -l
+********************
+* Edition history
+
+* #   date      Comments
+* -- -------   -------------------------------------------------
+* 1  84/4/26   create from 6800 routines
+* 2  84/11/28  make 7 byte mantissa
+* 3  84/12/2   interface for c
+
+* numbers are 9 bytes each, the first seven bytes the
+* mantissa. the second two bytes are exponent and mantissa
+* sign. b15 of the exponent is the mantissa sign. exponents
+* are limited to +/- 512.
+
+
+* number format defs
+
+MDC equ 16 mantissa digit count
+MBC equ 7 mantissa byte count
+EBC equ 2 exponent byte count
+WBC equ MBC+EBC
+
+MS equ $80 MANTISSA SIGN MASK
+EXM equ $7E EXPONENT UNUSED MASK
+
+* set up variable stack for transcendentals
+
+ csect
+EABS rmb WBC
+ESHX rmb WBC
+EORD rmb WBC
+ESHY rmb WBC
+EANG rmb WBC
+ESHANG rmb WBC
+EQUAD rmb 1
+EITER rmb 1
+ endsect
+
+TRSP equ 6*WBC+2
+
+
+ opt l

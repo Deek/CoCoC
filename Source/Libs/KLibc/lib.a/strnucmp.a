@@ -1,0 +1,40 @@
+ psect strnucmp_a,0,0,2,0,0
+
+*** strnucmp(s1, s2, n)
+*    compares at most n chars
+*    ret 0 if all s2 match or n goes to 0
+*    else ret s1[i]-s2[i] where i is index at miss
+
+strnucmp: pshs y,u
+ ldu 8,s s2
+ ldd 10,s check for null count
+ beq strncmp4 if really none
+ bra strncmp2 get to work
+
+strncmp1 ldd 10,s fetch n
+ subd #1
+ std 10,s
+ beq strncmp3 if all n match
+ ldb ,u+ s2 char
+ beq strncmp3 s2 exhausted
+strncmp2 ldb ,u s2 char
+ clra
+ pshs d
+ lbsr toupper
+ std ,s
+ ldx 8,s s1
+ ldb ,x+
+ stx 8,s
+ clra
+ pshs d
+ lbsr toupper
+ leas 2,s
+ subd ,s++
+ beq strncmp1 if match
+ bra strncmp4
+
+strncmp3 clra
+ clrb
+strncmp4 puls y,u,pc
+
+ endsect

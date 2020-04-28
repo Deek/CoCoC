@@ -1,0 +1,24 @@
+********** clconvert_a **********
+
+*     16 to 32 bit conversions
+*      (d) is value to convert into flacc
+
+ psect clconvert_a,0,0,1,0,0
+
+* convert signed
+_litol: leax _flacc,y
+ std 2,x
+ tfr a,b
+ sex 
+ tfr a,b
+ std ,x
+ rts 
+
+
+* convert unsigned
+_lutol: leax _flacc,y
+ std 2,x
+ clr ,x
+ clr 1,x
+ rts 
+ endsect

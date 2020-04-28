@@ -1,0 +1,45 @@
+ psect ccmod_a,0,0,0,0,0
+
+*        entry  s+2 = dividend
+*                 d = divisor
+*        exit     d = remainder
+
+ vsect
+sign rmb 1
+handler rmb 2
+ endsect
+
+ccumod: clr sign,y
+ leax ccudiv,pcr
+ stx handler,y
+ bra common
+
+ccmod: leax ccdiv,pcr
+ stx handler,y
+ clr sign,y
+ tst 2,s check ddend sign
+ bpl common
+ inc sign,y
+
+common subd #$0000
+ bne common1 if ok
+ puls x get return addr
+ ldd ,s++ return ddend
+ jmp ,x and exit
+
+
+common1 ldx 2,s stack ddend
+ pshs x
+ jsr [handler,y] process (x returns remainder)
+ ldd ,s get ret addr
+ std 2,s cover ddend
+ tfr x,d copy remainder
+ tst sign,y
+ beq common2 if ok
+ nega turn over
+ negb
+ sbca #$00
+common2 std ,s++ clean stack
+ rts and leave
+
+ endsect

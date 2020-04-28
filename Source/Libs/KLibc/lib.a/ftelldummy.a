@@ -1,0 +1,13 @@
+********** ftelldummy_a **********
+
+
+ psect ftelldummy_a,0,0,1,0,0
+
+ftell: leax _flacc,y
+ clra
+ clrb
+ std 0,x
+ std 2,x
+ rts
+
+ endsect

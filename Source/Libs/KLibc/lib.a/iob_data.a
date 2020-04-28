@@ -1,0 +1,139 @@
+ psect iob_data_a,0,0,1,0,0
+
+ ifp1
+ use /dd/defs/stdio.a
+ endc
+ vsect
+_iob: fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb _READ _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb _WRITE _flag
+ fdb 1 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb _SCF+_UNBUF+_WRITE _flag
+ fdb 2 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ fdb 0 _ptr
+ fdb 0 _base
+ fdb 0 _end
+ fdb 0 _flag
+ fdb 0 _fd
+ fcb 0 _save
+ fdb 0 _bufsiz
+
+ endsect
+
+* vsect
+* rmb 256 extra stack for file buffers
+* endsect

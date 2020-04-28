@@ -1,0 +1,36 @@
+ psect index_a,0,0,0,0,0
+
+
+* index(s, c)
+* char *s, c;
+strchr:
+index: ldx 2,s *s
+index1 ldb ,x+
+ beq index2 if end of string
+ cmpb 5,s
+ bne index1 if not same
+ tfr x,d copy pointer (past)
+ bra rindex3
+
+index2 clra
+ rts
+
+
+* rindex(s, c)
+* char *s, c;
+strrchr:
+rindex: ldx 2,s
+ ldd #1 preset 0+1
+ pshs d
+ bra rindex2
+
+rindex1 cmpb 7,s
+ bne rindex2 if not same
+ stx ,s save pointer+1
+rindex2 ldb ,x+
+ bne rindex1 if not end
+ puls d recover pointer
+rindex3 subd #1 adjust for post incr
+ rts
+
+ endsect

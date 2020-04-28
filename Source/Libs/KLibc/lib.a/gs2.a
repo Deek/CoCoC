@@ -1,0 +1,55 @@
+*
+* handler for _gs_rdy, _gs_opt, _gs_opt, _gs_devnm
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect gs2,0,0,1,0,0
+
+_gs_rdy:
+ ldb #SS.Ready
+ lda 3,S get pn
+ os9 I$GetStt
+ lbcs _os9err
+ clra make 16 bits
+ rts
+
+
+_gs_eof:
+ ldb #SS.EOF
+ bra gs1
+
+_gs_opt:
+ ldb #SS.Opt
+ ldx 4,S buffer ptr
+gs1 lda 3,S pn
+ os9 I$GetStt
+ bra gs4
+
+_gs_devn:
+ ldb #SS.DevNm
+ ldx 4,S buffer ptr
+ lda 3,S pn
+ os9 I$GetStt
+ bcs gs4 if error
+gs2 lda ,X+ get a char
+ bpl gs2 if not terminator
+ anda #$7f fix it up
+ sta -1,X
+ clr ,X and terminate
+ rts
+
+
+_gs_gfd:
+ pshs Y we need this
+ ldb #SS.FD
+ lda 5,S pn
+ ldx 6,S buffer
+ ldy 8,S count
+ os9 I$GetStt
+ puls Y
+gs4 lbra _sysret
+
+ ends

@@ -1,0 +1,44 @@
+ psect reverse_c,0,0,0,0,0
+ nam reverse1_c
+* */*
+* *
+* *reverse(s)
+* *char *s;
+* *   {
+ ttl reverse
+reverse:
+ pshs u
+* *   register char *hd = s;
+ ldu 4,s
+
+* *   char *tl = hd + strlen(hd) - 1;
+ pshs u
+ pshs u
+ lbsr strlen
+ leas 2,s
+ addd ,s++
+ tfr d,x
+
+* *   while (hd < tl)
+* *      {
+ bra _2
+* *      temp = *hd;
+* *      *hd++ = *tl;
+* *      *tl-- = temp;
+_3
+ ldb 0,u
+ lda ,-x
+ sta ,u+
+ stb 0,x
+_2
+ pshs x
+ cmpu ,s++
+ blo _3
+
+* *      }
+* *   return (s);
+ ldd 4,s
+ puls u,pc
+
+* *   }
+ endsect

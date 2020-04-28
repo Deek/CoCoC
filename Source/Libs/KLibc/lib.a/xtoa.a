@@ -1,0 +1,52 @@
+ psect xtoa_a,0,0,0,0,0
+ nam xtoa_a
+*             itoa(n, s)        /* convert n to characters in s */
+*             utoa(n, s)
+*             int   n;
+*             char  *s;
+*                {
+utoa:
+ clra int sign = 0
+ clrb
+ pshs d,u
+ ldu 8,s register char *p
+ bra _9
+
+itoa:
+ clra int sign = 0
+ clrb
+ pshs d,u
+ ldu 8,s register char *p
+*
+ tst 6,s if (sign = (n < 0))
+ bpl _9
+ inc 0,s
+ subd 6,s n = -n
+ std 6,s
+*                do
+*                   {
+_9 ldd 6,s *p++ = n % 10 + '0'
+ pshs d
+ ldd #10
+ lbsr  ccumod
+ addb #'0
+ stb ,u+
+ ldd 6,s  } while ((n /= 10) > 0);
+ pshs d
+ ldd #10
+ lbsr  ccudiv
+ std 6,s
+ bgt _9
+ tst 0,s if (sign)
+ beq _11
+ ldb #'- *p++ = '-'
+ stb ,u+
+_11 clr 0,u *p = '\0'
+ ldd 8,s reverse (s)
+ pshs d
+ lbsr reverse returns s
+ leas 4,s
+* tfr u,d return (p)
+ puls u,pc
+
+ endsect

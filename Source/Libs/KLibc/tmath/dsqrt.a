@@ -1,0 +1,326 @@
+ psect dsqrt_a,0,0,0,0,0
+
+ use mdefs.a
+
+trunc: lbsr _dprep
+ bsr _dints
+ lbra _mret
+
+sqrt: lbsr _dprep
+ lbsr _dsqrts
+ lbra _mret
+
+
+sqr: lbsr _dprep
+ lbsr _dsqrs
+ lbra _mret
+
+inv: lbsr _dprep
+ lbsr _dinvs
+ lbra _mret
+
+ pag
+
+* INT TAKES INTEGER OF NUMBER X POINTS TO
+* X POINTS TO NUMBER. X IS LEFT ALONE AND
+* POINTS TO ANSWER ON RETURN
+* INTEGER IS GREATEST VALUE INTEGER
+* 1 LEVELS ON THE MATH STACK
+
+_dints:
+ pshs y
+ ldd MBC,x get exp
+ lsla get rid of sign bit
+ asra
+ bmi INTZ all fraction just zero
+ cmpd #MBC*8
+ bcc INTS leave the same to large number
+ decb adjust
+ bmi INTZ all fraction just zero
+
+ stb ,-s save exp for now
+ andb #$07 get bit mask
+INT1 orcc #$01 set carry
+ rora a was zero
+ decb
+ bpl INT1
+ ldb ,s+ recover b
+
+ lsrb find no. of byte divide by 8
+ lsrb
+ lsrb
+ bne INT2
+ anda ,x
+ sta ,x
+ clra
+
+INT2 decb
+ bgt INT3
+ anda 1,x
+ sta 1,x
+ clra
+
+INT3 decb
+ bgt INT4
+ anda 2,x
+ sta 2,x
+ clra
+
+INT4 decb
+ bgt INT5
+ anda 3,x
+ sta 3,x
+ clra
+
+INT5 decb
+ bgt INT6
+ anda 4,x
+ sta 4,x
+ clra
+
+INT6 decb
+ bgt INT7
+ anda 5,x
+ sta 5,x
+ clra
+
+INT7 anda 6,x
+ sta 6,x
+
+ lda MBC,x check sign
+ anda #MS
+ beq INTS exit
+ leay EIN,pcr
+ lbsr _denter
+ lbsr _dsubs
+
+INTS clrb no problem
+ puls y,pc
+
+INTZ lda MBC,x CHECK SIGN
+ bpl INTZ1
+ lda #$80
+ sta ,x
+ sta MBC,x
+ lda #1
+ sta MBC+1,x
+ ldd #0
+ std 1,x
+ std 3,x
+ std 5,x
+ bra INTS
+
+INTZ1 ldd #0
+ std ,x
+ std 2,x
+ std 4,x
+ sta 6,x
+ std MBC,x
+ bra INTS
+
+
+EIN fcb $80,0,0,0,0,0,0,0,1
+
+
+
+
+* _dinvs  TAKES INVERSE OF NUMBER
+* 1 LEVELS ON THE x STACK
+
+_dinvs: leax -WBC,x move down x
+ ldd WBC,x
+ std ,x
+ ldd WBC+2,x
+ std 2,x
+ ldd WBC+4,x
+ std 4,x
+ lda WBC+6,x
+ sta 6,x
+ ldd MBC+WBC,x
+ std MBC,x
+ ldd #$8000 load up one
+ std WBC,x
+ clra
+ std WBC+2,x
+ std WBC+4,x
+ sta WBC+6,x
+ incb
+ std WBC+MBC,x
+ lbra _ddivs
+
+
+
+
+
+* SQR SQUARES THE NUMBER
+
+_dsqrs: leax -WBC,x make room for copy
+ ldd WBC,x
+ std ,x
+ ldd WBC+2,x
+ std 2,x
+ ldd WBC+4,x
+ std 4,x
+ lda WBC+6,x
+ sta 6,x
+ ldd WBC+MBC,x
+ std MBC,x
+ lbra _dmuls
+
+
+
+* NAM SQRT
+
+* SQRT TAKES THE SQUARE ROOT OF THE NUMBER
+* pointed to by x
+
+SQRT0 comb error
+ ldb #44 illegal operand
+ rts
+
+_dsqrts: ldd MBC,x get exp
+ bmi SQRT0 no sqrt of number<0
+ bitb #1 check for odd or even exp
+ beq SQRT1
+ addd #1 MAKE EVEN
+ lsr ,x
+ ror 1,x
+ ror 2,x
+ ror 3,x
+ ror 4,x
+ ror 5,x
+ ror 6,x
+SQRT1 lsla get sign right
+ asra then divide exp by two
+ lsra always pos
+ rorb
+ std MBC,x
+
+ lda #MBC+1+MBC+1+2 make scratch on s
+SQRT2 clr ,-s
+ deca
+ bne SQRT2
+ lda #MBC*8 SET BIT COUNT
+ sta 2*MBC+2,s
+
+SQRT3 lsl 6,x roll in 2 bits
+ rol 5,x
+ rol 4,x
+ rol 3,x
+ rol 2,x
+ rol 1,x
+ rol ,x
+ rol 7,s
+ rol 6,s
+ rol 5,s
+ rol 4,s accum
+ rol 3,s
+ rol 2,s
+ rol 1,s
+ rol ,s
+ lsl 6,x
+ rol 5,x
+ rol 4,x
+ rol 3,x
+ rol 2,x
+ rol 1,x
+ rol ,x
+ rol 7,s
+ rol 6,s
+ rol 5,s
+ rol 4,s
+ rol 3,s
+ rol 2,s
+ rol 1,s
+ rol ,s
+
+ lsl MBC+8,s roll ans 1 bit
+ rol MBC+7,s
+ rol MBC+6,s
+ rol MBC+5,s
+ rol MBC+4,s
+ rol MBC+3,s
+ rol MBC+2,s
+ rol MBC+1,s
+
+ comb
+ rol MBC+8,s
+ rol MBC+7,s
+ rol MBC+6,s
+ rol MBC+5,s
+ rol MBC+4,s
+ rol MBC+3,s
+ rol MBC+2,s
+ rol MBC+1,s
+
+ ldb #1
+ stb 2*MBC+3,s flag
+ ldd 6,s
+ subd MBC+7,s see if goes in
+ std 6,s
+ ldd 4,s
+ sbcb MBC+6,s
+ sbca MBC+5,s
+ std 4,s
+ ldd 2,s
+ sbcb MBC+4,s
+ sbca MBC+3,s
+ std 2,s
+ ldd ,s
+ sbcb MBC+2,s
+ sbca MBC+1,s
+ std 0,s
+ bpl SQRT4
+
+ clr 2*MBC+3,s flag
+ ldd 6,s
+ addd MBC+7,s
+ std 6,s add back in
+ ldd 4,s
+ adcb MBC+6,s
+ adca MBC+5,s
+ std 4,s
+ ldd 2,s
+ adcb MBC+4,s
+ adca MBC+3,s
+ std 2,s
+ ldd ,s
+ adcb MBC+2,s
+ adca MBC+1,s
+ std ,s
+
+SQRT4 lsr MBC+1,s
+ ror MBC+2,s
+ ror MBC+3,s
+ ror MBC+4,s
+ ror MBC+5,s
+ ror MBC+6,s
+ ror MBC+7,s
+ ror MBC+8,s
+ lda 2*MBC+3,s
+ adda MBC+8,s
+ sta MBC+8,s
+
+ dec 2*MBC+2,s BIT COUNT
+ lbne SQRT3
+
+ lda MBC+8,s
+ sta 6,x
+ ldd MBC+6,s
+ std 4,x
+ ldd MBC+4,s
+ std 2,x
+ ldd MBC+2,s
+ std ,x
+ clrb
+ leas 2*MBC+4,s
+ rts
+
+
+
+
+
+
+
+
+ endsect

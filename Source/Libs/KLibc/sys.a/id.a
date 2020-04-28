@@ -1,0 +1,58 @@
+*
+* Identity system calls
+*
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+*
+* Equates for level one pointers (sorry!)
+D.Proc equ $4b
+P$User equ $9
+
+ psect id_a,0,0,2,0,0
+
+* getpid()
+getpid: pshs y save data pointer
+ os9 F$ID ** no error possible
+ puls y
+ tfr a,b
+ clra
+ rts
+
+* getuid()
+getuid: pshs y
+ os9 F$ID ** no error possible
+ tfr y,d
+ puls y,pc
+
+
+* asetuid()
+asetuid: pshs y
+ bra setu10 skip the id checks
+
+* setuid()
+setuid: pshs y
+ bsr getuid get user id
+ std -2,s superuser?
+ beq setu10 bra if so
+ ldb #E$FNA not allowed
+errexit puls y
+ lbra _os9err
+
+setu10 ldy 4,s get new user id
+ os9 F$SUser set user id
+ bcc setu20 bra if ok
+
+ cmpb #E$UnkSvc illegal code?
+ bne errexit bra if not
+
+** Illegal code (sorry) ***
+ tfr y,d
+ ldy >D.Proc 
+ std P$User,y
+
+setu20 clra
+ clrb
+ puls y,pc
+ 
+ endsect

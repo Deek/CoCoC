@@ -1,0 +1,118 @@
+ ifp1
+ use /dd/defs/stdio.a
+ endc
+ psect getc_a,0,0,1,0,0
+*** getc(fp)
+*    returns next char from fp or EOF
+getc: pshs u
+ ldu 4,s fp
+ beq eofret1 null fp is error
+ lda _flag,u
+ anda #_WRITTEN
+ bne eofret1 error if written in update
+ ldx _ptr,u
+ cmpx _end,u
+ bhs fillbuf have to refill buffer
+getc1 ldb ,x+
+getc2 stx _ptr,u
+ clra
+getc3 puls u,pc
+
+
+*** ungetc(ch,fp)
+*    push a char back onto fp
+ungetc: pshs u
+ ldu 6,s fp
+ beq eofret1 null fp is error
+ ldb _flag+1,u
+ andb #_READ
+ beq eofret1 must be read mode
+ ldd 4,s get ch
+ cmpd #-1 ch = -1 is error
+ beq eofret1
+ ldx _ptr,u
+ cmpx _base,u
+ beq eofret1 if at beginning
+ stb ,-x put char back
+ bra getc2 clean up and return
+
+
+*** getw(fp)
+*    gets two byte word from fp
+getw: pshs u
+ ldu 4,s fp
+ pshs u,pc stack fp & make space
+ bsr getc
+ std 2,s save ms byte
+ cmpd #-1
+ beq getw3 if error
+ bsr getc
+ cmpd #-1
+ beq getw3 if error
+ lda 3,s ms byte; b has ls byte
+getw3 leas 4,s clean up stack
+ puls u,pc
+
+
+eofret ldb #_EOF
+ bra eofret0
+
+errret ldb #_ERR
+eofret0 orb _flag+1,u
+ stb _flag+1,u
+eofret1 ldd #-1
+ puls u,pc
+ pag
+fillbuf ldd _flag,u
+ anda #_INIT
+ andb #_ERR+_EOF+_READ
+ cmpb #_READ
+ bne eofret1 if errors or not read
+ cmpa #_INIT
+ beq fillbu2 if already init
+ pshs u stack fp
+ lbsr _setbase init iob
+ leas 2,s
+fillbu2 leax _iob,y
+ pshs x
+ cmpu ,s++
+ bne fillbu3 if not stdin
+ ldb _flag+1,u
+ andb #_SCF
+ beq fillbu3 if rbf
+ leax _iob+13,y
+ pshs x
+ lbsr fflush flush std out if scf on std in
+ leas 2,s
+fillbu3 ldb _flag+1,u
+ andb #_BIGBUF
+ beq fillbu4 if don't have bufer
+ ldd _bufsiz,u
+ pshs d
+ ldx _base,u
+ ldd _fd,u
+ pshs d,x
+ ldb _flag+1,u
+ andb #_SCF
+ beq fillbu5
+ lbsr readln
+ bra fillbu6
+
+fillbu4 ldd #$0001
+ pshs d
+ leax _save,u use push back buff
+ stx _base,u
+ ldd _fd,u
+ pshs d,x
+fillbu5 lbsr read
+fillbu6 leas 6,s
+ std -2,s check returned value
+ beq eofret if EOF
+ bmi errret if real error
+ ldx _base,u else must be ok
+ leax d,x new buf end
+ stx _end,u
+ ldx _base,u
+ lbra getc1
+
+ endsect

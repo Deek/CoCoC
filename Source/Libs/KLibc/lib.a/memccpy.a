@@ -1,0 +1,40 @@
+ psect memccpy_a,0,0,0,0,0
+
+* /*
+*  * Copy s2 to s1, stopping if character c is copied.
+*  * Copy no more than n bytes.
+*  * Return a pointer to the byte after character c in the copy,
+*  *  or NULL if c is not found in the first n bytes.
+*  */
+*
+* char *
+* memccpy(s1, s2, c, n)
+* register char *s1, *s2;
+* int           c, n;
+*    {
+*    while (n-- > 0)
+*       if ((*s1++ = *s2++) == c)
+*          return (s1);
+*    return (0);
+*    }
+
+memccpy:
+ pshs y,u
+ ldu 8,s *s2
+ ldx 6,s *s1
+ ldy 12,s n
+ beq _4 handle null case
+
+_2 lda ,u+
+ sta ,x+
+ cmpa 11,s
+ bne _3
+ tfr u,d
+ bra _5
+
+_3 leay -1,y
+ bne _2
+_4 tfr y,d aka return 0
+_5 puls y,u,pc
+
+ endsect

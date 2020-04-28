@@ -1,0 +1,191 @@
+ psect dtype_a,0,0,0,0,0
+
+
+* type conversions involving floats and doubles
+
+_dtol: lbsr _xtofla put in flacc
+ lbra _dtols
+
+_dtoi: bsr _dtol
+ ldd 2,x
+ rts 
+
+_ltod: ldd ,x
+ std >_flacc,y
+ ldd 2,x
+ leax >_flacc,y
+ std 2,x
+ lbra _ltods
+
+_itod: leax >_flacc,y
+ std $02,x
+ tfr a,b
+ sex 
+ tfr a,b
+ std ,x
+ lbra _ltods
+
+_utod: leax >_flacc,y
+ std 2,x
+ clr ,x
+ clr 1,x
+ lbra _ltods
+
+_dtof: ldd ,x
+ std >_flacc,y
+ lda 2,x
+ ldb 7,x
+ leax >_flacc,y
+ std 2,x
+ rts 
+
+_ftod: ldd ,x
+ std >_flacc,y
+ ldd 2,x
+ leax >_flacc,y
+ sta 2,x
+ stb 7,x
+ clr 3,x
+ clr 4,x
+ clr 5,x
+ clr 6,x
+ rts 
+ pag
+
+* entry for long to double conversion
+* x points to flacc with long to be converted
+
+_ltods lda #128+32 set init exp
+ sta 7,x
+ clr 4,x clear extra bits
+ clr 5,x
+ clr 6,x
+ lda ,x
+ tfr a,b check for zero
+ orb 1,x
+ orb 2,x
+ orb 3,x
+ beq _ltods4 return zero
+ ldb 1,x
+ tsta  check sign
+ bpl _ltods1
+ pshs b,a neg take 2's comp
+ clra 
+ clrb 
+ subd 2,x
+ std 2,x
+ ldd #$0000
+ sbcb 1,s
+ sbca ,s
+ leas 2,s
+ bvs _ltods2
+
+_ltods1 dec 7,x justify up
+ asl 3,x
+ rol 2,x
+ rolb 
+ rola 
+ bpl _ltods1
+
+_ltods2 anda #$7f put sign in
+ tst ,x
+ bpl _ltods3
+ ora #$80
+_ltods3 std ,x
+ rts 
+
+_ltods4 clr 7,x
+_ltods5 clr ,x
+ clr 1,x
+ clr 2,x
+ clr 3,x
+ rts 
+
+ pag
+
+* converts double to long
+* x points to double
+
+_dtols0 ldd #$002a
+ lbra _rpterr
+
+_dtols ldb 7,x
+ beq _ltods5 move in zero
+ subb #$81 take out excess 128
+ bcs _dtols8 in case <1 then enter 0 or -1
+ negb 
+ addb #32-1
+ bmi _dtols0 report err to large
+ bne _dtols1 go shift
+ ldd ,x
+ cmpd #$8000 see of -2**32
+ bne _dtols0 report err
+ lda $02,x
+ ora $03,x
+ ora $04,x
+ ora $05,x
+ ora $06,x
+ bne _dtols0 report err
+ rts 
+
+_dtols1 pshs b b has amount to shift
+ ldd ,x
+ bmi _dtols3 if neg round up instead of down
+ ora #$80 implied one
+_dtols2 lsra
+ rorb 
+ ror $02,x
+ ror $03,x
+ dec ,s
+ bne _dtols2
+ std ,x
+ puls pc,b done
+
+_dtols3 clr ,-s see if fractional part loss
+_dtols4 lsra
+ rorb 
+ ror $02,x
+ ror $03,x
+ ror $04,x
+ ror $05,x
+ ror $06,x
+ bcc _dtols5
+ inc ,s loss of fraction flag
+_dtols5 dec $01,s
+ bne _dtols4
+
+ std ,x
+ ldd ,s++ recover s, see if fraction loss
+ bne _dtols6
+ lda $04,x check rest mantissa for fract
+ ora $05,x
+ ora $06,x
+ beq _dtols7
+
+_dtols6 ldd $2,x round up since neg
+ addd #1
+ std $02,x
+ ldd ,x
+ adcb #0
+ adca #0
+ bcs _dtols0 go zero (path is never taken)
+ std ,x
+
+_dtols7 clra now get 2's comp notation
+ clrb 
+ subd 2,x
+ std 2,x
+ ldd #0
+ sbcb 1,x
+ sbca ,x
+ std ,x
+ rts 
+
+_dtols8 lda ,x check sign
+ lbpl _ltods5 pos enter zero
+ ldd #-1 neg enter -1
+ std 2,x
+ std ,x
+ rts 
+
+ endsect

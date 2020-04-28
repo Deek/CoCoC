@@ -1,0 +1,26 @@
+ psect strass_a,0,0,0,0,0
+
+* _strass(to, from, count)
+* char  *to, *from;
+* int   count;
+_strass: pshs y,u
+ ldu 6,s *to
+ ldy 8,s *from
+ ldd 10,s count
+ lsra  divide by two
+ rorb
+ tfr d,x copy byte count
+ bcc _strass0 if even
+ lda ,y+ copy odd byte
+ sta ,u+
+
+_strass0 stx -2,s check for zero
+ beq _strass2 if was 0 or 1
+
+_strass1 ldd ,y++
+ std ,u++
+ leax -1,x
+ bne _strass1
+_strass2 puls y,u,pc
+
+ endsect

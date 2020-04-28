@@ -1,0 +1,39 @@
+*
+* File i/o system calls
+*
+
+ use /dd/defs/os9defs.a
+ psect read_a,0,0,2,0,0
+
+* read(fd,buf,count)
+read: pshs y
+ ldx 6,s
+ lda 5,s
+ ldy 8,s
+ pshs y save the count for later
+ os9 I$Read
+
+read1 bcc rdexit no problem if carry clear
+ cmpb #E$EOF is the error EOF?
+ bne read10 bra if not
+ clra return zero bytes on EOF
+ clrb
+ puls x,y,pc
+
+read10 puls x,y reset stack and data pointer
+ lbra _os9err report error
+
+rdexit tfr y,d return read/write count in d
+ puls x,y,pc reset stack & data pointer and return
+
+* readln(fildes,buffer,count)
+readln: pshs y save data pointer
+ lda 5,s get path number
+ ldx 6,s get buffer address
+ ldy 8,s get byte count
+
+ pshs y save request for later
+ os9 I$ReadLn call os9
+ bra read1
+
+ endsect

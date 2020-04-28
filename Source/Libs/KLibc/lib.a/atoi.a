@@ -1,0 +1,50 @@
+ psect atoi_a,0,0,3,0,0
+
+atoi: pshs u
+ ldu 4,s
+ clra
+ clrb
+ pshs d accum
+ pshs b sign
+_atoi1 ldb ,u+
+ cmpb #$20
+ beq _atoi1
+ cmpb #$09
+ beq _atoi1
+ cmpb #'-
+ bne _atoi3
+ stb 0,s
+ bra _atoi5
+
+_atoi3 cmpb #'+
+ bne _atoi6
+ bra _atoi5
+
+_atoi4 ldd 1,s
+ aslb
+ rola *2
+ aslb
+ rola *4
+ addd 1,s *5
+ aslb
+ rola *10
+ pshs d
+ ldb -1,u
+ clra
+ subb #'0
+ addd ,s++
+ std 1,s
+_atoi5 ldb ,u+
+_atoi6 cmpb #'0
+ blo _atoi7
+ cmpb #'9
+ bls _atoi4
+_atoi7 tst ,s+
+ puls d
+ beq _atoi8
+ nega
+ negb
+ sbca #0
+_atoi8 puls pc,u
+
+ endsect

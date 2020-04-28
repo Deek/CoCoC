@@ -1,0 +1,26 @@
+ psect skip_a,0,0,0,0,0
+ nam skip_c
+
+skipbl:
+ ldx 2,s
+_3 ldb ,x+
+ cmpb #32
+ beq _3
+ cmpb #9
+ beq _3
+ bra _7
+
+
+skipwd:
+ ldx 2,s
+_8 ldb ,x+
+ beq _7
+ cmpb #32
+ beq _7
+ cmpb #9
+ bne _8
+_7 leax -1,x
+ tfr x,d
+ rts
+
+ endsect

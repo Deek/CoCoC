@@ -1,0 +1,52 @@
+ psect htol_a,0,0,0,0,0
+
+*                htol(s)
+*                char *s;        /* returns long for hex ascii in s */
+
+htol: pshs y,u
+ leax _flacc,y
+ leay _chcodes,y
+ ldu 6,s
+ clra
+ clrb
+ std 0,x
+ std 2,x
+_$1 ldb ,u
+ cmpb #$20 space?
+ beq _$2
+ cmpb #$09 tab?
+ bne _$8 must be good
+_$2 leau 1,u bump ptr
+ bra _$1
+
+_$3 lda #4
+_$4 asl 3,x
+ rol 2,x
+ rol 1,x
+ rol 0,x
+ deca
+ bne _$4
+ ldb ,u+
+ subb #'0
+ cmpb #9
+ ble _$5
+ subb #7 fix for alpha
+ cmpb #15
+ ble _$5
+ subb #32 fix for case
+_$5 andcc #$fe
+ lda #3
+ bra _$7
+
+_$6 ldb #0
+_$7 adcb a,x
+ stb a,x
+ deca
+ bpl _$6
+ ldb ,u
+_$8 ldb b,y
+ andb #$40
+ bne _$3
+ puls y,u,pc
+
+ endsect

@@ -1,0 +1,24 @@
+
+  psect clincdec_a,0,0,1,0,0
+
+
+_linc: ldd #1
+ addd 2,X
+ std 2,X
+ ldd ,X
+ adcb #0
+ adca #0
+ std ,X
+ rts
+
+
+_ldec: ldd 2,X
+ subd #1
+ std 2,X
+ ldd ,X
+ sbcb #0
+ sbca #0
+ std ,X
+ rts 
+
+ endsect

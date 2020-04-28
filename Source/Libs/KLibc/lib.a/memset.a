@@ -1,0 +1,31 @@
+ psect memset_a,0,0,0,0,0
+
+* /*
+*  * Set an array of n chars starting at s to the character c.
+*  * Return s.
+*  */
+*
+* char *
+* memset(s, c, n)
+* register char *s, c;
+* int           n;
+*    {
+*    char  *os = s;
+*
+*    while (n-- > 0)
+*       *s++ = c;
+*    return (os);
+*    }
+
+memset: pshs u
+ ldu 4,s *s
+ ldx 8,s n
+ beq setmem2
+ ldb 7,s c
+setmem1 stb ,u+
+ leax -1,x
+ bne setmem1
+setmem2 ldd 4,s return s
+ puls u,pc
+
+ endsect

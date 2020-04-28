@@ -1,0 +1,30 @@
+* string compare forcing upper case
+*
+ psect strucmp_c,0,0,0,0,0
+
+strucmp: pshs u
+ ldx 4,s register char *s1
+ ldu 6,s register char *s2
+ bra _4 first compare chars
+
+_3 ldb ,u+  was it a null?
+ beq _5
+_4 ldb ,u s2 char
+ clra
+ pshs d,x
+ lbsr toupper
+ leas 2,s clean off D
+ ldx 0,s recover X
+ std ,s save fixed up char
+ ldb ,x+ s1 char
+ clra
+ pshs d,x
+ lbsr toupper
+ leas 2,s clean off D
+ puls x recover X
+ subd ,s++ see if same
+ beq _3
+
+_5 puls u,pc return s1-s2 or 0 if end
+
+ endsect

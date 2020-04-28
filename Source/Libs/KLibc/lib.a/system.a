@@ -1,0 +1,51 @@
+ psect system_a,0,0,2,0,0
+
+strsiz set 82 80 + cr + null
+
+*    system(s)
+*    char *s;
+system: pshs u
+ ldd #-166
+ lbsr _stkcheck
+ leas -(strsiz+4),s extra for status, cid
+ ldd #strsiz-1 max size to copy
+ ldu strsiz+8,s *s
+ leax ,s *local_buffer
+ pshs d
+ pshs x,u
+ lbsr strncpy
+ leas 6,s
+ clr strsiz-2,s in case string too long
+ leax tcr,pcr
+ pshs d,x d has string start
+ lbsr strcat terminate with CR
+ leas 4,s
+ clra
+ clrb
+ pshs d data size
+ incb
+ pshs d type
+ pshs d language
+ leax 6,s parm pnt
+ pshs x
+ pshs x again for strlen
+ lbsr strlen
+ std ,s parm size
+ leax tshell,pcr
+ pshs x
+ lbsr os9fork
+ leas 12,s
+ std strsiz,s save id
+waitloop leax strsiz+2,s
+ pshs x
+ lbsr wait
+ leas 2,s
+ cmpd strsiz,s was it the right child?
+ bne waitloop
+ leas (strsiz+2),s waste buffer and cid
+ puls d,u,pc return status in d
+
+tshell fcc 'shell'
+tcr fcb $d,0
+
+ endsect

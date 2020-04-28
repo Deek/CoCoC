@@ -1,0 +1,37 @@
+ nam setjmp
+
+ psect setjmp_a,0,0,1,0,0
+
+ csect
+his_sp   rmb 2 caller's sp
+his_ret  rmb 2 caller's return addr
+his_reg  rmb 2 caller's register var
+his_stat rmb 2 caller's static ptr
+ ends
+
+
+setjmp: ldx 2,S get env addr
+ ldd ,S get return addr
+ std his_ret,X save in env
+ sty his_stat,X save static ptr
+ stu his_reg,X save register var
+ sts his_sp,X save stack ptr
+ clra return ok
+ clrb
+ rts
+
+
+longjmp: ldx 2,S get env addr
+ ldy his_stat,X get static ptr
+ ldu his_reg,X get register var
+ ldd 4,S get return value
+ bne longjmp1 if some value
+ ldb #1 force a value
+longjmp1 lds his_sp,X get new stack ptr
+ leas 2,S clean off return
+ jmp [his_ret,X] go there
+
+
+ ends
+
+ end

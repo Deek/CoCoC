@@ -1,0 +1,413 @@
+ psect log_a,0,0,0,0,0
+
+ ifp1
+ use mdefs.a
+ endc
+
+pow:
+ lbsr _bdprep
+ lbsr YTOX
+ lbra _mret
+
+exp:
+ lbsr _dprep
+ lbsr _exp
+ lbra _mret
+
+antilg:
+ lbsr _dprep
+ lbsr ANTILG
+ lbra _mret
+
+log10:
+ lbsr _dprep
+ lbsr LOG10
+ lbra _mret
+
+log:
+ lbsr _dprep
+ lbsr _log
+ lbra _mret
+
+ pag
+* YTOX DOES Y TO X POWER
+* 2  LEVELS ON MATH STACK
+
+YTOX lbsr _dexg
+ lbsr _log
+ bcs YTOX2
+ lbsr _dmuls
+ bcs YTOX1
+ bsr _exp
+YTOX1 rts
+
+YTOX2 leax WBC,x
+ rts
+
+
+
+
+* ANTILG  DOES 10 TO THE X POWER
+* 2  LEVELS ON MATH STACK
+
+ANTILG
+ pshs y
+ leay LN10,pcr
+ lbsr _denter
+ lbsr _dmuls
+ puls y
+ bcc _exp
+ rts
+
+
+
+* LOG10 DOES THE LOG TO THE BASE 10
+* 2  LEVELS ON MATH STACK
+
+LOG10
+ pshs y
+ lbsr _log
+ bcs LOG11
+ leay LN10,pcr
+ lbsr _denter
+ lbsr _ddivs
+LOG11 puls y,pc
+
+ pag
+ ttl exponential
+
+* EXP DOES NATURAL EXPONENTTIATION OF
+* NUMBER ON STACK
+* 2  LEVELS ON MATH STACK
+
+ABS set EABS
+SHX set ESHX
+ORD set EORD
+SHY set ESHY
+ANG set EANG
+SHANG set ESHANG
+QUAD set EQUAD
+ITER set EITER
+
+_exp:
+ pshs y
+ leas -TRSP,s trans var
+ leay LN2,pcr remove factors LN(2)
+ lbsr _dfact let ORD keep number
+ leay ORD,s
+ lbsr _dexit
+ leay ANG,s move rem into angle
+ lbsr _dexit
+ lbsr _dcornrm
+ ldd #$1000 put one in abs
+ std ABS,s
+ clra
+ std ABS+2,s
+ std ABS+4,s
+ std ABS+6,s
+ sta ABS+8,s
+
+ lda #1 SET UP ITER COUNT
+ sta ITER,s
+
+EXP1 lbsr GEXP get log table value
+ ldd ANG+6,s see if table value fits in
+ subd SHANG+6,s
+ std ANG+6,s
+ ldd ANG+4,s
+ sbcb SHANG+5,s
+ sbca SHANG+4,s
+ std ANG+4,s
+ ldd ANG+2,s
+ sbcb SHANG+3,s
+ sbca SHANG+2,s
+ std ANG+2,s
+ ldd ANG,s
+ sbcb SHANG+1,s
+ sbca SHANG,s
+ std ANG,s
+ bcs EXP2 fits in
+
+ leay ABS,s get ABS*(1+1/2**I)
+ ldb ITER,s
+ lbsr _dshft1
+ ldd ABS+6,s
+ addd SHX+6,s
+ std ABS+6,s
+ ldd ABS+4,s
+ adcb SHX+5,s
+ adca SHX+4,s
+ std ABS+4,s
+ ldd ABS+2,s
+ adcb SHX+3,s
+ adca SHX+2,s
+ std ABS+2,s
+ ldd ABS,s
+ adcb SHX+1,s
+ adca SHX,s
+ std ABS,s
+ bra EXP3
+
+EXP2 ldd ANG+6,s table value did not fit
+ addd SHANG+6,s
+ std ANG+6,s
+ ldd ANG+4,s
+ adcb SHANG+5,s
+ adca SHANG+4,s
+ std ANG+4,s
+ ldd ANG+2,s
+ adcb SHANG+3,s
+ adca SHANG+2,s
+ std ANG+2,s
+ ldd ANG,s
+ adcb SHANG+1,s
+ adca SHANG,s
+ std ANG,s
+
+EXP3 lda ITER,s check ITER now
+ inca
+ sta ITER,s
+ cmpa #MBC*8+1 SEE IF DONE
+ lbls EXP1 keep going
+
+ leay ABS,s get answer out
+ lbsr _denter
+ lbsr _dcorfix
+ pshs x save x
+ leax ORD+2,s number of LN(2)
+ lbsr _exd
+ puls x
+ bcs EXP6 error
+ addd MBC,x
+ bvs EXP6 error
+ anda #^MS mask off sign
+ std MBC,x
+ anda #EXM
+ beq EXP4 good
+ cmpa #EXM
+ bne EXP6
+EXP4 leas TRSP,s clean stack
+ clrb good
+ puls y,pc
+
+EXP6 ldb #40 overflow
+ lda ORD+MBC,s get sign
+ bpl EXP7
+ ldb #43
+EXP7 leas TRSP,s
+ coma
+ puls y,pc
+
+
+ pag
+ ttl logarithm
+
+* LOG DOES THE NATURAL LOG OF THE NUMBER ON THE
+* STACK
+* 2  LEVELS ON MATH STACK
+
+ABS set EABS
+SHX set ESHX
+ORD set EORD
+SHY set ESHY
+ANG set EANG
+SHANG set ESHANG
+QUAD set EQUAD
+ITER set EITER
+
+_log:
+ pshs y
+ leas -TRSP,s trans var
+ lda ,x check for zero
+ bne LOG0
+LOG6 leas TRSP,s clean stack
+ comb
+ ldb #44 illegal arguement
+ puls y,pc
+
+LOG0 ldd MBC,x
+ bmi LOG6 error no neg numbers
+ std ORD,s just some scratch
+ ldd #0
+ std MBC,x
+ leay ABS,s move to ABS
+ lbsr _dexit
+ lbsr _dcornrm
+ ldd #0 start angle=0
+ std ANG,s
+ std ANG+2,s
+ std ANG+4,s
+ std ANG+6,s
+ sta ANG+7,s
+
+ lda #1 SET ITER
+ sta ITER,s
+
+LOG1 leay ABS,s get inverse in 1+1/2**I
+ ldb ITER,s
+ lbsr _dshft1
+ ldd ABS+6,s
+ addd SHX+6,s
+ std ABS+6,s
+ ldd ABS+4,s
+ adcb SHX+5,s
+ adca SHX+4,s
+ std ABS+4,s
+ ldd ABS+2,s
+ adcb SHX+3,s
+ adca SHX+2,s
+ std ABS+2,s
+ ldd ABS,s
+ adcb SHX+1,s
+ adca SHX,s
+ std ABS,s
+ bita #$F0 see if went over one
+ beq LOG2
+
+ ldd ABS+6,s take back out
+ subd SHX+6,s
+ std ABS+6,s
+ ldd ABS+4,s
+ sbcb SHX+5,s
+ sbca SHX+4,s
+ std ABS+4,s
+ ldd ABS+2,s
+ sbcb SHX+3,s
+ sbca SHX+2,s
+ std ABS+2,s
+ ldd ABS,s
+ sbcb SHX+1,s
+ sbca SHX,s
+ std ABS,s
+ bra LOG3
+
+LOG2 lbsr GEXP
+ ldd ANG+6,s
+ addd SHANG+6,s
+ std ANG+6,s
+ ldd ANG+4,s
+ adcb SHANG+5,s
+ adca SHANG+4,s
+ std ANG+4,s
+ ldd ANG+2,s
+ adcb SHANG+3,s
+ adca SHANG+2,s
+ std ANG+2,s
+ ldd ANG,s
+ adcb SHANG+1,s
+ adca SHANG,s
+ std ANG,s
+
+LOG3 lda ITER,s
+ inca
+ sta ITER,s
+ cmpa #MBC*8+1
+ lbls LOG1
+
+LOG4 leay ANG,s get answer out
+ lbsr _denter
+ lbsr _dcorfix
+ lda MBC,x
+ ora #MS
+ sta MBC,x
+ ldd ORD,s get orginal exp
+ lsla get sign
+ asra
+ lbsr _entd enter
+ leay LN2,pcr
+ lbsr _denter
+ lbsr _dmuls
+ lbsr _dadds
+ leas TRSP,s clean up stack
+ puls y,pc
+
+
+ pag
+* GEXP  GET S POINTER TOO ANGLE USING ITER
+* ANSWER IN SHANG
+* USES ITER
+
+ABS set EABS+2
+SHX set ESHX+2
+ORD set EORD+2
+SHY set ESHY+2
+ANG set EANG+2
+SHANG set ESHANG+2
+QUAD set EQUAD+2
+ITER set EITER+2
+
+GEXP ldb ITER,s times 8
+ clra
+ lslb
+ rola
+ lslb
+ rola
+ lslb
+ rola
+ cmpd #LOGTBE-LOGTAB
+ bcc GEXP0
+ bsr GEXP1
+ rts
+
+GEXP0 ldb #LOGTBE-LOGTAB-8
+ bsr GEXP1
+ ldb ITER,s
+ subb #30 30 entries in LOGTAB
+ leay SHANG,s
+ lbra _dshft2
+
+GEXP1 leay LOGTAB,pcr
+ clra
+ leay d,y
+ ldd ,y
+ std SHANG+2,s
+ ldd 2,y
+ std SHANG+4,s
+ ldd 4,y
+ std SHANG+6,s
+ ldd 6,y
+ std SHANG+8,s
+ rts
+ pag
+ ttl trig and log constants
+
+* set up constants and tables to be used by trig stuff
+
+LN10 fcb $93,$5d,$8d,$dd,$aa,$a8,$ac,$00,$02
+LN2 fcb $b1,$72,$17,$f7,$d1,$cf,$79,$00,$00
+
+LOGTAB
+ fcb $0b,$17,$21,$7f,$7d,$1c,$f7,$9b ln(2)
+ fcb $06,$7c,$c8,$fb,$2f,$e6,$12,$fd ln(1+1/2)
+ fcb $03,$91,$fe,$f8,$f3,$53,$44,$36 ln(1+1/4)
+ fcb $01,$e2,$70,$76,$e2,$af,$2e,$5f
+ fcb $00,$f8,$51,$86,$00,$8b,$15,$33
+ fcb $00,$7e,$0a,$6c,$39,$e0,$cc,$01
+ fcb $00,$3f,$81,$51,$61,$f8,$07,$c8
+ fcb $00,$1f,$e0,$2a,$6b,$10,$67,$89
+ fcb $00,$0f,$f8,$05,$51,$58,$85,$e0
+ fcb $00,$07,$fe,$00,$aa,$6a,$c4,$3a
+ fcb $00,$03,$ff,$80,$15,$51,$56,$22
+ fcb $00,$01,$ff,$e0,$02,$aa,$6a,$b1
+ fcb $00,$00,$ff,$f8,$00,$55,$51,$56
+ fcb $00,$00,$7f,$fe,$00,$0a,$aa,$6b
+ fcb $00,$00,$3f,$ff,$80,$01,$55,$51
+ fcb $00,$00,$1f,$ff,$e0,$00,$2a,$aa
+ fcb $00,$00,$0f,$ff,$f8,$00,$05,$55
+ fcb $00,$00,$07,$ff,$fe,$00,$00,$ab
+ fcb $00,$00,$03,$ff,$ff,$80,$00,$15
+ fcb $00,$00,$01,$ff,$ff,$e0,$00,$03
+ fcb $00,$00,$00,$ff,$ff,$f8,$00,$00
+ fcb $00,$00,$00,$7f,$ff,$fe,$00,$00
+ fcb $00,$00,$00,$3f,$ff,$ff,$80,$00
+ fcb $00,$00,$00,$1f,$ff,$ff,$e0,$00
+ fcb $00,$00,$00,$0f,$ff,$ff,$f8,$00
+ fcb $00,$00,$00,$07,$ff,$ff,$fe,$00
+ fcb $00,$00,$00,$03,$ff,$ff,$ff,$80
+ fcb $00,$00,$00,$01,$ff,$ff,$ff,$e0
+ fcb $00,$00,$00,$00,$ff,$ff,$ff,$f8
+ fcb $00,$00,$00,$00,$7f,$ff,$ff,$fe
+ fcb $00,$00,$00,$00,$40,$00,$00,$00
+LOGTBE
+
+ endsect

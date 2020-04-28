@@ -1,0 +1,213 @@
+********** fseek_a **********
+*
+*  7/27/86 *01* fix a/b confusion in fseek
+
+ ifp1
+ use /dd/defs/stdio.a
+ endc
+ psect fseek_a,0,0,1,0,0
+
+*** fseek(fp, long offset, type)
+*    type 0, 1, 2 is beg, cur loc, end of file
+
+fseek: pshs u
+ ldu 4,s fp
+ leas -6,s work space
+ lbeq fseek16 if null fp
+ ldd _flag,u
+ bitb #_READ+_WRITE
+ lbeq fseek16 if not r/w
+ bita #_INIT
+ bne fseek3 if init
+ pshs u
+ lbsr _setbase else init
+ leas 2,s
+ lbra fseek14 and head out
+
+fseek3 bita #_WRITTEN
+ beq fseek4 if not written yet
+ pshs u
+ lbsr fflush flush it
+ leas 2,s
+ lda _flag,u *01*
+ anda #^_WRITTEN
+ sta _flag,u mark as clean *01*
+ ldd _base,u reset pnt
+ addd _bufsiz,u
+ std _end,u
+ lbra fseek13 set ptr to end
+
+fseek4 ldd _ptr,u
+ cmpd _end,u
+ lbhs fseek14 buff is full
+ leax 2,s scratch + 2
+ pshs x save to addr
+ leax 14,s from addr (requested offset)
+ lbsr _lmove move to scratch
+ ldx 16,s type
+ beq fseek5 from beg
+ cmpx #1
+ beq fseek6 from cur loc
+ lbra fseek11 from end
+
+fseek5 leax 2,s use scratch for next
+ pshs x to addr
+ ldd 2,x LSW
+ pshs d
+ ldd ,x MSW
+ pshs d
+ pshs u fp
+ lbsr ftell get cur pos into flacc
+ leas 2,s
+ lbsr _lsub (0,s)-(flacc)->flacc; x->flacc; stk cleaned
+ lbsr _lmove (flacc) to *0,s (our scratch); stk cleaned
+fseek6 ldd _bufsiz,u
+ lbsr _litol convert to long in flacc
+ ldd 2,x stack long bufsiz from flacc
+ pshs d
+ ldd ,x
+ pshs d
+ leax 6,s point to our scratch
+ ldd 2,x stack that
+ pshs d
+ ldd ,x
+ pshs d
+ leax k0,pcr
+ lbsr _lcmpr
+ bge fseek8
+ leax 6,s point to our buff
+ lbsr _lneg turn over
+ bra fseek9
+
+fseek8 leax 6,s point to our buff
+fseek9 lbsr _lcmpr
+ blt fseek10
+ ldd 4,s new offset
+ addd _ptr,u
+ std ,s save
+ cmpd _base,u
+ bcs fseek10
+ ldd ,s
+ cmpd _end,u
+ bcc fseek10
+ ldd ,s
+ std _ptr,u
+ ldb _flag+1,u
+ andb #^_EOF
+ stb _flag+1,u
+ lbra fseek17
+
+fseek10 ldd 16,s type
+ cmpd #$0001 from cur pos?
+ bne fseek12
+fseek11 leax 12,s offset
+ pshs x
+ ldd 2,x copy offset down
+ pshs d
+ ldd ,x
+ pshs d
+ ldd _end,u
+ subd _ptr,u bytes left in buffer
+ lbsr _litol make long
+ lbsr _lsub
+ lbsr _lmove
+fseek12 ldd _end,u
+fseek13 std _ptr,u
+fseek14 ldb _flag+1,u
+ andb #^_EOF
+ stb _flag+1,u
+ ldd 16,s type
+ pshs d
+ leax 14,s offset
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ ldd _fd,u fildes
+ pshs d
+ lbsr lseek
+ leas 8,s
+ ldd 2,x returned position in flacc
+ pshs d
+ ldd ,x
+ pshs d
+ leax km1,pcr
+ lbsr _lcmpr
+ bne fseek17
+fseek16 ldd #-1
+ bra fseek18
+
+fseek17 clra
+ clrb
+fseek18 leas 6,s
+ puls pc,u
+
+
+k0 fdb 0,0
+km1 fdb -1,-1
+ pag
+*** rewind(fp)
+*    uses fseek(fp,0L,0)
+
+rewind:
+ clra
+ clrb
+ tfr d,x
+ pshs d,x from beg
+ ldd 6,s fp
+ pshs d,x with 0L offset
+ lbsr fseek
+ leas 8,s
+ rts
+ pag
+*** long ftell(fp)
+*    returns current file pos in flacc
+*    does lseek(fp,0L,1)
+*       and adjusts for current buff pos
+
+ftell: pshs u
+ ldu 4,s fp
+ beq ftell1
+ ldd _flag,u
+ andb #_READ+_WRITE
+ bne ftell3 if read or write
+ftell1 leax _flacc,y
+ ldd #-1
+ std 0,x
+ std 2,x
+ puls pc,u
+
+
+ftell3 anda #_INIT
+ bne ftell4 if already init
+ pshs u
+ lbsr _setbase
+ leas 2,s
+ftell4 ldd #$0001 from curpos
+ pshs d
+ clrb 
+ pshs d 0 offset
+ pshs d
+ ldd _fd,u fildes
+ pshs d
+ lbsr lseek
+ leas 8,s
+ ldd 2,x copy flacc to stack
+ pshs d LSW
+ ldd ,x MSW
+ pshs d
+ lda _flag,u
+ anda #_WRITTEN
+ beq ftell5 if not written
+ ldd _base,u add unflushed part
+ bra ftell6
+
+ftell5 ldd _end,u subtract flushed part
+ftell6 pshs d
+ ldd _ptr,u
+ subd ,s++
+ lbsr _litol make long in flacc
+ lbsr _ladd flacc += 0,s
+ puls pc,u x-> flacc
+
+ endsect

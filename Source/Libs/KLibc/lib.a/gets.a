@@ -1,0 +1,80 @@
+********** gets_a **********
+
+ psect gets_a,0,0,1,0,0
+
+*** gets(s)
+*    get string from stdin to (not thru) '\n'
+*    returns s if successful or null
+*    stack   s
+*           ret
+*        ->  u
+
+gets: pshs u
+ ldu 4,s *s
+ bra gets2
+
+gets1 stb ,u+
+gets2 leax _iob,y
+ pshs x
+ lbsr getc
+ leas 2,s
+ cmpb #$0D
+ beq gets4 quit on CR
+ cmpd #-1
+ bne gets1 loop if no error
+ clra ret null on error
+ clrb
+ bra gets5
+
+gets4 clr 0,u terminate string
+ ldd 4,s return *s
+gets5 puls pc,u
+
+ pag
+*** fgets(s,n,fp)
+*     copy n-1 max bytes from fp to s
+*     return s if successful else null
+*     if n=0, it gets to fgets3 w/ *s in d instead
+
+*   stack    fp
+*            n
+*            s
+*           ret
+*            u
+*        ->  *s
+*      of result of getc
+
+fgets: pshs u
+ ldx 4,s *s
+ clr ,x in case we bail early
+ ldu 6,s n
+ beq fgets4 in case of null count
+ pshs x save in temp
+ bra fgets2
+
+fgets1 ldx ,s
+ stb ,x+
+ stx ,s
+ cmpb #$0D
+ beq fgets3 if found EOL
+fgets2 leau -1,u count off
+ stu -2,s
+ beq fgets3 if got n-1 chars
+ ldd 10,s fp
+ pshs d
+ lbsr getc
+ leas 2,s
+ cmpd #-1
+ bne fgets1 get another char
+fgets3 clr [,s] terminate w/null
+ cmpd #-1
+ bne fgets4
+ clra ret null on error
+ clrb
+ bra fgets5
+
+fgets4 ldd 6,s ret *s
+fgets5 leas 2,s clear temp counter
+ puls u,pc
+
+ endsect

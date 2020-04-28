@@ -1,0 +1,44 @@
+ psect memcmp_a,0,0,2,0,0
+
+* /*
+*  * Compare n bytes.
+*  * Return *s1 - *s2.
+*  *  This amounts to s1 >, ==, or < s2.
+*  */
+*
+* memcmp(s1, s2, n)
+* register char *s1, *s2;
+* int           n;
+*    {
+*    int   diff;
+*
+*    if (s1 != s2)
+*       while (n-- > 0)
+*          if (diff = *s1++ - *s2++)
+*             return (diff);
+*    return (0);
+*    }
+
+memcmp: pshs y,u
+ ldx 6,s s1
+ cmpx 8,s
+ beq memcmp3 if same
+ ldu 8,s s2
+ ldy 10,s n
+ beq memcmp3 if null length
+
+memcmp1 ldb ,u+ s2 char
+ subb ,x+ *s2 - *s1
+ beq memcmp2 if match
+ negb fix sign
+ sex
+ bra memcmp4
+
+memcmp2 leay -1,y
+ bne memcmp1 more to go
+
+memcmp3 clra
+ clrb
+memcmp4 puls y,u,pc
+
+ endsect

@@ -1,0 +1,50 @@
+ psect ccmult_a,0,0,1,0,0
+
+ccmult: tsta
+ bne _ccmult1
+ tst 2,s
+ bne _ccmult1
+ lda 3,s
+ mul 
+ ldx ,s
+ stx 2,s
+ ldx #0
+ std ,s
+ puls pc,b,a
+
+
+_ccmult1 pshs d
+ ldd #$0000
+ pshs d
+ pshs d
+ lda 5,s
+ ldb 9,s
+ mul 
+ std 2,s
+ lda 5,s
+ ldb 8,s
+ mul 
+ addd 1,s
+ std 1,s
+ bcc _ccmult2
+ inc ,s
+_ccmult2 lda 4,s
+ ldb 9,s
+ mul 
+ addd 1,s
+ std 1,s
+ bcc _ccmult3
+ inc ,s
+_ccmult3 lda 4,s
+ ldb 8,s
+ mul 
+ addd ,s
+ std ,s
+ ldx 6,s
+ stx 8,s
+ ldx ,s
+ ldd 2,s
+ leas 8,s
+ rts 
+
+ endsect

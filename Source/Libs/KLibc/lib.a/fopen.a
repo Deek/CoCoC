@@ -1,0 +1,184 @@
+ ifp1
+ use /dd/defs/stdio.a
+ endc
+ psect fopen_a,0,0,2,0,0
+
+*  input:   d = pn
+*           x = *mode
+*           u = *_iob = fp
+*  output:  _iob allocated of necessary, iniz _flag in any case
+*            to _READ or _WRITE or both.  Stash path num in _fd.
+*            setbase will fill in the rest since _iob is static
+*            and all zeros
+
+setiob
+ pshs d save path number
+ stu -2,s check for fp
+ bne setiob3 if already have one
+ leau _iob,y
+ lda #_NFILE
+setiob1 ldb _flag+1,u
+ andb #_READ+_WRITE
+ beq setiob3 found empty one
+ leau _iobsiz,u
+ deca
+ bne setiob1
+ ldd #$c8 e$pthful
+ std errno,y
+ clra
+ clrb
+ puls x,pc
+
+
+setiob3 puls d recover path number
+ std _fd,u
+ ldd 1,x second and third chars
+ tsta make sure something there
+ beq setiob5
+ cmpa #'+ update?
+ beq setiob4 was ?+
+ cmpb #'+
+ bne setiob5 was not ??+
+setiob4 ldb #_READ+_WRITE
+ bra setiob8
+
+setiob5 ldb ,x
+ cmpb #'r read?
+ beq setiob6
+ cmpb #'d dir?
+ bne setiob7
+setiob6 ldb #_READ
+ bra setiob8
+
+setiob7 ldb #_WRITE
+setiob8 orb _flag+1,u
+ stb _flag+1,u
+ ldd _base,u
+ addd _bufsiz,u
+ std _ptr,u
+ std _end,u
+ tfr u,d
+ rts
+
+ pag
+*  input:   x = *mode
+*           u = *filename
+*  output:  d = path number, and file opened or created in proper mode
+
+* first figure out auxilliary modes
+openit clra
+ clrb
+ pshs d,u
+ ldd 1,x second and third chars
+ tsta
+ beq openit4 only one char given
+ cmpa #'x
+ bne openit2 if not ?x
+ cmpb #'+ update?
+ bne openit1 if not ?x+
+ ldd #$0007 ewr cause is ?x+
+ bra openit3
+
+openit1 ldd #$0004 e
+ bra openit3
+
+openit2 cmpa #'+ ?+
+ bne openit9
+ ldd #$0003 rw cause is ?+
+openit3 std ,s
+
+* now figure out primary mode
+openit4 ldb ,x
+ cmpb #'r
+ bne openit5
+ ldd ,s
+ orb #1
+ bra openit11
+
+openit5 cmpb #'a
+ bne openit6
+ ldd ,s
+ orb #$02 w
+ pshs d
+ pshs u
+ lbsr open
+ leas 4,s
+ std 2,s save pn
+ cmpd #-1
+ beq openit7 assume not there
+ ldu #2 from end
+ ldx #0 with 0 offset
+ pshs x,u
+ pshs d,x
+ lbsr lseek
+ puls d recover path number
+ leas 6,s
+ bra openit13
+ pag
+openit6 cmpb #'w
+ bne openit8
+openit7 ldd ,s
+ orb #$02 w
+ pshs d
+ pshs u
+ lbsr creat
+ bra openit12
+
+openit8 cmpb #'d
+ beq openit10
+openit9 ldd #$cb E$BMode
+erret std errno,y
+ ldd #-1
+ bra openit13
+
+
+openit10 ldd ,s
+ orb #$81 dir + read
+* andb #$fd wipe write
+openit11 pshs d
+ pshs u
+ lbsr open
+openit12 leas 4,s
+openit13 leas 4,s
+ rts
+ pag
+***************** high level entries ****************
+*** fdopen(fildes,action)
+fdopen: pshs u
+ ldu #0 flag
+ ldx 6,s action
+ ldd 4,s path number
+ bra open3
+
+
+*** fopen(filename,action)
+fopen: pshs u
+ ldx 6,s *action
+ ldu 4,s *name
+ lbsr openit pn in d or -1
+ ldu #0 no file pointer yet
+ std -2,s
+ bpl open2
+open1 clra
+ clrb
+ puls u,pc
+
+
+*** freopen(filename,action,stream)
+**     stream is one of three std paths
+freopen: pshs u
+ ldd 8,s file pointer
+ pshs d
+ lbsr fclose close nor path
+ leas 2,s
+ ldx 6,s action
+ ldu 4,s filename
+ lbsr openit ret pn in d or -1
+ std -2,s
+ bmi open1 error
+ ldu 8,s get file pointer
+open2 ldx 6,s *action
+open3 lbsr setiob
+open4 puls pc,u
+
+ endsect

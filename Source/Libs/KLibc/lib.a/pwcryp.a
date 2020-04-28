@@ -1,0 +1,42 @@
+ psect pwcryp_a,0,0,0,0,0
+
+pwcryp: pshs u save user's reg var
+ ldu 4,s get string addr
+ ldd #$ffff
+ pshs d 3 byte accum for crc
+ pshs b
+ leax ,s pointer to crc accum
+ pshs x set addr of accum for crc
+ pshs u set for strlen
+ lbsr strlen
+ std ,s set length of string for crc
+ pshs u set addr of string for crc
+ lbsr crc
+ leas 6,s clean up from crc call
+ lda ,s+
+ bsr out2h
+ lda ,s+
+ bsr out2h
+ lda ,s+
+ bsr out2h
+ clr ,u terminate the new string
+ ldd 4,s return s
+ puls u,pc
+
+
+out2h pshs a
+ lsra
+ lsra
+ lsra
+ lsra
+ bsr out2h1
+ puls a
+ anda #$0f
+out2h1 adda #'0
+ cmpa #'9
+ bls out2h2
+ adda #7
+out2h2 sta ,u+
+ rts
+
+ endsect

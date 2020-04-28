@@ -1,0 +1,611 @@
+ psect dtrig_a,0,0,0,0,0
+
+ ifp1
+ use mdefs.a
+ endc
+
+acos:
+ lbsr _dprep
+ lbsr ACOS
+ lbra _mret
+
+asin:
+ lbsr _dprep
+ lbsr ASIN
+ lbra _mret
+
+atan:
+ lbsr _dprep
+ lbsr ATAN
+ lbra _mret
+
+sin:
+ lbsr _dprep
+ lbsr SIN
+ lbra _mret
+
+cos:
+ lbsr _dprep
+ lbsr COS
+ lbra _mret
+
+tan:
+ lbsr _dprep
+ lbsr TAN
+ lbra _mret
+
+deg: lda #1
+ sta _deg,y
+ rts
+
+rad: clr _deg,y
+ rts
+
+
+ pag
+
+* ACOS DOES THE ARC COS
+* 4  LEVELS ON MATH STACK
+
+ACOS
+ pshs y
+ bsr ASIN do sine
+ bcs ACOS2
+ lda MBC,x
+ eora #MS flip sign
+ sta MBC,x
+ lda _deg,y get mode
+ leay NINTY,pcr
+ tsta now check mode
+ bne ACOS1
+ leay PI2,pcr
+ACOS1 lbsr _denter
+ lbsr _dadds
+ACOS2 puls y,pc
+ pag
+* ASIN DOES THE ARC SINE
+* 4  LEVELS ON MATH STACK
+
+ASIN
+ pshs y
+ lda MBC,x take care of sign
+ tfr a,b
+ anda #^MS
+ sta MBC,x
+ andb #MS
+ stb ,-s
+ tfr x,y
+ lbsr _denter copy number
+ lbsr _dsqrs square it
+ bcs ASIN4
+ leay EIN,pcr subtract from one
+ lbsr _denter
+ lbsr _dsubs
+ lda MBC,x
+ bpl ASIN2 error >1?
+ anda #^MS
+ sta MBC,x
+ lbsr _dsqrts
+ lbsr _ddivs
+ ldy 1,s reload core pointer
+ lbsr FNDAN
+ bcs ASIN1
+ASIN0 lda ,s recover sign
+ adda MBC,x
+ sta MBC,x
+ clrb
+ASIN1 leas 1,s clean stack
+ puls y,pc
+
+ASIN2 lda ,x
+ bne ASIN4
+ leax 2*WBC,x
+ ldy 1,s reload core pointer
+ lda _deg,y get mode
+ leay NINTY,pcr
+ tsta now check mode
+ bne ASIN5
+ leay PI2,pcr
+ASIN5 lbsr _denter
+ bra ASIN0
+
+ASIN4 leax WBC,x
+ leas 1,s clean stack
+ comb
+ ldb #44 illegal arg
+ puls y,pc
+ pag
+* SIN DO SIN OF NUMBER ON STACK
+* 2  LEVELS ON MATH STACK
+
+ABS set EABS
+SHX set ESHX
+ORD set EORD
+SHY set ESHY
+ANG set EANG
+SHANG set ESHANG
+QUAD set EQUAD
+ITER set EITER
+
+SIN
+ pshs y
+ leas -TRSP,s tans var
+ lbsr FNDXY get x and y of unut
+ leay ORD,s in case
+ lda QUAD,s
+ bita #1 1st or 3rd ?
+ beq SIN1
+ leay ABS,s
+SIN1 lbsr _denter
+ lbsr _dcorfix normalize back
+ lda #^MS ADD IN SIGN NOW
+ anda MBC,x
+ ldb QUAD,s check quad
+ bitb #$02
+ beq SIN2
+ ora #MS
+SIN2 sta MBC,x
+ leas TRSP,s
+ clrb
+ puls y,pc
+ pag
+* COS DO COSINE OF NUMBER ON STACK
+* USES QUAD ITER MEM
+* 2  LEVELS ON MATH STACK
+* 11 LEVELS ON STACK
+
+COS
+ pshs y
+ leas -TRSP,s trans var
+ lbsr FNDXY get x and y of unit
+ leay ABS,s in case
+ lda QUAD,s
+ bita #1 1ST OR 3RD ?
+ beq COS1
+ leay ORD,s
+COS1 lbsr _denter
+ lbsr _dcorfix NORMALIZE BACK
+ lda #^MS ADD IN SIGN NOW
+ anda MBC,x
+ ldb QUAD,s check quad
+ incb
+ bitb #$02
+ beq COS2
+ ora #MS
+COS2 sta MBC,x
+ clrb
+ leas TRSP,s
+ puls y,pc
+ pag
+* TAN DO TANGENT OF NUMBER ON STACK
+* USES XTEMP1 + XTEMP2 + XTEMP3
+* USES QUAD ITER MEM
+* 2  LEVELS ON MATH STACK
+* 11 LEVELS ON STACK
+
+TAN
+ pshs y
+ leas -TRSP,s trans space
+ lbsr FNDXY GET X AND Y OF UNIT
+ lda QUAD,s
+ bita #1 1ST OR 3RD ?
+ beq TAN1
+ leay ABS,s
+ lbsr _denter
+ lbsr _dcorfix
+ leay ORD,s
+ lbsr _denter
+ lbsr _dcorfix
+ bra TAN2
+
+TAN1 leay ORD,s
+ lbsr _denter
+ lbsr _dcorfix
+ leay ABS,s
+ lbsr _denter
+ lbsr _dcorfix
+TAN2 lbsr _ddivs
+ bcs TAN5
+ lda #^MS ADD IN SIGN NOW
+ anda MBC,x
+ ldb QUAD,s CHECK QUAD
+ bitb #$01
+ beq TAN3
+ ora #MS
+TAN3 sta MBC,x
+ clrb
+TAN4 leas TRSP,s clean stack
+ puls y,pc
+
+TAN5 ldb #44
+ leas TRSP,s
+ puls y,pc
+ pag
+* ATAN DOES ARC TANGENT OF NUMBER ON STACK
+* 1  LEVELS ON MATH STACK
+
+ATAN
+ pshs y
+ lda MBC,x get sign
+ tfr a,b
+ anda #^MS strip sign
+ sta MBC,x
+ andb #MS get sign here
+ stb ,-s save sign
+ bsr FNDAN get angle
+ lda ,s+ restore sign
+ bcs ATAN1
+ adda MBC,x
+ sta MBC,x
+ clrb
+ATAN1 puls y,pc
+ pag
+ ttl trig cordic routines
+
+* FNDAN  GIVEN THE TANGENT (POS) IN THE STACK
+* FINDS THE ANGLE C=1 IF OVERFLOW
+* ANSWER LEFT ON MATH STACK
+* 1 LEVELS ON THE MATH STACK
+
+ABS set EABS+2
+SHX set ESHX+2
+ORD set EORD+2
+SHY set ESHY+2
+ANG set EANG+2
+SHANG set ESHANG+2
+QUAD set EQUAD+2
+ITER set EITER+2
+CTNF set ITER+1
+
+FNDAN pshs Y save core pointer
+ leas -(TRSP+3),s make working space
+ clr CTNF,s flag for tan or ctn
+ ldd MBC,x CHECK EXP SIGN
+ lsla
+ asra
+ bmi FNDAN1
+ tstb
+ beq FNDAN1
+ inc CTNF,s mark change for ctn
+ lbsr _dinvs take reciprocal
+ bcc FNDAN1 no error
+ leas TRSP+3,s clean stack
+ puls y,pc
+
+FNDAN1 ldd #$1000 init abs to 1
+ std ABS,s
+ clra
+ std ABS+2,s
+ std ABS+4,s
+ std ABS+6,s
+ sta ABS+7,s
+ leay ORD,s
+ lbsr _dexit
+ lbsr _dcornrm
+ ldd #0 clear angle
+ std ANG,s
+ std ANG+2,s
+ std ANG+4,s
+ std ANG+6,s
+ sta ANG+7,s
+ lda #1 iteration
+ sta ITER,s
+
+FNDAN2 lda ORD,s check sign
+ bmi FNDAN3
+ lbsr CCWROT clockwise
+ bra FNDAN4
+
+FNDAN3 lbsr CWROT
+FNDAN4 lda ITER,s
+ inca inc iteration
+ sta ITER,s
+ cmpa #MBC*8+1
+ bls FNDAN2
+
+ lda CTNF,s see if did ctn or tan
+ beq FNDAN5
+ ldd #$1847 subtract from pi/2
+ subd ANG+6,s
+ std ANG+6,s
+ ldd #$442d
+ sbcb ANG+5,s
+ sbca ANG+4,s
+ std ANG+4,s
+ ldd #$fb54
+ sbcb ANG+3,s
+ sbca ANG+2,s
+ std ANG+2,s
+ ldd #$1921
+ sbcb ANG+1,s
+ sbca ANG,s
+ std ANG,s
+FNDAN5 leay ANG,s fix angle to float
+ lbsr _denter
+ lbsr _dcorfix
+ ldy TRSP+3,s reload static pointer
+ lda _deg,y see if radian or degrees
+ beq FNDAN6
+ leay RTDCNV,pcr
+ lbsr _denter
+ lbsr _dmuls
+FNDAN6 leas TRSP+3,s clean stack
+ clrb
+ puls y,pc
+ pag
+* FNDXY GIVEN ANGLE IN STACK
+* FINDS THE X AND Y COORDINATES
+* RETURNS IN QUAD THE QUADRANT
+* EXPECTS _deg TO BE SET FOR DEG OR RADIAN *** NEEDS Y->STATIC ***
+* ANSWER LEFT IN ABS ORD
+* 2  LEVELS ON MATH STACK
+* expects 6*WBC+2 free space on stack for scratch
+* after return
+
+ABS set EABS+2
+SHX set ESHX+2
+ORD set EORD+2
+SHY set ESHY+2
+ANG set EANG+2
+SHANG set ESHANG+2
+QUAD set EQUAD+2
+ITER set EITER+2
+
+FNDXY lda _deg,y see what mode
+ beq FNDXY1
+ leay DTRCNV,pcr convert to radians
+ lbsr _denter
+ lbsr _dmuls
+
+FNDXY1 leay TWOPI,pcr get right quad
+ lbsr _dfact
+ leax WBC,x skip integer portion
+ leay PI2,pcr
+ lbsr _dfact
+ lbsr _exd
+ stb QUAD,s
+ leay ANG,s get angle
+ lbsr _dexit
+ lbsr _dcornrm normalize it for cordic
+ leay ANGTAB,pcr subtract off 45 deg init
+ ldd ANG+6,s
+ subd 6,y
+ std ANG+6,s
+ ldd ANG+4,s
+ sbcb 5,y
+ sbca 4,y
+ std ANG+4,s
+ ldd ANG+2,s
+ sbcb 3,y
+ sbca 2,y
+ std ANG+2,s
+ ldd ANG,s
+ sbcb 1,y
+ sbca ,y
+ std ANG,s
+ leay MAG,pcr
+ ldd ,y move over init mag
+ std ABS,s
+ std ORD,s
+ ldd 2,y
+ std ABS+2,s
+ std ORD+2,s
+ ldd 4,y
+ std ABS+4,s
+ std ORD+4,s
+ ldd 6,y
+ std ABS+6,s
+ std ORD+6,s
+ lda #1
+ sta ITER,s
+FNDXY2 lda ANG,s check angle sign
+ bmi FNDXY3
+ bsr CWROT clockwise rotation
+ bra FNDXY4
+
+FNDXY3 lbsr CCWROT counterclockwise rotation
+FNDXY4 lda ITER,s inc and check loop count
+ inca
+ sta ITER,s
+ cmpa #MBC*8+1
+ bls FNDXY2
+FNDXY5 rts
+ pag
+* CWROT ROTATES CLOCKWISE AMOUNT DETERMINED BY
+* THE ITER COUNT AND ANGE TABLE
+* y saved
+
+ABS set EABS+4
+SHX set ESHX+4
+ORD set EORD+4
+SHY set ESHY+4
+ANG set EANG+4
+SHANG set ESHANG+4
+QUAD set EQUAD+4
+ITER set EITER+4
+
+CWROT lbsr _dshft get shifted x and y
+ ldd ABS+6,s
+ subd SHY+6,s
+ std ABS+6,s
+ ldd ABS+4,s
+ sbcb SHY+5,s
+ sbca SHY+4,s
+ std ABS+4,s
+ ldd ABS+2,s
+ sbcb SHY+3,s
+ sbca SHY+2,s
+ std ABS+2,s
+ ldd ABS,s
+ sbcb SHY+1,s
+ sbca SHY,s
+ std ABS,s
+ ldd ORD+6,s
+ addd SHX+6,s
+ std ORD+6,s
+ ldd ORD+4,s
+ adcb SHX+5,s
+ adca SHX+4,s
+ std ORD+4,s
+ ldd ORD+2,s
+ adcb SHX+3,s
+ adca SHX+2,s
+ std ORD+2,s
+ ldd ORD,s
+ adcb SHX+1,s
+ adca SHX,s
+ std ORD,s
+ lbsr GANG get angle
+ ldd ANG+6,s
+ subd SHANG+6,s
+ std ANG+6,s
+ ldd ANG+4,s
+ sbcb SHANG+5,s
+ sbca SHANG+4,s
+ std ANG+4,s
+ ldd ANG+2,s
+ sbcb SHANG+3,s
+ sbca SHANG+2,s
+ std ANG+2,s
+ ldd ANG,s
+ sbcb SHANG+1,s
+ sbca SHANG,s
+ std ANG,s
+ rts
+ pag
+* CCWROT ROTATES COUNTERCLOCKWISE AMOUNT DETERMINED BY
+* THE ITER COUNT AND ANGE TABLE
+
+CCWROT lbsr _dshft get shifted x and y
+ ldd ABS+6,s
+ addd SHY+6,s
+ std ABS+6,s
+ ldd ABS+4,s
+ adcb SHY+5,s
+ adca SHY+4,s
+ std ABS+4,s
+ ldd ABS+2,s
+ adcb SHY+3,s
+ adca SHY+2,s
+ std ABS+2,s
+ ldd ABS,s
+ adcb SHY+1,s
+ adca SHY,s
+ std ABS,s
+ ldd ORD+6,s
+ subd SHX+6,s
+ std ORD+6,s
+ ldd ORD+4,s
+ sbcb SHX+5,s
+ sbca SHX+4,s
+ std ORD+4,s
+ ldd ORD+2,s
+ sbcb SHX+3,s
+ sbca SHX+2,s
+ std ORD+2,s
+ ldd ORD,s
+ sbcb SHX+1,s
+ sbca SHX,s
+ std ORD,s
+ lbsr GANG get angle
+ ldd ANG+6,s
+ addd SHANG+6,s
+ std ANG+6,s
+ ldd ANG+4,s
+ adcb SHANG+5,s
+ adca SHANG+4,s
+ std ANG+4,s
+ ldd ANG+2,s
+ adcb SHANG+3,s
+ adca SHANG+2,s
+ std ANG+2,s
+ ldd ANG,s
+ adcb SHANG+1,s
+ adca SHANG,s
+ std ANG,s
+ rts
+ pag
+* GANG  GET S POINTER TOO ANGLE USING ITER
+* ANSWER IN SHANG
+* USES ITER
+
+ABS set EABS+6
+SHX set ESHX+6
+ORD set EORD+6
+SHY set ESHY+6
+ANG set EANG+6
+SHANG set ESHANG+6
+QUAD set EQUAD+6
+ITER set EITER+6
+
+GANG ldb ITER,s times 9
+ clra
+ lslb
+ rola
+ lslb
+ rola
+ lslb
+ rola
+ cmpd #ANGTBE-ANGTAB
+ bcc GANG0
+ bsr GANG2
+ rts
+
+GANG0 ldb #ANGTBE-ANGTAB-8
+ bsr GANG2
+ ldb ITER,s
+ subb #20 20 entries in ANGTAB
+ leay SHANG,s
+ lbra _dshft2
+
+GANG2 leay ANGTAB,pcr
+ clra
+ leay d,y
+ ldd ,y
+ std SHANG+2,s
+ ldd 2,y
+ std SHANG+4,s
+ ldd 4,y
+ std SHANG+6,s
+ ldd 6,y
+ std SHANG+8,s
+ rts
+ pag
+ ttl trig and log constants
+
+* set up constants and tables to be used by trig stuff
+
+NINTY fcb 180,0,0,0,0,0,0,0,7
+TWOPI fcb $c9,$0f,$da,$a2,$21,$68,$c2,$00,$03
+PI fcb $c9,$0f,$da,$a2,$21,$68,$c2,$00,$02
+PI2 fcb $c9,$0f,$da,$a2,$21,$68,$c2,$00,$01
+DTRCNV fcb $8e,$fa,$35,$12,$94,$e9,$c9,$7f,$fb
+RTDCNV fcb $e5,$2e,$e0,$d3,$1e,$0f,$be,$00,$06
+MAG fcb $09,$b7,$4e,$da,$84,$35,$e5,$a6,$7e
+EIN fcb $80,0,0,0,0,0,0,0,1
+
+ANGTAB
+ fcb $0c,$90,$fd,$aa,$22,$16,$8c,$23 atn(1)
+ fcb $07,$6b,$19,$c1,$58,$6e,$d3,$da atn(1/2)
+ fcb $03,$eb,$6e,$bf,$25,$90,$1b,$ac atn(1/4)
+ fcb $01,$fd,$5b,$a9,$aa,$c2,$f6,$dc
+ fcb $00,$ff,$aa,$dd,$b9,$67,$ef,$4e
+ fcb $00,$7f,$f5,$56,$ee,$a5,$d8,$93
+ fcb $00,$3f,$fe,$aa,$b7,$76,$e5,$35
+ fcb $00,$1f,$ff,$d5,$55,$bb,$ba,$97
+ fcb $00,$0f,$ff,$fa,$aa,$ad,$dd,$dc
+ fcb $00,$07,$ff,$ff,$55,$55,$6e,$ef
+ fcb $00,$03,$ff,$ff,$ea,$aa,$ab,$77
+ fcb $00,$01,$ff,$ff,$fd,$55,$55,$5c
+ fcb $00,$00,$ff,$ff,$ff,$aa,$aa,$ab
+ fcb $00,$00,$7f,$ff,$ff,$f5,$55,$55
+ fcb $00,$00,$3f,$ff,$ff,$fe,$aa,$ab
+ fcb $00,$00,$1f,$ff,$ff,$ff,$d5,$55
+ fcb $00,$00,$0f,$ff,$ff,$ff,$fa,$ab
+ fcb $00,$00,$07,$ff,$ff,$ff,$ff,$55
+ fcb $00,$00,$03,$ff,$ff,$ff,$ff,$eb
+ fcb $00,$00,$01,$ff,$ff,$ff,$ff,$fd
+ fcb $00,$00,$01,$00,$00,$00,$00,$00
+ANGTBE
+
+ endsect

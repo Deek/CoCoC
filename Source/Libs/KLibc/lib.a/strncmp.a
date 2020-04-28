@@ -1,0 +1,30 @@
+ psect strncmp_a,0,0,2,0,0
+
+*** strncmp(s1, s2, n)
+*    compares at most n chars
+*    ret 0 if all s2 match or n goes to 0
+*    else ret s1[i]-s2[i] where i is index at miss
+
+strncmp: pshs y,u
+ ldx 6,s s1
+ ldu 8,s s2
+ ldy 10,s n
+ beq strncmp3 if null length
+ bra strncmp2 get to work
+
+strncmp1 leay -1,y
+ beq strncmp3 if all n match
+ ldb ,u+ s2 char
+ beq strncmp3 s2 exhausted
+strncmp2 ldb ,u s2 char
+ subb ,x+ *s2 - *s1
+ beq strncmp1 if match
+ negb fix sign
+ sex
+ bra strncmp4
+
+strncmp3 clra
+ clrb
+strncmp4 puls y,u,pc
+
+ endsect

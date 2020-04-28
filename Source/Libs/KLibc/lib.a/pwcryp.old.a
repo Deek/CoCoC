@@ -1,0 +1,34 @@
+ psect pwcryp_a,0,0,0,0,0
+
+pwcryp: ldx 2,s
+ bra _4
+
+_1 clrb
+ anda #$7f make sure 7 bits
+ cmpa #'z
+ bhi _2
+ cmpa #'a
+ blo _2
+ anda #$DF force upper case
+_2 asla
+ bpl _3
+ eora #$1d
+_3 anda #$7f
+ incb
+ cmpb #5
+ bls _2
+ cmpa #$21
+ blo _2
+ cmpa #$7f
+ beq _2
+ cmpa #',
+ beq _2
+ cmpa #':
+ beq _2
+ sta ,x+
+_4 lda ,x
+ bne _1
+ ldd 2,s return s
+ rts
+
+ endsect

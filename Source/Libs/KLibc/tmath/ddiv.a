@@ -1,0 +1,152 @@
+ psect ddiv_a,0,0,0,0,0
+
+ ifp1
+ use mdefs.a
+ endc
+
+* divide double on stack by one X->
+
+_ddiv: lbsr _aprep
+ bsr _ddivs
+ lbra _mret
+
+
+* NAM ddivs
+
+* This routine divides two numbers pointed
+* to by x . answer at x 
+* x=x+WBC on return.
+* c=1 if overrange exp>511
+
+_ddivs: lda WBC,x see if op1=0
+ andcc #$fe clc
+ beq div1 EXIT NO ERR
+ lda ,x see if op2=0
+ bne div2 go divide
+ comb overflow
+div1 ldd #0
+ std WBC,x
+ std WBC+2,x
+ std WBC+4,x
+ sta WBC+6,x
+ std WBC+MBC,x
+ leax WBC,x
+ bcc div0
+ ldb #41 divide by zero
+div0 rts
+
+div2 ldd #0 clear loop counter storage space
+ std ,--s
+ std ,--s
+ std ,--s
+ std ,--s
+ std ,--s
+
+div3 ldd WBC+5,x GET OP1-OP2
+ subd 5,x
+ std WBC+5,x
+ lda WBC+4,x
+ sbca 4,x
+ sta WBC+4,x
+ ldd WBC+2,x
+ sbcb 3,x
+ sbca 2,x
+ std WBC+2,x
+ ldd WBC,x
+ sbcb 1,x
+ sbca ,x
+ std WBC,x
+ lda 7,s
+ sbca #0
+ sta 7,s
+ bcs div6
+div4 comb
+ bsr SHFT shift op1 + mq
+ tst ,s see if done
+ bmi div7 EXIT
+ bra div3
+
+div5 ldd WBC+5,x
+ addd 5,x
+ std WBC+5,x
+ lda WBC+4,x
+ adca 4,x
+ sta WBC+4,x
+ ldd WBC+2,x
+ adcb 3,x
+ adca 2,x
+ std WBC+2,x
+ ldd WBC,x
+ adcb 1,x
+ adca ,x
+ std WBC,x
+ lda 7,s
+ adca #0
+ sta 7,s
+ bcs div4
+div6 clrb
+ bsr SHFT
+ tst ,s
+ bmi div7
+ bra div5
+
+SHFT rol 8,s
+ rol 7,s
+ rol 6,s
+ rol 5,s
+ rol 4,s
+ rol 3,s
+ rol 2,s
+ lsl WBC+6,x
+ rol WBC+5,x
+ rol WBC+4,x
+ rol WBC+3,x
+ rol WBC+2,x
+ rol WBC+1,x
+ rol WBC,x
+ rol 9,s
+ inc 10,s
+ rts
+
+div7 ldb #MBC*8 see how many shifts
+ cmpb 8,s
+ ldd WBC+MBC,x
+ bcs div8
+ addd #1 add 1 if 32 shifts
+div8 subd MBC,x
+ stb WBC+MBC+1,x
+ tfr a,b
+ andb #EXM see if overflow
+ beq div9
+ cmpb #EXM
+ bne div10 error
+div9 ldb MBC,x get sign now
+ eorb WBC+MBC,x
+ lsla
+ lslb
+ rora
+ sta WBC+MBC,x
+ ldd ,s++ move answer over
+ std WBC,x
+ ldd ,s++
+ std WBC+2,x
+ ldd ,s++
+ std WBC+4,x
+ ldd ,s++
+ sta WBC+6,x
+ leas 2,s
+ leax WBC,x
+ clrb
+ rts
+
+div10 leas 10,s
+ leax WBC,x
+ tfr a,b see iv over or under
+ ldb #40 assume over
+ bita #$40
+ beq div11
+ ldb #43 under
+div11 coma
+ rts
+
+ endsect

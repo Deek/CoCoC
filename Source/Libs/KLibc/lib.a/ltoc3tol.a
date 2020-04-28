@@ -1,0 +1,31 @@
+ psect ltoc3tol_a,0,0,0,0,0
+
+* c3tol(l, s)
+* long  *l;
+* char  *s;
+
+c3tol: pshs u
+ ldu 4,s
+ ldx 6,s
+ clra
+ ldb ,x+
+ std ,u++
+ ldd ,x++
+ std ,u++
+ puls u,pc
+
+*
+* ltoc3(s, l)
+* char  *s;
+* long  l;
+
+ltoc3: pshs u
+ leau 7,s skip ms byte
+ ldx 4,s
+ lda ,u+
+ sta ,x+
+ ldd ,u++
+ std ,x++
+ puls u,pc
+
+ endsect

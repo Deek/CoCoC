@@ -1,0 +1,31 @@
+*
+* handler for ss.size and ss.pos
+*  remember to declare the returns as long!!!
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect gs1,0,0,1,0,0
+
+_gs_size:
+ ldb #SS.Size
+ bra common1
+
+_gs_pos:
+ ldb #SS.Pos
+common1 pshs U
+ lda 5,S get pn
+ os9 I$GetStt
+ bcc common2
+ ldx #-1 return -1
+ tfr X,U sign extend
+ clra
+ std errno,Y only an error sometimes
+common2 stx _flacc,Y top half
+ leax _flacc,Y need a pointer for lmove
+ stu 2,X bottom half
+ puls U,PC
+
+ ends

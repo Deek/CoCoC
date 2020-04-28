@@ -1,0 +1,39 @@
+*
+* handler for _ss_rel, _ss_rest, _ss_opt,
+*  _ss_pfd, _ss_ssig, _ss_tiks
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ psect ss1,0,0,1,0,0
+
+_ss_rel:
+ ldb #SS.Relea
+ bra ss2
+
+_ss_rest:
+ ldb #SS.Reset
+ bra ss2
+
+_ss_opt:
+ ldb #SS.Opt
+ bra ss1
+
+_ss_pfd:
+ ldb #SS.FD
+ bra ss1
+
+_ss_ssig:
+ ldb #SS.SSig
+ bra ss1
+
+_ss_tiks:
+ ldb #SS.Ticks
+ss1 ldx 4,S get buf, or parm
+ss2 lda 3,S get pn
+ os9 I$SetStt
+ lbra _sysret
+
+ ends

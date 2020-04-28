@@ -1,0 +1,22 @@
+*
+* handler for _ss_wtrk
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+
+ psect ss3,0,0,1,0,0
+
+_ss_wtrk: pshs Y,U
+ ldb #SS.WTrk
+ ldy 10,S
+ ldu 8,S
+ ldx 14,S
+ lda 7,S
+ os9 I$SetStt
+ puls Y,U
+ lbra _sysret
+
+ ends

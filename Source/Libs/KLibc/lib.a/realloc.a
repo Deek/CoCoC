@@ -1,0 +1,51 @@
+*
+* realloc changes the size of memory allocated
+*  by malloc
+*
+*  char  *realloc(char *ptr, unsigned size);
+*
+*  remember:
+*   typdef struct header {
+*          struct header *ptr;
+*          unsigned      size;
+*          } HEADER;
+*
+
+ psect realloc_a,0,0,1,0,0
+
+realloc:
+ pshs D,Y,U need ptr and space
+ ldd 10,S get size
+ std ,S set for call
+ lbsr malloc get memory
+ std ,S save ptr for return
+ beq out if error
+ cmpd 8,S same location?
+ beq out
+ ldu 8,S was it just malloc request?
+ beq out yes
+ tfr D,X get ptr to new loc
+ ldu 8,S get ptr to old loc
+ ldd -2,U get memsize
+ subd #1 remove header
+ aslb
+ rola
+ aslb
+ rola make bytes
+ cmpd 10,S check size
+ bls realloc1
+ ldd 10,S get new size
+realloc1 tfr D,Y copy ctr
+lup ldd ,U++ get byte
+ std ,X++ move to new loc
+ leay -2,Y count off
+ bne lup
+
+ ldd 8,S get old loc
+ pshs D
+ lbsr free give it up
+ puls D fix stack
+
+out puls D,Y,U,PC
+
+ endsect

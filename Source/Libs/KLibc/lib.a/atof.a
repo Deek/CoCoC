@@ -1,0 +1,226 @@
+ nam atof.a
+
+ psect atof_a,0,0,0,0,0
+
+ csect
+fracdig rmb 2
+posexp rmb 1
+negmant rmb 1
+exp rmb 2
+num rmb 8
+siz equ *
+ endsect
+
+atof: pshs U
+ ldu 4,S
+ ldb #siz
+ clra
+_1 pshs a
+ decb
+ bne _1
+
+_2 ldb ,U+
+ cmpb #$20
+ beq _2
+ cmpb #9
+ beq _2
+
+ cmpb #'-
+ bne _3
+ inc negmant,S
+ bra _5
+
+_3 cmpb #'+
+ beq _5
+ bra _6
+
+_4 sex
+* pshs D
+ leax num,S was +2
+* pshs X
+ lbsr numX10
+* leas 4,S
+_5 ldb ,U+
+_6 cmpb #'0
+ blt _7
+ cmpb #'9
+ ble _4
+
+_7 cmpb #'.
+ beq _9
+ bra _10
+
+_8 sex
+* pshs D
+ leax num,S was +2
+* pshs X
+ lbsr numX10
+* leas 4,S
+ inc fracdig+1,S
+_9 ldb ,U+
+ cmpb #'0
+ blt _10
+ cmpb #'9
+ ble _8
+
+_10 leax num,S
+ ldb #128+56 aka 184
+ stb 7,X
+ pshs X
+ pshs X
+ lbsr _dnorm
+ leas 2,S
+ lbsr _dmove
+ ldb -1,u
+ cmpb #'e
+ beq _11
+ cmpb #'E
+ bne _19
+_11 inc posexp,S
+ ldb ,U+
+ cmpb #'+
+ beq _14
+
+ cmpb #'-
+ bne _15
+ clr posexp,S
+ bra _14
+
+_13 clra
+ pshs D
+ ldd exp+2,S
+ aslb *2
+ rola
+ aslb *4
+ rola
+ addd exp+2,S *5
+ aslb *10
+ rola
+ addd ,S++
+ std exp,S
+_14 ldb ,U+
+_15 subb #'0
+ bcs _16
+ cmpb #9
+ ble _13
+
+_16
+ ldd exp,S
+ tst posexp,S
+ beq _18
+ nega
+ negb
+ sbca #0
+_18 addd fracdig,S
+ std fracdig,S
+_19 clr posexp,S
+ ldd fracdig,S
+ bge _20
+ nega
+ negb
+ sbca #0
+ std fracdig,S
+ inc posexp,S
+_20 ldb posexp,S
+ clra
+ pshs D
+ ldd fracdig+2,S
+ pshs D
+ leax num+4,S
+ lbsr _dstack
+ lbsr scale ans in flacc (x -> flacc)
+ leas 8+4,S undo _dstack and other parms
+ tst negmant,S
+ beq _23
+ leau num,S set up dest
+ pshs U
+ lbsr _dmove *x -> *(0,S)
+ leax num,S
+ lbsr _dneg leaves in flacc
+_23 leas siz,S
+ puls U,PC
+
+
+
+
+numX10
+ pshs D save new number
+ leas -8,S
+ ldd 5,X
+ aslb
+ rola 
+ std 5,X
+ std 5,S
+ ldd 3,X
+ rolb 
+ rola 
+ std 3,X
+ std 3,S
+ ldd 1,X
+ rolb 
+ rola 
+ std 1,X
+ std 1,S
+ lda ,X
+ rola 
+ sta ,X
+ sta ,S
+ asl 6,X
+ rol 5,X
+ rol 4,X
+ rol 3,X
+ rol 2,X
+ rol 1,X
+ rol ,X
+* bcs z03a5
+ asl 6,X
+ rol 5,X
+ rol 4,X
+ rol 3,X
+ rol 2,X
+ rol 1,X
+ rol ,X
+* bcs z03a5
+ ldd 5,X
+ addd 5,S
+ std 5,X
+ ldd 3,X
+ adcb 4,S
+ adca 3,S
+ std 3,X
+ ldd 1,X
+ adcb 2,S
+ adca 1,S
+ std 1,X
+ ldb ,X
+ adcb ,S
+ stb ,X
+* bcs z03a5
+ ldd 8,S
+ andb #$0f
+* clra
+ addd 5,X
+ std 5,X
+ ldd #0
+ adcb 4,X
+ adca 3,X
+ std 3,X
+ ldd #0
+ adcb 2,X
+ adca 1,X
+ std 1,X
+ lda #0
+ adca ,X
+ sta ,X
+* bcs z03a5
+ leas 10,S
+* clra 
+* clrb 
+ rts 
+
+
+*z03a5 ldd #1
+* leas 8,S
+* rts 
+
+ endsect

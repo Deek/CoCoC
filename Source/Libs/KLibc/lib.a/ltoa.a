@@ -1,0 +1,59 @@
+ psect ltoa_a,0,0,0,0,0
+ nam ltoa_a
+*            ltoa(n, s)        /* convert n to characters in s */
+*            long  n;
+*            char  *s;
+*               {
+ltoa:
+ clra int   sign = 0;
+ clrb
+ pshs d,u
+ ldu 10,s  register char  *p = s;
+
+ tst 6,s if (sign = (n < 0))
+ bpl _10
+
+ inc 0,s
+ leax 6,s  n = -n;
+ pshs x
+ leax 8,s
+ lbsr  _lneg
+ lbsr  _lmove
+*                do
+*                   {
+_10 ldd 8,s   *p++ = n % 10 + '0';
+ pshs d
+ ldd 8,s
+ pshs d
+ leax lten,pcr
+ lbsr  _lmod
+ ldb 3,x
+ addb #'0
+ stb ,u+
+ leax 6,s   } while ((n /= 10) > 0);
+ pshs x
+ ldd 2,x
+ pshs d
+ ldd 0,x
+ pshs d
+ leax lten,pcr
+ lbsr  _ldiv
+ lbsr  _lmove
+ ldd 8,s
+ addd 6,s
+ bne _10
+ tst 0,s if (sign)
+ beq _16
+ ldb #'-     *p++ = '-';
+ stb ,u+
+_16 clr 0,u *p = '\0';
+ ldd 10,s reverse(s)
+ pshs d
+ lbsr reverse reverse returns s
+ leas 4,s
+* tfr u,d
+ puls u,pc
+
+lten fdb 0,10
+
+ endsect

@@ -1,0 +1,9 @@
+ psect pffdummy_a,0,0,1,0,0
+
+pffloat: leax pffdata,pcr
+ tfr x,d
+ rts
+
+pffdata fcb 0
+
+ endsect

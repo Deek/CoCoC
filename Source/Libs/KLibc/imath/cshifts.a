@@ -1,0 +1,40 @@
+********** cshifts_a **********
+
+*   perform appropriate rotation on value above ret on stack
+*    return value in d
+
+ psect cshifts_a,0,0,1,0,0
+
+ccasr: tstb
+ beq shiftxit
+ccasr1 asr 2,s
+ ror 3,s
+ decb 
+ bne ccasr1
+ bra shiftxit
+
+
+cclsr: tstb
+ beq shiftxit
+cclsr1 lsr 2,s
+ ror 3,s
+ decb 
+ bne cclsr1
+ bra shiftxit
+
+
+ccasl: tstb
+ beq shiftxit
+ccasl1 asl 3,s
+ rol 2,s
+ decb
+ bne ccasl1
+shiftxit ldd 2,s get number
+ pshs d save
+ ldd 2,s get return
+ std 4,s overwrite value
+ ldd ,s get new value
+ leas 4,s clean stack
+ rts
+
+ endsect

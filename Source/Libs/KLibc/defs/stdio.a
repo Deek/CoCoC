@@ -1,0 +1,27 @@
+ csect
+_ptr rmb 2 buffer pionter
+_base rmb 2 buffer base
+_end rmb 2 buffer end
+_flag rmb 2 flags
+_fd rmb 2 file descriptor
+_save rmb 1 pushback char
+_bufsiz rmb 2 buffer size
+_iobsiz equ *
+ endsect
+
+* flags for _flag
+_READ set 1
+_WRITE set 2
+_UNBUF set 4
+_BIGBUF set 8
+_EOF set $10
+_ERR set $20
+_SCF set $40
+_RBF set $80
+_DEVMASK set $c0
+_WRITTEN set $1
+_INIT set $80
+
+* msc constants
+BUFSIZ set 256
+_NFILE set 16

@@ -1,0 +1,96 @@
+*
+* Memory request system calls
+*
+ use /dd/defs/os9defs.a
+ psect mem_a,0,0,5,0,0
+
+ vsect
+_spare: rmb 2
+ endsect
+
+* sbrk(size)   get memory from system
+sbrk: ldd memend,y get hi bound
+ pshs d save it
+ ldd 4,s get the size required
+ cmpd _spare,y any spare left?
+ blo sbrk20
+
+* have to get some from the system
+ pshs y save data pointer
+ clra
+ clrb
+ os9 F$Mem get current size/end
+ addd 6,s add in additional
+ os9 F$Mem re-size memory
+ tfr y,d save high bound
+ puls y restore data ptr
+ bcc sbrk10 bra if no error
+ ldd #-1 return error code
+ leas 2,s junk scratch
+ rts
+
+sbrk10 std memend,y save new memory address
+ addd _spare,y add in spare bytes
+ subd 0,s less old base
+ std _spare,y is new spare value
+
+* now spare is big enough
+sbrk20 leas 2,s junk scratch
+ ldd _spare,y get spare count
+ pshs d
+ subd 4,s less size
+ std _spare,y updated value
+ ldd memend,y get hi bound
+ subd ,s++ base of free memory
+ pshs d save
+
+ clra
+ ldx 0,s
+sbrk30 sta ,x+ clear out the new memory
+ cmpx memend,y
+ blo sbrk30
+
+ puls d,pc
+ pag
+* ibrk(size)   get memory within data allocation
+ibrk: ldd 2,s get the size required
+ addd _mtop,y add in the current top
+ bcs ibrk20 if it wraps round - error
+ cmpd _stbot,y overlap stack?
+ bhs ibrk20 yes - error
+ pshs d no - save top
+ ldx _mtop,y reset to bottom
+
+ clra
+sbloop cmpx 0,s reached the end?
+ bhs ibrk10 yes - done
+ sta ,x+ no - clear and bump
+ bra sbloop
+
+ibrk10 ldd _mtop,y return value
+ puls x restore new top
+ stx _mtop,y and save for next time
+ rts
+
+ibrk20 ldd #-1 return memory full
+ rts
+
+
+*   unbrk(pnt)  returns memory gotten with sbrk
+unbrk: ldd 2,s get old end
+ pshs y
+ os9 F$Mem set new end
+ bcc _2
+ ldd #-1
+ puls y,pc
+
+
+_2 tfr y,d copy new top
+ puls y recover base
+ std memend,y
+ clra
+ clrb
+ std _spare,y kill any leftover
+ rts
+
+ endsect

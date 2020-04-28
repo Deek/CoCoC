@@ -1,0 +1,224 @@
+ psect hyp_a,0,0,0,0,0
+
+ ifp1
+ use mdefs.a
+ endc
+
+
+sinh:
+ lbsr _dprep
+ lbsr SINH
+ lbra _mret
+
+cosh:
+ lbsr _dprep
+ lbsr COSH
+ lbra _mret
+
+tanh:
+ lbsr _dprep
+ lbsr TANH
+ lbra _mret
+
+asinh:
+ lbsr _dprep
+ lbsr ASINH
+ lbra _mret
+
+acosh:
+ lbsr _dprep
+ lbsr ACOSH
+ lbra _mret
+
+atanh:
+ lbsr _dprep
+ lbsr ATANH
+ lbra _mret
+
+
+ pag
+* SINH
+
+SINH
+ lbsr _exp
+ bcs SINH1
+ pshs y
+ leay ,x
+ lbsr _denter
+ lbsr _dinvs
+ lbsr _dsubs
+ ldd MBC,x
+ subd #1 divide by 2
+ lsla
+ lsl MBC,x
+ rora
+ std MBC,x
+ puls y
+ clra
+SINH1 rts
+
+* COSH
+
+COSH
+ lbsr _exp
+ bcs COSH1
+ pshs y
+ leay ,x
+ lbsr _denter
+ lbsr _dinvs
+ lbsr _dadds
+ ldd MBC,x
+ subd #1 divide by 2
+ lsla
+ lsl MBC,x
+ rora
+ std MBC,x
+ puls y
+ clra
+COSH1 rts
+
+ pag
+* TANH
+
+TANH
+ lbsr _exp
+ bcs TANH1
+ pshs y
+ leay ,x
+ lbsr _denter
+ leas -2*WBC,s
+ leay WBC,s
+ lbsr _dexit
+ leax -WBC,x recover x
+ lbsr _dinvs
+ leay ,s
+ lbsr _dexit
+ leax -WBC,x
+ lbsr _dsubs
+ leay ,s
+ lbsr _denter
+ leay WBC,s
+ lbsr _denter
+ leas 2*WBC,s
+ puls y
+ lbsr _dadds
+ lbsr _ddivs
+ clra
+TANH1 rts
+
+ pag
+* ASINH
+
+ASINH
+ pshs y
+ lda MBC,x save sign
+ pshs a
+ anda #^MS strip sign
+ sta MBC,x
+ ldd MBC,x see if room to square
+ lsla
+ asra
+ cmpd #-28
+ blt ASINH2
+ cmpd #MBC*8
+ blt ASINH0
+ addd #1
+ std MBC,x
+ bra ASINH1
+
+ASINH0 leay ,x
+ lbsr _denter make copy
+ lbsr _dsqrs
+ leay EIN,pcr
+ lbsr _denter
+ lbsr _dadds
+ lbsr _dsqrts
+ lbsr _dadds
+ASINH1 lbsr _log
+ puls a get sign
+ anda #MS
+ ora MBC,x
+ sta MBC,x
+ clra
+ puls y,pc
+
+ASINH2 puls a clean stack
+ anda #MS
+ ora MBC,x
+ sta MBC,x
+ std MBC,x
+ clra
+ puls y,pc
+
+ pag
+* ACOSH
+
+ACOSH
+ pshs y
+ ldd MBC,x get exp
+ bmi ACOSH2 err
+ lsla
+ asra
+ cmpd #1
+ blt ACOSH2
+ cmpd #MBC*8
+ blt ACOSH0
+ addd #1
+ std MBC,x
+ bra ACOSH1
+
+ACOSH0 leay ,x
+ lbsr _denter make copy
+ lbsr _dsqrs
+ leay EIN,pcr
+ lbsr _denter
+ lbsr _dsubs
+ lbsr _dsqrts
+ lbsr _dadds
+ACOSH1 lbsr _log
+ clra
+ puls y,pc
+
+ACOSH2 comb
+ ldb #44 illegal arg
+ puls y,pc
+
+ pag
+* ATANH
+
+ATANH
+ pshs y
+ ldd MBC,x get exp
+ lsla
+ asra
+ cmpd #1
+ bge ACOSH2
+ leas -WBC,s
+ leay ,s
+ lbsr _dexit
+ leax -WBC,x
+ leay EIN,pcr
+ lbsr _denter
+ lbsr _dadds
+ leay EIN,pcr
+ lbsr _denter
+ leay ,s
+ lbsr _denter
+ leas WBC,s
+ lbsr _dsubs
+ lbsr _ddivs
+ bcs ATANH1
+ lbsr _log
+ bcs ATANH1
+ ldd MBC,x
+ subd #1
+ lsla
+ lsl MBC,x
+ rora
+ std MBC,x
+ clra
+ATANH1 puls y,pc
+
+EIN fcb $80,0,0,0,0,0,0,0,1
+
+ endsect

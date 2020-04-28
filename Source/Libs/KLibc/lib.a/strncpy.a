@@ -1,0 +1,27 @@
+ psect strncpy_a,0,0,2,0,0
+
+*** strncpy(t, f, n)
+*    copies f thru null to t, up to n
+*    if f < n, t is padded with nulls
+
+strncpy: pshs y,u
+ ldu 8,s f
+ ldx 6,s t
+ ldy 10,s n
+ beq strncpy3 if null count
+
+strncpy1 ldb ,u+
+ stb ,x+
+ leay -1,y count off n
+ beq strncpy3 if zero
+ tstb
+ bne strncpy1 till null on f
+
+strncpy2 clr ,x+ pad
+ leay -1,y
+ bne strncpy2
+
+strncpy3 ldd 6,s return t
+ puls y,u,pc
+
+ endsect

@@ -1,0 +1,16 @@
+
+* utility to return program name, ala 68K
+
+ psect _prgname,0,0,0,0,0
+
+_prgname: leax btext,pcr get start of prog
+ ldd 2,x get prog size
+ leax d,x point past end
+ leax -4,x back up over crc and null
+loop lda ,-x get a char
+ bne loop find preceeding null
+out leax 1,x point to last good char
+ tfr x,d
+ rts
+
+ endsect

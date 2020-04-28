@@ -1,0 +1,40 @@
+ psect setbuf_a,0,0,2,0,0
+
+ ifp1
+ use /dd/defs/stdio.a
+ endc
+
+
+setbuf: pshs u
+ ldu 4,s
+ lda _flag,u
+ anda #_WRITTEN
+ beq setbuf1 if no prior flush
+ pshs u
+ lbsr fflush
+ leas 2,s
+setbuf1 ldd _flag,u first clear old stuff
+ anda #^_WRITTEN
+ andb #^(_UNBUF+_BIGBUF)
+ std _flag,u
+ ldx 6,s new buf addr
+ beq setbuf3 if unbuffered
+ ldd _bufsiz,u
+ bne setbuf2
+ ldd #BUFSIZ
+ std _bufsiz,u
+setbuf2 stx _base,u set new base
+ leax d,x get new end
+ ldb #_BIGBUF
+ bra setbuf4
+
+setbuf3 leax _save+1,u
+ ldb #_UNBUF
+setbuf4 orb _flag+1,u
+ stb _flag+1,u
+ stx _end,u set new end
+ stx _ptr,u make empty
+ puls pc,u
+
+
+ endsect

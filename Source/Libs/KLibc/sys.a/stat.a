@@ -1,0 +1,119 @@
+*
+*  Status system calls
+*
+
+* 05-13-87  return char cnt on ss.ready
+* 01-09-85  added more calls
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+ psect stat_a,0,0,3,0,0
+
+* getstat(code,path[,buffer][,count])
+getstat: pshs y,u
+ lda 9,s get the path number
+ ldb 7,s get the code
+ beq getst30  SS.OPT?
+ cmpb #1  SS.Ready?
+* beq getst05 swap this and next for ret count
+ beq getst40
+ cmpb #2  SS.Size?
+ beq getst10
+ cmpb #5  SS.Pos?
+ beq getst10
+ cmpb #6  SS.EOF?
+ beq getst40
+ cmpb #14  SS.DevNam
+ beq getst30
+ cmpb #15  SS.FD
+ beq getst20
+
+* can't do other codes
+ ldb #208 illegal service request
+ bra getst12
+
+*getst05 os9 I$GetStt uncomment for ret count
+* bcs getst12 if error
+* bra getst17 finish up
+
+* codes 2 or 5
+getst10 os9 I$GetStt
+ bcc getst15
+getst12 puls y,u
+ lbra _os9err
+
+getst15 stx [10,s] store MSW
+ ldx 10,s get address of destination
+ stu 2,x store LSW
+ clrb
+getst17 clra
+ puls y,u,pc
+
+
+* code 0 - 32 bytes into buffer
+getst20 ldy 12,s byte count
+getst30 ldx 10,s buffer or parm
+getst40
+ os9 I$GetStt
+ puls y,u
+ lbra _sysret
+ pag
+* setstat(code,path,buffer)
+* OR setstat(code,path,offset)
+setstat: pshs y,u
+ lda 9,s get path number
+ ldb 7,s get code
+ beq setst30  SS.OPT?
+ cmpb #2 SS.Size?
+ beq setst20
+ cmpb #3 SS.Reset?
+ beq setst30
+ cmpb #4 SS.WTrk?
+ beq setst10
+ cmpb #10 SS.FRZ?
+ beq setst50
+ cmpb #11 SS.SPT?
+ beq setst30
+ cmpb #12 SS.SQD?
+ beq setst50
+ cmpb #13 SS.DCM?
+ beq setst40
+ cmpb #15 SS.FD?
+ beq setst30
+ cmpb #16 SS.Ticks?
+ beq setst30
+ cmpb #17 SS.Lock?
+ beq setst20
+ cmpb #20 SS.BlkRd?
+ beq setst10
+ cmpb #21 SS.BlkWr?
+ beq setst10
+ cmpb #25 SS.Elog?
+ beq setst10
+ cmpb #26 SS.Sig
+ beq setst30
+ cmpb #27 SS.Rel
+ beq setst50
+
+ ldb #208 illegal code
+ puls y,u
+ lbra _os9err
+
+
+setst10 ldy 14,s side/density
+setst20 ldu 12,s get LSW or track no
+setst30 ldx 10,s get MSW or buffer
+ bra setst50
+
+setst40 tfr a,b copy code
+ lda 11,s get path
+ ldx 12,s parm1
+ ldy 14,s parm2
+ ldu 16,s parm3
+setst50
+ os9 I$SetStt
+ puls y,u
+ lbra _sysret
+
+ endsect

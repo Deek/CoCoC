@@ -1,0 +1,100 @@
+ psect clmul_a,0,0,1,0,0
+
+* input x->long2           output x->long in _flacc
+*      s+2=long1                  long2 removed from stack
+*
+*   8,s  b a
+*   6,s  d c
+*   4,s  ret
+*   2,s  f e
+*   0,s  h g
+*
+_A set 9
+_B set 8
+_C set 7
+_D set 6
+_E set 3
+_F set 2
+_G set 1
+_H set 0
+*
+*           DCBA   long1
+*           HGFE   long2
+*           ----
+*             AE
+*            AF
+*            BE
+*           AG
+*           BF
+*           CE
+*        (A)H     (X) is lost
+*        (B)G
+*        (C)F
+*        (D)E
+
+
+_lmul: ldd 2,x stack long1
+ pshs d
+ ldd ,x
+ pshs d
+ leax _flacc,y
+ clr ,x
+ clr 1,x
+ lda _A,s
+ ldb _E,s
+ mul  A*E
+ std 2,x
+ lda _A,s
+ ldb _F,s
+ mul  A*F
+ addd 1,x
+ std 1,x
+ bcc _lmul1
+ inc ,x
+_lmul1 lda _B,s
+ ldb _E,s
+ mul  B*E
+ addd 1,x
+ std 1,x
+ bcc _lmul2
+ inc ,x
+ pag
+_lmul2 lda _A,s
+ ldb _G,s
+ mul  A*G
+ addd ,x
+ std ,x
+ lda _B,s
+ ldb _F,s
+ mul  B*F
+ addd ,x
+ std ,x
+ lda _C,s
+ ldb _E,s
+ mul  C*E
+ addd ,x
+ std ,x
+ lda _A,s
+ ldb _H,s
+ mul  A*H
+ addb ,x
+ stb ,x
+ lda _B,s
+ ldb _G,s
+ mul  B*G
+ addb ,x
+ stb ,x
+ lda _C,s
+ ldb _F,s
+ mul  C*F
+ addb ,x
+ stb ,x
+ lda _D,s
+ ldb _E,s
+ mul  D*E
+ addb ,x
+ stb ,x
+ leas 4,s
+ lbra _lbexit clean up stack and return
+
+ endsect

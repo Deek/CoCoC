@@ -1,0 +1,20 @@
+ psect uminmax_a,0,0,0,0,0
+
+* min(v1, v2)
+* int  v1, v2;
+umin: ldd 2,s
+ cmpd 4,s
+ bls minx
+ ldd 4,s
+minx rts
+
+
+* max(v1, v2)
+* int  v1, v2;
+umax: ldd 2,s
+ cmpd 4,s
+ bhs maxx
+ ldd 4,s
+maxx rts
+
+ endsect

@@ -1,0 +1,78 @@
+ psect dcmpr_a,0,0,0,0,0
+
+* dcmpr compares double pointed by x to double on stack
+* stack is cleaned off and x preserved
+* result in cc
+
+_dcmpr: lda 2,s check signs first
+ eora ,x
+ bmi _dcmpr4 different
+ lda 2,s check sign op1
+ bmi _dcmpr2
+ lda 7+2,s now check for zero
+ beq _dcmpr1
+ ldb 7,x
+ beq _dcmpr5
+ cmpa 7,x
+ bne _dcmpr3
+ ldd 2,s compare mantissa
+ cmpd ,x
+ bne _dcmpr3
+ ldd 4,s
+ cmpd 2,x
+ bne _dcmpr3
+ ldd 6,s
+ cmpd 4,x
+ bne _dcmpr3
+ lda 8,s
+ anda #$fe
+ pshs a
+ ldb 6,x
+ andb #$fe
+ cmpa ,s+
+ bne _dcmpr3
+ bra _dcmpr6
+
+_dcmpr1 lda 7,x
+ bne _dcmpr7 op2>op1
+ clra  op1=op2=0
+ bra _dcmpr6 exit
+
+_dcmpr2 lda 7,x both signs neg
+ cmpa 7+2,s
+_dcmpr3 bhi _dcmpr5 op1>op2
+ bcs _dcmpr7 op2>op1
+ ldd ,x compare mantissa
+ cmpd 2,s
+ bne _dcmpr3
+ ldd 2,x
+ cmpd 4,s
+ bne _dcmpr3
+ ldd 4,x
+ cmpd 6,s
+ bne _dcmpr3
+ lda 6,x
+ anda #$fe
+ pshs a
+ lda 8,s
+ anda #$fe watch sign
+ cmpa ,s+
+ bne _dcmpr3
+ bra _dcmpr6
+
+_dcmpr4 lda ,x see which pos
+ bpl _dcmpr7
+_dcmpr5 lda #1 op1>op2
+ andcc #$fe
+_dcmpr6 pshs cc save cc, return clean stack
+ ldd 1,s
+ std 9,s
+ puls cc
+ leas 8,s
+ rts 
+
+_dcmpr7 clra  op2>op1
+ cmpa #1
+ bra _dcmpr6
+
+ endsect

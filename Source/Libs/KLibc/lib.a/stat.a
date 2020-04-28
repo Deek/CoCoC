@@ -1,0 +1,83 @@
+* stat.a
+* C stat() call for OS9
+* by Matthew Belmonte
+* 860208
+READ. equ %00000001
+DIR. equ %10000000
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+ psect stat_a,0,0,0,0,0
+ nam stat_a
+ ttl stat
+stat:
+ pshs u,y
+ ldd #-65
+ lbsr _stkcheck make sure enough room
+ leas -33,s for scratch area
+ ldx 39,s pathname argument
+ leau ,x points to filename
+cpynam lda ,x+
+ beq cpdone
+ cmpa #'/
+ bne cpynam
+ leau ,x save addr of last '/'
+ bra cpynam
+cpdone lda ,u
+ sta 1,s save char after the '/'
+ lda #'.+$80 parent dir
+ sta ,u replace it w/ '.'
+ ldx 39,s
+ lda #READ.+DIR.
+ os9 I$Open open it
+ sta ,s save dir path desc
+ lda 1,s
+ sta ,u restore filename
+ lbcs error
+find   lda ,s
+ leax 1,s buffer
+ ldy #32 record length
+ os9 I$Read directory
+ bcs error
+ leax 1,s
+ leay ,u target filename
+cmpnam lda ,x
+ anda #%01111111 strip MSb
+ cmpa ,y+
+ bne find look @ next entry
+ lda ,x+
+ bpl cmpnam
+ lda ,y must be same length
+ bne find so check for '\0'
+ lda ,s
+ os9 I$Close directory
+ bcs error
+ leax device,pcr "@"
+ lda #READ.
+ os9 I$Open
+ bcs error
+ sta ,s path desc
+ ldx 30,s LSN (MS 16)
+ lda 32,s LSN (LS 8)
+ clrb
+ tfr d,u
+ lda ,s
+ os9 I$Seek
+ bcs error
+ ldx 41,s &stbuf argument
+ ldy #$100 sizeof(stbuf)
+ lda ,s
+ os9 I$Read file desc sector
+ bcs error
+ lda ,s
+ os9 I$Close
+ bcs error
+ ldd #0 no error
+clenup leas 33,s done w/ scratch area
+ puls y,u,pc
+error clra
+ std errno error code
+ ldd #-1 error flag
+ bra clenup
+device fcs "@"
+ endsect

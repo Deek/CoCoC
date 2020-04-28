@@ -1,0 +1,26 @@
+ psect case_a,0,0,0,0,0
+
+toupper: clra
+ ldb 3,s
+ leax _chcodes,y
+ lda d,x
+ anda #4
+ beq returnit
+ andb #$df
+ clra
+ rts
+
+tolower: clra
+ ldb 3,s
+ leax _chcodes,y
+ lda d,x
+ anda #2
+ beq returnit
+ orb #$20
+ clra
+ rts
+
+returnit ldd 2,s
+retfixed rts
+
+ endsect

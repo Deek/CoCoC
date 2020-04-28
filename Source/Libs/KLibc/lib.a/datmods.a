@@ -1,0 +1,117 @@
+
+* data module handler package
+*
+*  entry points:
+*   int   datlink(name, datptr, space)
+*   char  *name, **datptr;
+*   int   *space;
+*      Loads (if necessary) and links the file "name".
+*      "datptr" is set to the address of the data section.
+*      "space" is set to the free space available.
+*      Return value is:
+*         -1 for error (errno set as required)
+*          0 for successful link
+*          1 if load was required (ie cold start)
+*
+*   int   dunlink(datptr)
+*   char  *datptr;
+*      Unlinks the module belonging to "datptr"
+*      Returns -1 if error (errno set) else 0
+*
+*   int   lockdata(datptr)
+*   char  *datptr;
+*      Attmpts to lock the data module (*datptr is
+*      considered to be the lock byte) by changing
+*      the lock byte (normally -1) to 0.  Returns
+*      process stack level on failure, else 0
+*      Errno is not set.
+*
+*   int   unlkdata(datptr)
+*   char  *datptr;
+*      Unlocks the data module.
+*      Returns -1 on attempt to unlock an unlocked
+*      module, else 0;
+
+
+* A data module is locked when loaded.  It must be set
+*  for use by a call to unlkdata after the origional
+*  loader is done with any initialization required.
+
+
+* In all cases, 'datptr' points to the lock byte.
+*  User space starts at 'datptr' + 1
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+ pag
+ psect datmods_a,0,0,1,0,0
+
+lockdata: ldx 2,S get lock byte ptr
+ pshs CC
+ orcc #$10 set int mask
+ inc ,X bump lock
+ beq gotit
+ ldb ,X
+ dec ,X put it back
+badnews sex make 16 bit
+ puls CC,PC
+
+
+unlkdata: ldx 2,S get lock byte ptr
+ pshs CC
+ orcc #$10 set int mask
+ ldb ,X
+ bne badnews
+ dec ,X
+gotit clra
+ clrb
+ puls CC,PC
+
+
+datlink: pshs Y,U save registers
+ clr ,-S
+ clr ,-S set up ok return
+ ldx 8,S get name ptr
+ lda #$40 data module type
+ os9 F$Link
+ bcc foundit
+ cmpb #E$MNF
+ beq loadit
+ coma set the carry bit in case
+oops puls X,Y,U restore stack
+ lbra _os9err
+
+
+loadit ldx 8,S get name ptr again
+ lda #$40 data module
+ os9 F$Load
+ bcs oops this is fatal
+ inc 1,S say had to load
+foundit pshs Y data start for computation
+ tfr U,D module start
+ subd ,S++ negative difference
+ std ,Y++ save the offset
+ sty [10,S] return ptr
+ addd 2,U add on module size
+ subd #5 checksum and local storage
+ std [12,S] return it
+ ldd ,S get return status
+ beq dontlock if just linking
+ pshs Y stack lock byte pointer
+ bsr lockdata try to lock it
+ std ,S++ did we lock it?
+ beq dontlock if success
+ clr 1,S this turns out to be a link
+dontlock puls D,Y,U,PC get registers
+
+
+dunlink: pshs U save register
+ ldu 4,S get data ptr
+ ldd ,--U get header offset
+ leau D,U find module start
+ os9 F$UnLink
+ puls U
+ lbra _sysret
+
+ endsect

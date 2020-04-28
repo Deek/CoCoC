@@ -1,0 +1,1029 @@
+ psect cfloats_a,0,0,0,0,0
+
+* 11-12-85  add zero test in -dneg: so printf works.
+
+
+* define mtath buffer usage on stack
+
+ csect
+_wrk rmb 8
+_wrk1 rmb 8
+_op2 rmb 8
+_sgnop1 rmb 1 save for op1 sign
+_cmbsgn rmb 3 combined sign of op1 + op2
+_sgnop2 rmb 1 save for op2 sign
+_exovr rmb 1 for exp overflow
+_mbuf rmb 4 space for ext ret address and u
+_op1 rmb 8
+ endsect
+
+_exb equ 7
+
+
+ ttl _dnorm
+ pag
+
+* dnorm  two bytes on stack is pointer to double
+* to be normalized
+* x points to answer in flacc
+
+_dnorm: ldx 2,s get pointer double
+ lbsr _dstack put on stack
+ bsr _dnorm1 return address before double
+ rts 
+
+_dnorm1 pshs u
+ leas -_mbuf,s get u's data in same form
+ tfr s,u
+ clr _exovr,u
+ clr _cmbsgn,u
+ lbsr _dadds13 go justify
+ lbra _mexit
+
+
+* dneg negate double x points to
+* on return
+_dneg: ldb #7 double byte index
+ clra accumulator
+_dneg1 ora b,x
+ decb
+ bpl _dneg1
+ tsta is it zero?
+ lbeq _xtofla just copy back
+ ldd ,x else flip sign bit
+ eora #$80
+ lbra _xtofla1
+
+
+ ttl entries for *,/,+,-
+ pag
+
+* for four banger stuff x points to op2
+* op1 on stack
+* on return x points to answer in flacc
+
+_dadd: lbsr _mprep
+ lbsr _dadds
+ lbra _mexit
+
+_dsub: lbsr _mprep
+ lbsr _dsubs
+ lbra _mexit
+
+_dmul: lbsr _mprep
+ lbsr _dmuls
+ bra _mexit
+
+_ddiv: lbsr _mprep
+ lbsr _ddivs
+ bra _mexit
+
+
+ ttl type conversions
+ pag
+
+* entry points for type conversions
+
+_dtol: lbsr _xtofla put in flacc
+ lbra _dtols
+
+_dtoi: bsr _dtol
+ ldd 2,x
+ rts 
+
+_ltod: ldd ,x
+ std >_flacc,y
+ ldd 2,x
+ leax >_flacc,y
+ std 2,x
+ lbra _ltods
+
+_itod: leax >_flacc,y
+ std $02,x
+ tfr a,b
+ sex 
+ tfr a,b
+ std ,x
+ lbra _ltods
+
+_utod: leax >_flacc,y
+ std 2,x
+ clr ,x
+ clr 1,x
+ lbra _ltods
+
+_dtof: ldd ,x
+ std >_flacc,y
+ lda 2,x
+ ldb _exb,x
+ leax >_flacc,y
+ std 2,x
+ rts 
+
+_ftod: ldd ,x
+ std >_flacc,y
+ ldd 2,x
+ leax >_flacc,y
+ sta 2,x
+ stb _exb,x
+ clr 3,x
+ clr 4,x
+ clr 5,x
+ clr 6,x
+ rts 
+
+  ttl mexit
+ pag
+
+* mexit  puts op1 into flacc recovers stack and u
+* as set up by mprep
+
+_mexit leax >_flacc,y
+ ldd _op1,u
+ std ,x
+ ldd _op1+2,u
+ std 2,x
+ ldd _op1+4,u
+ std 4,x
+ ldd _op1+6,u
+ std 6,x
+ leas _mbuf,u recover s
+ puls u get u back
+ puls b,a get return address
+ std 6,s put back
+ leas 6,s
+ rts 
+
+ ttl _dcmpr
+ pag
+
+* dcmpr compares double pointed by x to double on stack
+* stack is cleaned off and x preserved
+* result in cc
+
+_dcmpr: lda 2,s check signs first
+ eora ,x
+ bmi _dcmpr4 different
+ lda 2,s check sign op1
+ bmi _dcmpr2
+ lda _exb+2,s now check for zero
+ beq _dcmpr1
+ ldb _exb,x
+ beq _dcmpr5
+ cmpa _exb,x
+ bne _dcmpr3
+ ldd 2,s compare mantissa
+ cmpd ,x
+ bne _dcmpr3
+ ldd 4,s
+ cmpd 2,x
+ bne _dcmpr3
+ ldd 6,s
+ cmpd 4,x
+ bne _dcmpr3
+ lda 8,s
+ anda #$fe
+ pshs a
+ ldb 6,x
+ andb #$fe
+ cmpa ,s+
+ bne _dcmpr3
+ bra _dcmpr6
+
+_dcmpr1 lda _exb,x
+ bne _dcmpr7 op2>op1
+ clra  op1=op2=0
+ bra _dcmpr6 exit
+
+_dcmpr2 lda _exb,x both signs neg
+ cmpa _exb+2,s
+_dcmpr3 bhi _dcmpr5 op1>op2
+ bcs _dcmpr7 op2>op1
+ ldd ,x compare mantissa
+ cmpd 2,s
+ bne _dcmpr3
+ ldd 2,x
+ cmpd 4,s
+ bne _dcmpr3
+ ldd 4,x
+ cmpd 6,s
+ bne _dcmpr3
+ lda 6,x
+ anda #$fe
+ pshs a
+ lda 8,s
+ anda #$fe watch sign
+ cmpa ,s+
+ bne _dcmpr3
+ bra _dcmpr6
+
+_dcmpr4 lda ,x see which pos
+ bpl _dcmpr7
+_dcmpr5 lda #1 op1>op2
+ andcc #$fe
+_dcmpr6 pshs cc save cc, return clean stack
+ ldd 1,s
+ std 9,s
+ puls cc
+ leas 8,s
+ rts 
+
+_dcmpr7 clra  op2>op1
+ cmpa #1
+ bra _dcmpr6
+
+ ttl dsubs
+ pag
+
+* entry for dsub
+* subtracts doubles on u as set up by mprep
+* op1=op1-op2
+
+_dsubs lda _op2+_exb,u see if op2 =0
+ beq _dsubs1
+ ldb _sgnop2,u change sign on op2
+ eorb #$80
+ stb _sgnop2,u
+ eorb _sgnop1,u
+ stb _cmbsgn,u update cmbsgn
+ ldb _op1+_exb,u
+ bne _dadds1 if op1 <>0 then just add
+ lbsr _x2op1 return with op2 as answer
+ lda _op1,u
+ lbra _just2
+
+_dsubs1 lda _op1,u put sign back in op1 and return
+ ldb _sgnop1,u
+ lbra _just3
+
+ ttl dadds
+ pag
+
+* entry for dadd
+* adds doubles on u as set up by mprep
+* op1=op1+op2
+
+_dadds lbeq _x2op1 return op2 as answer
+ lda _op2+_exb,u see if op2 zero
+ beq _dsubs1 return op1 as answer
+_dadds1 suba _op1+_exb,u check exp diff
+ beq _dadds4 no diff don't adjust first
+ sta _wrk,u save exp diff in wrk
+ bcs _dadds5
+ ldb _op2+_exb,u use op2 exp, it was bigger
+ stb _op1+_exb,u
+ ldd _op1,u adjust op1
+_dadds2 lsra
+ rorb 
+ ror _op1+2,u
+ ror _op1+3,u
+ ror _op1+4,u
+ ror _op1+5,u
+ ror _op1+6,u
+ dec _wrk,u
+ bne _dadds2
+ std _op1,u
+
+_dadds3 lda _cmbsgn,u see if add or subtract
+ bmi _dadds9
+ bra _dadds7
+
+_dadds4 inc _wrk,u now used as round up flag
+ orcc #$01 c=1 for add and sub
+ bra _dadds3
+
+_dadds5 ldd _op2,u adjust op2, op1 bigger
+_dadds6 lsra
+ rorb 
+ ror _op2+2,u
+ ror _op2+3,u
+ ror _op2+4,u
+ ror _op2+5,u
+ ror _op2+6,u
+ inc _wrk,u
+ bne _dadds6
+ std _op2,u
+
+ lda _cmbsgn,u see if add or subtract
+ bmi _dadds10
+
+_dadds7 ldd _op1+5,u add
+ adcb _op2+6,u
+ adca _op2+5,u
+ std _op1+5,u
+ ldd _op1+3,u
+ adcb _op2+4,u
+ adca _op2+3,u
+ std _op1+3,u
+ ldb _op1+2,u
+ adcb _op2+2,u
+ stb _op1+2,u
+ ldd _op1,u
+ adcb _op2+1,u
+ adca _op2,u
+ std _op1,u
+ bcc _dadds8
+ inc _op1+_exb,u overflow shift down
+ ror _op1,u
+ ror _op1+1,u
+ ror _op1+2,u
+ ror _op1+3,u
+ ror _op1+4,u
+ ror _op1+5,u
+ ror _op1+6,u
+_dadds8 lda _sgnop2,u use op2 sign
+ sta _cmbsgn,u
+ bra _dadds13
+
+_dadds9 rola subtract but negate carry
+ coma 
+ asra 
+_dadds10 ldd _op1+5,u subtract
+ sbcb _op2+6,u
+ sbca _op2+5,u
+ std _op1+5,u
+ ldd _op1+3,u
+ sbcb _op2+4,u
+ sbca _op2+3,u
+ std _op1+3,u
+ ldd _op1+1,u
+ sbcb _op2+2,u
+ sbca _op2+1,u
+ std _op1+1,u
+ lda _op1,u
+ sbca _op2,u
+ sta _op1,u
+ lda _sgnop1,u
+ bcc _dadds12
+ com _op1,u
+ com _op1+1,u
+ com _op1+2,u
+ com _op1+3,u
+ com _op1+4,u
+ com _op1+5,u
+ com _op1+6,u
+ lda _wrk,u
+ beq _dadds11
+ lbsr _rndup
+_dadds11 lda _sgnop2,u use op2 sign
+_dadds12 sta _cmbsgn,u
+_dadds13 clr _wrk,u
+
+_just lda _op1,u see if justified
+ bmi _just2
+ ora _op1+1,u check for zero first
+ ora _op1+2,u
+ ora _op1+3,u
+ ora _op1+4,u
+ ora _op1+5,u
+ ora _op1+6,u
+ beq _just5 return exp zero
+ ldd _op1,u
+_just0 dec _op1+_exb,u adjust exp
+ bne _just1
+ dec _exovr,u
+_just1 asl _wrk,u now shift up
+ rol _op1+6,u
+ rol _op1+5,u
+ rol _op1+4,u
+ rol _op1+3,u
+ rol _op1+2,u
+ rolb 
+ rola 
+ bpl _just0 keep trying
+ stb _op1+1,u
+ ldb _op1+_exb,u
+ beq _ovrchk
+
+_just2 ldb _cmbsgn,u add in sign now
+_just3 anda #$7f
+ andb #$80
+ pshs b
+ adda ,s+
+ sta _op1,u
+ tst _exovr,u see if exp to big
+ bne _ovrchk
+_just4 rts
+
+_just5 sta _op1+_exb,u
+ rts 
+
+_ovrchk lda _exovr,u get full exp
+ ldb _op1+_exb,u
+ subd #$0000 test
+ beq _ovrchk2
+ bmi _ovrchk2
+_ovrchk1 ldd #$0028 overflow error
+ lbra _rpterr
+
+_ovrchk2 lbsr _retzer if to small just return zero
+ bra _ovrchk1
+
+ ttl dmuls
+ pag
+
+* entry point for _dmul
+* multiplies doubles on u as set up by mprep
+* op1=op1*op2
+
+_dmuls beq _retzer enter for mul
+ lda _op2+_exb,u see if either number zero
+ beq _retzer
+ lbsr _dmulm mul mantissa
+ clra 
+ ldb _op1+_exb,u now add exponents
+ addb _op2+_exb,u
+ adca #$00 save overflow
+ subd #$0080 take out extra 128
+ stb _op1+_exb,u
+ sta _exovr,u save for error stuff
+ lbsr _just get answer justified
+ lda _wrk,u see if need to round up
+ bpl _just4 just return
+ lbra _rndup go round up
+
+_retzer clra
+ sta _op1+_exb,u
+ bra _a2op1
+
+ ttl ddivs
+ pag
+
+* entry point for divide
+* divides doubles on u as set up by mprep
+* op1=op1/op2
+
+_ddivs ldb _op2+_exb,u check for zero
+ bne _ddivs1
+ ldd #$0029 divide by zero error
+ lbra _rpterr
+
+_ddivs1 tsta now check op1 for zero
+ beq _retzer
+ lbsr _ddivm go divide mantissa's
+ clra 
+ ldb _op1+_exb,u subtract exponents
+ subb _op2+_exb,u
+ sbca #$00
+ addd #$0081 put back in 128 bias
+ sta _exovr,u
+ stb _op1+_exb,u
+ lda _wrk+6,u
+ coma  shift back one
+ asra 
+ ror _op1,u
+ ror _op1+1,u
+ ror _op1+2,u
+ ror _op1+3,u
+ ror _op1+4,u
+ ror _op1+5,u
+ ror _op1+6,u
+ ror _wrk,u
+ lbsr _just get justified
+ lda _wrk,u
+ bpl _a2op11 just return
+ lbra _rndup round up and return
+
+ ttl mul div service
+ pag
+
+* sop1set  moves op1 to wrk, then falls thru to a2op1
+
+_sop1set pshs a
+ ldd _op1,u
+ std _wrk,u
+ ldd _op1+2,u
+ std _wrk+2,u
+ ldd _op1+4,u
+ std _wrk+4,u
+ ldb _op1+6,u
+ stb _wrk+6,u
+ puls a
+
+* a2op1  moves a accum to op1 mantissa
+
+_a2op1 sta _op1,u
+ sta _op1+1,u
+ sta _op1+2,u
+ sta _op1+3,u
+ sta _op1+4,u
+ sta _op1+5,u
+ sta _op1+6,u
+_a2op11 rts
+
+ ttl mulm
+ pag
+
+* mul mantissa of op1 and op2
+* answer in op1
+
+_dmulm clra mul mantissa
+ bsr _sop1set move op1 to wrk clear op1
+ ldb #7*8 loop count
+ stb _wrk1,u
+_dmulm1 lda _wrk+6,u see if to add
+ lsra 
+ bcc _dmulm2
+ ldd _op1+5,u op2=op2+_op2
+ addd _op2+5,u
+ std _op1+5,u
+ ldd _op1+3,u
+ adcb _op2+4,u
+ adca _op2+3,u
+ std _op1+3,u
+ ldd _op1+1,u
+ adcb _op2+2,u
+ adca _op2+1,u
+ std _op1+1,u
+ lda _op1,u
+ adca _op2,u
+ sta _op1,u
+_dmulm2 ror _op1,u shift right op2,wrk
+ ror _op1+1,u
+ ror _op1+2,u
+ ror _op1+3,u
+ ror _op1+4,u
+ ror _op1+5,u
+ ror _op1+6,u
+ ror _wrk,u
+ ror _wrk+1,u
+ ror _wrk+2,u
+ ror _wrk+3,u
+ ror _wrk+4,u
+ ror _wrk+5,u
+ ror _wrk+6,u
+ dec _wrk1,u loop count
+ bne _dmulm1
+ rts 
+
+ ttl ddivm
+ pag
+
+* divide mantissa of op1/op2
+* answer in op1
+
+_ddivm clra
+ lbsr _sop1set move op1 to wrk clear op1
+ ldb #7*8+1 loop count
+ stb _wrk1,u
+
+_ddivm1 ldb _wrk,u see if first byte will go in
+ cmpb _op2,u
+ bcs _ddivm2
+ ldd _wrk+5,u try whole thing now
+ subd _op2+5,u
+ std _wrk1+5,u save in wrk1 in case goes in
+ ldd _wrk+3,u
+ sbcb _op2+4,u
+ sbca _op2+3,u
+ std _wrk1+3,u
+ ldb _wrk+2,u
+ sbcb _op2+2,u
+ stb _wrk1+2,u
+ ldd _wrk,u
+ sbcb _op2+1,u
+ sbca _op2,u
+ bcs _ddivm2
+ std _wrk,u it went in, move result to wrk
+ lda _wrk1+2,u
+ sta _wrk+2,u
+ ldd _wrk1+3,u
+ std _wrk+3,u
+ ldd _wrk1+5,u
+ std _wrk+5,u
+
+_ddivm2 rol _op1+6,u shift wrk,op1 left
+ rol _op1+5,u
+ rol _op1+4,u
+ rol _op1+3,u
+ rol _op1+2,u
+ rol _op1+1,u
+ rol _op1,u
+ rol _wrk+6,u
+ rol _wrk+5,u
+ rol _wrk+4,u
+ rol _wrk+3,u
+ rol _wrk+2,u
+ rol _wrk+1,u
+ rol _wrk,u
+ dec _wrk1,u loop count
+ bhi _ddivm1
+ beq _ddivm3 done
+
+ ldd _wrk+5,u if c=1 it will definitly go in
+ subd _op2+5,u
+ std _wrk+5,u
+ ldd _wrk+3,u
+ sbcb _op2+4,u
+ sbca _op2+3,u
+ std _wrk+3,u
+ ldd _wrk+1,u
+ sbcb _op2+2,u
+ sbca _op2+1,u
+ std _wrk+1,u
+ lda _wrk,u
+ sbca _op2,u
+ sta _wrk,u
+ clra 
+ bra _ddivm2 go shift
+
+_ddivm3 ror _wrk,u shift back to use for remainder
+ com _op1,u anwser flipped
+ com _op1+1,u
+ com _op1+2,u
+ com _op1+3,u
+ com _op1+4,u
+ com _op1+5,u
+ com _op1+6,u
+ rts 
+
+ ttl mprep
+ pag
+
+* mprep saves u an stack and creates working space on stack
+* u returns pointing to working space
+* number passed on stack is op1
+* x comes in pointing to op2
+* a returns with op1 exp
+
+_mprep puls b,a get return address
+ pshs u save u
+ leas -_mbuf,s make room
+ tfr s,u get u pointing to it
+ pshs b,a put back return
+ clr _exovr,u
+ ldd $06,x
+ std _op2+6,u
+ ldd $04,x
+ std _op2+4,u
+ ldd $02,x
+ std _op2+2,u
+ ldd ,x
+ stb _op2+1,u
+ tfr a,b
+ sta _sgnop2,u save op2 sign
+ ora #$80
+ sta _op2,u put in implied 1
+ eorb _op1,u
+ stb _cmbsgn,u save combined sign
+ lda _op1,u
+ sta _sgnop1,u save op1 sign
+ ora #$80
+ sta _op1,u put in implied 1
+ lda _op1+_exb,u return a=op1 exp
+ rts 
+
+ ttl ltods
+ pag
+
+* entry for long to double conversion
+* x points to flacc with long to be converted
+
+ leax _op1,u
+_ltods lda #128+32 set init exp
+ sta _exb,x
+ clr 4,x clear extra bits
+ clr 5,x
+ clr 6,x
+ lda ,x
+ tfr a,b check for zero
+ orb 1,x
+ orb 2,x
+ orb 3,x
+ beq _ltods4 return zero
+ ldb 1,x
+ tsta  check sign
+ bpl _ltods1
+ pshs b,a neg take 2's comp
+ clra 
+ clrb 
+ subd 2,x
+ std 2,x
+ ldd #$0000
+ sbcb 1,s
+ sbca ,s
+ leas 2,s
+ bvs _ltods2
+
+_ltods1 dec _exb,x justify up
+ asl 3,x
+ rol 2,x
+ rolb 
+ rola 
+ bpl _ltods1
+
+_ltods2 anda #$7f put sign in
+ tst ,x
+ bpl _ltods3
+ ora #$80
+_ltods3 std ,x
+ rts 
+
+ leax _op1,u
+ clr 4,x
+ clr 5,x
+ clr 6,x
+_ltods4 clr _exb,x
+_ltods5 clr ,x
+ clr 1,x
+ clr 2,x
+ clr 3,x
+ rts 
+
+ ttl dtol
+ pag
+
+* converts double to long
+* x points to double
+
+_dtols0 ldd #$002a
+ lbra _rpterr
+
+ leax _op1,u
+_dtols ldb _exb,x
+ beq _ltods5 move in zero
+ subb #$81 take out excess 128
+ bcs _dtols8 in case <1 then enter 0 or -1
+ negb 
+ addb #32-1
+ bmi _dtols0 report err to large
+ bne _dtols1 go shift
+ ldd ,x
+ cmpd #$8000 see of -2**32
+ bne _dtols0 report err
+ lda $02,x
+ ora $03,x
+ ora $04,x
+ ora $05,x
+ ora $06,x
+ bne _dtols0 report err
+ rts 
+
+_dtols1 pshs b b has amount to shift
+ ldd ,x
+ bmi _dtols3 if neg round up instead of down
+ ora #$80 implied one
+_dtols2 lsra
+ rorb 
+ ror $02,x
+ ror $03,x
+ dec ,s
+ bne _dtols2
+ std ,x
+ puls pc,b done
+
+_dtols3 clr ,-s see if fractional part loss
+_dtols4 lsra
+ rorb 
+ ror $02,x
+ ror $03,x
+ ror $04,x
+ ror $05,x
+ ror $06,x
+ bcc _dtols5
+ inc ,s loss of fraction flag
+_dtols5 dec $01,s
+ bne _dtols4
+
+ std ,x
+ ldd ,s++ recover s, see if fraction loss
+ bne _dtols6
+ lda $04,x check rest mantissa for fract
+ ora $05,x
+ ora $06,x
+ beq _dtols7
+
+_dtols6 ldd $2,x round up since neg
+ addd #1
+ std $02,x
+ ldd ,x
+ adcb #0
+ adca #0
+ bcs _dtols0 go zero (path is never taken)
+ std ,x
+
+_dtols7 clra now get 2's comp notation
+ clrb 
+ subd 2,x
+ std 2,x
+ ldd #0
+ sbcb 1,x
+ sbca ,x
+ std ,x
+ rts 
+
+_dtols8 lda ,x check sign
+ lbpl _ltods5 pos enter zero
+ ldd #-1 neg enter -1
+ std 2,x
+ std ,x
+ rts 
+
+ ttl rndup
+ pag
+
+* add carry to mantissa of op1
+
+_rndup inc _op1+6,u round up op1
+ bne _rndup2
+ inc _op1+5,u
+ bne _rndup2
+ inc _op1+4,u
+ bne _rndup2
+ inc _op1+3,u
+ bne _rndup2
+ inc _op1+2,u
+ bne _rndup2
+ inc _op1+1,u
+ bne _rndup2
+ ldb _op1,u
+ tfr b,a
+ anda #$7f
+ inca 
+ bpl _rndup1
+ inc _op1+_exb,u
+ anda #$7f get sign back
+_rndup1 andb #$80
+ pshs b
+ adda ,s+
+ sta _op1,u
+_rndup2 rts
+
+_ein fdb $0000,$0000,$0000,$0081
+
+ ttl gen service
+ pag
+
+* move number at x to op1
+
+ leax >_ein,pcr
+_x2op1 pshs a
+ ldd ,x
+ std _op1,u
+ ldd 2,x
+ std _op1+2,u
+ ldd 4,x
+ std _op1+4,u
+ ldd 6,x
+ std _op1+6,u
+ puls pc,a
+
+_op12x pshs a
+ ldd _op1,u
+ std ,x
+ ldd _op1+2,u
+ std $02,x
+ ldd _op1+4,u
+ std $04,x
+ ldd _op1+6,u
+ std $06,x
+ puls pc,a
+
+ ttl xtofla
+ pag
+
+* move double at x to flacc
+
+_xtofla: ldd ,x
+_xtofla1 std >_flacc,y
+ ldd 2,x
+ std >_flacc+2,y
+ ldd 4,x
+ std >_flacc+4,y
+ ldd 6,x
+ leax >_flacc,y
+ std 6,x
+ rts 
+
+ ttl dinc ddec
+ pag
+
+* increment or decrement double pointed to by x
+
+_dinc: pshs x
+ bsr _dstack put number on stack
+ leax <_ein,pcr
+ pshs x
+ lbsr _mprep
+ lbsr _dadds add one
+_dinc1 ldx _mbuf+8+4,u get x back
+ bsr _op12x move to op1
+ ldx _mbuf,u get old u in x
+ leas _mbuf+8+4,u clean stack
+ tfr x,u
+ puls pc,x
+
+_ddec: pshs x
+ bsr _dstack
+ leax >_ein,pcr
+ pshs x
+ lbsr _mprep
+ lbsr _dsubs
+ bra _dinc1 exit with x pointing to answer
+
+ ttl finc fdec
+ pag
+
+* increment or decrement float pointed to by x
+
+_finc: pshs x
+ bsr _fstack
+ leax >_ein,pcr
+ pshs x
+ lbsr _mprep
+ lbsr _dadds
+_finc1 ldx _mbuf+8+4,u get x back
+ ldd _op1,u
+ std ,x
+ lda _op1+2,u
+ ldb _op1+_exb,u
+ std $02,x
+ ldx _mbuf,u get old u in x
+ leas _mbuf+8+4,u clean stack
+ tfr x,u
+ puls pc,x
+
+_fdec: pshs x
+ bsr _fstack
+ leax >_ein,pcr
+ pshs x
+ lbsr _mprep
+ lbsr _dsubs
+ bra _finc1
+
+ ttl fstack dstack
+ pag
+
+* 4 bytes x points is put in stack
+
+_fstack: leas -8,s
+ ldd 8,s take care of return address
+ std ,s
+ clra 
+ clrb 
+ std 5,s
+ std 7,s
+ ldd ,x
+ std 2,s
+ ldd 2,x
+ sta 4,s
+ stb 2+_exb,s
+ rts 
+
+* 8 bytes x points to gets put on stack
+
+_dstack: leas -$08,s
+ ldd 8,s get return address
+ std ,s
+ ldd ,x
+ std 2,s
+ ldd 2,x
+ std 4,s
+ ldd 4,x
+ std 6,s
+ ldd 6,x
+ std 8,s put back return address
+ rts 
+
+ ttl fmove dmove
+ pag
+
+* fmove  2 bytes on stack is 'to' pointer
+* x is 'from' pointer
+* 4 bytes moved
+* x return as 'to' pointer
+
+_fmove: pshs u
+ ldu 4,s
+ exg x,u
+ ldd ,u
+ std ,x
+ ldd 2,u
+ std $02,x
+ bra _dmove1
+
+
+* dmove 2 bytes on stack is 'to' pointer
+* x is 'from' pointer
+* 8 bytes moved
+* x returns as 'to' pointer
+
+_dmove: pshs u
+ ldu 4,s get to pointer
+ exg x,u exchange to and from
+ ldd ,u
+ std ,x
+ ldd 2,u
+ std 2,x
+ ldd 4,u
+ std 4,x
+ ldd 6,u
+ std 6,x
+_dmove1 puls u get u back
+ puls b,a get return address
+ std ,s wipe out from pointer
+ rts
+
+
+ endsect
+

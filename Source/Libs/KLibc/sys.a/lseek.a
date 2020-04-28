@@ -1,0 +1,61 @@
+*
+* File i/o system calls
+*
+
+ use /dd/defs/os9defs.a
+ psect lseek_a,0,0,3,0,0
+
+* lseek(fd,offset,type)
+lseek: pshs u save the register variable
+ ldd 10,s get type
+ bne lseek10
+ ldu #0
+ ldx #0
+ bra doseek
+
+lseek10 cmpd #1 from here?
+ beq here
+ cmpd #2 from the end?
+ beq end
+* bad type
+ ldb #E$Seek
+
+lserr clra
+ std errno,y
+ ldd #-1
+ leax _flacc,y
+ std 0,x
+ std 2,x
+ puls u,pc
+
+* from the end
+end lda 5,s get path number
+ ldb #2 get file size code
+ os9 I$GetStt
+ bcs lserr
+
+ bra doseek
+
+here lda 5,s
+ ldb #5
+ os9 I$GetStt
+ bcs lserr
+
+doseek tfr u,d work on the LSW first
+ addd 8,s
+ std _flacc+2,y
+ tfr d,u
+ tfr x,d
+ adcb 7,s
+ adca 6,s
+ bmi lserr seek is before beginning of file
+ tfr d,x
+ std _flacc,y
+
+ lda 5,s path number
+ os9 I$Seek
+ bcs lserr
+
+ leax _flacc,y
+ puls u,pc
+ endsect

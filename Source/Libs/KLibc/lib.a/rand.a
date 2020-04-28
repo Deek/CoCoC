@@ -1,0 +1,42 @@
+ psect rand_a,0,0,0,0,0
+
+ vsect
+next fdb 0,1
+ endsect
+
+rand:
+ pshs u
+ leax next,y
+ ldd 0,x
+ ldu 2,x
+ pshs d,u
+ leax mcon,pcr
+ lbsr _lmul
+ ldd 0,x
+ ldu 2,x
+ pshs d,u
+ leax acon,pcr
+ lbsr _ladd
+ leau next,y
+ ldd 0,x
+ ldx 2,x
+ std 0,u
+ stx 2,u
+ anda #$7f
+ puls u,pc
+
+
+srand:
+ leax next,y
+ ldd 2,s
+ std 2,x
+ clra
+ clrb
+ std 0,x
+ rts
+
+
+mcon fdb 16838,20077 aka 1103515245
+acon fdb 0,12345
+
+ endsect

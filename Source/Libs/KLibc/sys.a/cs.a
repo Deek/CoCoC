@@ -1,0 +1,14 @@
+Typ equ 1
+Edit equ 1
+Stk equ 1024
+ psect cstart_a,$11,$81,Edit,Stk,_cstart
+
+*
+* rob the first dp byte so nothing gets assigned
+* here.  No valid pointer can point to byte zero.
+*
+
+_cstart:
+ lbsr main call the program
+
+ endsect

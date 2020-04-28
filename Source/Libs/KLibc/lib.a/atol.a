@@ -1,0 +1,60 @@
+ psect atol_a,0,0,2,0,0
+
+atol: pshs u
+ ldu 4,s
+ clra
+ clrb
+ pshs b sign
+ pshs d accum
+ pshs d ditto
+_atol2 ldb ,u+
+ cmpb #$20
+ beq _atol2
+ cmpb #9
+ beq _atol2
+ cmpb #'-
+ bne _atol4
+ stb 4,s
+ bra _atol7
+
+_atol4 cmpb #'+
+ bne _atol8
+ bra _atol7
+
+_atol5 ldd 2,s stack our long
+ pshs d as multiplicand
+ ldd 2,s
+ pshs d
+ leax lten,pcr multiplier
+ lbsr _lmul
+ ldb -1,u
+ clra
+ subb #'0
+ addd 2,x
+ std 2,s
+ ldd #0
+ adcb 1,x
+ adca 0,x
+ std 0,s
+_atol7 ldb ,u+
+_atol8 clra
+ leax _chcodes,y
+ ldb d,x
+ andb #$08
+ bne _atol5
+ tst 4,s
+ beq _atol9
+ leax 0,s
+ lbsr _lneg
+ bra _atol10
+
+_atol9 leax 0,s
+_atol10 leau _flacc,y
+ pshs u
+ lbsr _lmove
+ leas 5,s
+ puls pc,u
+
+lten fdb 0
+ fdb 10
+ endsect

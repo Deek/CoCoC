@@ -1,0 +1,394 @@
+ psect dser_a,0,0,0,0,0
+ ifp1
+ use mdefs.a
+ endc
+
+ vsect
+_deg: rmb 1
+ rmb WBC*8
+_mthtop: rmb 0
+ endsect
+
+* aprep  preps x,s for +,-,*,/ operators
+
+_aprep: pshs x,y save pointer to op2
+ leax _mthtop,y
+ leay 8,s point to number on stack
+ lbsr _denter
+ bsr _dconv
+ ldy 0,s get original x
+ lbsr _denter
+ bsr _dconv
+ puls y,d get y and scrap old x
+ puls d get our return address
+ std 6,s
+ puls d get callers return clean stack
+ std 6,s
+ leas 4,s
+ rts
+
+
+* dprep does prep for single double on stack
+
+_dprep: pshs y save y
+ leax _mthtop,y
+ leay 6,s get pointer to double on stack
+ lbsr _denter
+ bsr _dconv
+ puls y,pc
+
+
+* bdprep gets two numbers on stack and prepares for math
+
+_bdprep: pshs y
+ leax _mthtop,y
+ leay 6,s get number on stack
+ lbsr _denter
+ bsr _dconv
+ leay -1,y move back one
+ lbsr _denter
+ bsr _dconv
+ puls y,pc
+
+ pag
+* dconv converts from c format to 9 byte format
+
+_dconv: ldb 7,x get exp
+ beq _dconv1
+ subb #$80 get out extra 128
+ sex
+ anda #^MS
+ std MBC,x
+ lda ,x take care of sign
+ anda #MS
+ ora MBC,x
+ sta MBC,x
+ lda ,x
+ ora #$80
+ sta ,x put in implied one
+ rts
+
+_dconv1 ldd #0 set to zero
+ std ,x
+ std 2,x
+ std 4,x
+ sta 6,x
+ std MBC,x
+ rts
+
+* mret return for all math functions
+
+_mret: bcs _errz error set to zero
+ lda ,x see if zero
+ bpl _mzer return zero
+ anda #^MS strip one
+ sta ,x
+ lda MBC,x get sign now
+ anda #MS
+ ora ,x
+ sta _flacc,y
+ ldd MBC,x get exp
+ lsla 
+ asra
+ addd #$80 but 128 back in
+ tsta
+ bne _errz0 error zero it
+ stb _flacc+7,y
+ ldd 1,x
+ std _flacc+1,y
+ ldd 3,x
+ std _flacc+3,y
+ ldd 5,x
+ std _flacc+5,y
+ leax _flacc,y
+ rts
+
+_errz0 ldb #40 overflow
+ tsta
+ bpl _errz
+ ldb #43 underflow
+
+_errz pshs b save error code
+ leax _flacc,y
+ ldd #0
+ std ,x
+ std 2,x
+ std 4,x
+ std 6,x
+ puls b get error back
+ clra
+ cmpb #43 underflow?
+ lbne _rpterr
+ std errno,y
+ rts
+
+_mzer
+ leax _flacc,y
+ ldd #0
+ std ,x
+ std 2,x
+ std 4,x
+ std 6,x
+ rts
+ pag
+* _entd ENTERS A + B ON STACK PRESERVING THE SIGN
+* x=x-WBC  y saved
+
+_entd: leax -WBC,x make room
+ cmpd #0 zero?
+ beq _entd5
+ sta ,-s save for sign
+ lda #16 init exp
+ sta MBC+1,x
+ lda ,s recover a
+ bpl _entd1
+ nega make pos
+ negb
+ sbca #0
+ bmi _entd2 no adjust
+_entd1 dec MBC+1,x adjust exp
+ lslb
+ rola
+ bpl _entd1
+
+_entd2 std ,x
+ ldd #0
+ std 2,x
+ std 4,x
+ sta 6,x
+ ldb ,s+ get sign
+ bpl _entd3
+ lda #MS
+_entd3 sta MBC,x
+ rts
+
+_entd5 ldd #0 clear out
+ std ,x
+ std 2,x
+ std 4,x
+ sta 6,x
+ std MBC,x
+ rts
+ pag
+* _exd exits number on x into d.
+* c=1 if abs(number)>32768.
+* x=x+WBC y saved
+
+_exd: ldd MBC,x get exp
+ lsla
+ asra
+ bmi _exd2 exit with zero
+ bne _exd4 exit error
+ lda #15 GET INTEGER PORTION
+ stb ,-s for subtract
+ suba ,s+
+ bcs _exd4 error
+ inca
+ sta ,-s FOR COUNT DOWN
+ ldd ,x get top 2 bytes
+
+_exd1 lsra shift right
+ rorb
+ dec ,s count down
+ bne _exd1
+
+ leas 1,s clean stack
+ tst MBC,x check sign
+ bpl _exd5 exit
+ nega
+ negb
+ sbca #0
+_exd5 andcc #$fe
+ leax WBC,x
+ rts
+
+_exd2 clra
+ clrb
+ leax WBC,x
+ rts
+
+_exd4 comb
+ ldb #42 overflow in conversion
+ leax WBC,x
+ rts
+ pag
+* _denter  enters number y points to
+* where x is
+* x=x-WBC  y=y+WBC
+
+_denter: leax -WBC,x make room
+ ldd ,y++
+ std ,x
+ ldd ,y++
+ std 2,x
+ ldd ,y++
+ std 4,x
+ lda ,y+
+ sta 6,x
+ ldd ,y++
+ std MBC,x
+ rts
+
+
+* _dexit REMOVES NUMBER  at x AND PLACES
+* at y
+* x=x+WBC y saved
+
+_dexit: ldd ,x++
+ std ,y
+ ldd ,x++
+ std 2,y
+ ldd ,x++
+ std 4,y
+ lda ,x+
+ sta 6,y
+ ldd ,x++
+ std MBC,y
+ rts
+
+
+* _dexg EXGCHANGES TWO NUMBER ON STACK
+
+_dexg:
+ pshs y
+ ldd ,x
+ ldy WBC,x
+ std WBC,x
+ sty ,x
+ ldd 2,x
+ ldy WBC+2,x
+ std WBC+2,x
+ sty 2,x
+ ldd 4,x
+ ldy WBC+4,x
+ std WBC+4,x
+ sty 4,x
+ lda 6,x
+ ldb WBC+6,x
+ sta WBC+6,x
+ stb 6,x
+ ldd MBC,x
+ ldy WBC+MBC,x
+ std WBC+MBC,x
+ sty MBC,x
+ puls y,pc
+
+ pag
+* xtofla
+* move double at x to flacc
+
+_xtofla: ldd ,x
+_xtofla1: std _flacc,y
+ ldd 2,x
+ std _flacc+2,y
+ ldd 4,x
+ std _flacc+4,y
+ ldd 6,x
+ leax _flacc,y
+ std 6,x
+ rts 
+
+
+* 4 bytes x points is put in stack
+
+_fstack: leas -8,s
+ ldd 8,s take care of return address
+ std ,s
+ clra 
+ clrb 
+ std 5,s
+ std 7,s
+ ldd ,x
+ std 2,s
+ ldd 2,x
+ sta 4,s
+ stb 2+7,s
+ rts 
+
+* dstack
+* 8 bytes x points to gets put on stack
+
+_dstack: leas -$08,s
+ ldd 8,s get return address
+ std ,s
+ ldd ,x
+ std 2,s
+ ldd 2,x
+ std 4,s
+ ldd 4,x
+ std 6,s
+ ldd 6,x
+ std 8,s put back return address
+ rts 
+
+ pag
+* fmove  2 bytes on stack is 'to' pointer
+* x is 'from' pointer
+* 4 bytes moved
+* x return as 'to' pointer
+
+_fmove: pshs u
+ ldu 4,s
+ exg x,u
+ ldd ,u
+ std ,x
+ ldd 2,u
+ std $02,x
+ bra _dmove1
+
+
+* dmove 2 bytes on stack is 'to' pointer
+* x is 'from' pointer
+* 8 bytes moved
+* x returns as 'to' pointer
+
+_dmove: pshs u
+ ldu 4,s get to pointer
+ exg x,u exchange to and from
+ ldd ,u
+ std ,x
+ ldd 2,u
+ std 2,x
+ ldd 4,u
+ std 4,x
+ ldd 6,u
+ std 6,x
+_dmove1 puls u get u back
+ puls b,a get return address
+ std ,s wipe out from pointer
+ rts
+ pag
+* takes absolute value
+
+dabs:
+fabs:
+ leax 2,s
+ lda ,x
+ anda #$7f
+ sta ,x
+ lbra _xtofla
+
+dexp:
+ leax 2,s
+ tst 7,x
+ beq dexp0
+ ldd 10,s
+ addb 7,x
+ adca #0
+ bmi dexp1
+ tsta
+ bne dexp2
+ stb 7,x
+dexp0 lbra _xtofla
+
+dexp1 lbsr _xtofla
+ ldb #43
+ coma
+ lbra _mret
+
+dexp2 lbsr _xtofla
+ ldb #40
+ coma
+ lbra _mret
+
+ endsect

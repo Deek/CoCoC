@@ -1,0 +1,55 @@
+ psect strspn_a,0,0,0,0,0
+
+* int  strspn(s1, s2)
+* char *s1, *s2;
+
+* returns the length of the initial segment of
+*  s1 composed entirely of chars from s2
+
+s1       set   2
+s2       set   4
+stacked  set   0
+
+strspn:  pshs  X,U         save U and make space
+stacked  set   stacked+4
+
+         ldx   s2+stacked,S
+         ldu   s1+stacked,S
+         pshs  X           first x for parm, this for string
+stacked  set   stacked+2
+
+sloop1   ldb   ,U+
+         beq   sdone       end of s1
+         stb   3,S         park for call
+         lbsr  strchr
+         bne   sloop1      try next char
+         bra   sdone
+
+* int  strcspn(s1, s2)
+* char *s1, *s2;
+
+* returns the length of the initial segment of
+*  s1 composed not of chars from s2
+
+stacked  set   0
+strcspn: pshs  X,U         save U and make space
+stacked  set   stacked+4
+
+         ldx   4+stacked,S
+         ldu   2+stacked,S
+         pshs  X           first x for parm, this for string
+stacked  set   stacked+2
+
+sloop2   ldb   ,U+
+         beq   sdone       end of s1
+         stb   3,S         park for call
+         lbsr  strchr
+         beq   sloop2      try next char
+
+sdone    leau  -1,U
+         tfr   U,D
+         subd  2+stacked,S p-s1
+         leas  stacked-2,S leave U
+         puls  U,PC
+
+         endsect

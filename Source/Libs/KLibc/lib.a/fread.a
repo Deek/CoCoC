@@ -1,0 +1,39 @@
+ psect fread_a,0,0,1,0,0
+
+*    fread(buffer, size, number, fp)
+
+*        for j=1 to n
+*           for k=1 to size
+*              get a char
+*           next k
+*        next j
+
+fread: pshs d,x,u
+ ldu 8,s *buffer
+ clra for J
+ clrb
+ bra fread4
+
+fread1 ldd 10,s for K
+ bra fread3
+
+fread2 ldd 14,s get fp
+ pshs d
+ lbsr getc
+ leas 2,s
+ cmpd #-1 error?
+ beq fread5
+ stb ,u+ save char
+ ldd ,s next K
+ subd #1
+fread3 std ,s
+ bne fread2
+ ldd 2,s next J
+ addd #1
+fread4 std 2,s
+ cmpd 12,s
+ blt fread1
+fread5 leas 2,s waste K
+ puls d,u,pc return J
+
+endsect

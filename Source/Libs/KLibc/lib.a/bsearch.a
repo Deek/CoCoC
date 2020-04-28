@@ -1,0 +1,63 @@
+ psect bsearch_a,0,0,0,0,0
+*
+* char     *bsearch(key, base, nel, width, compar)
+* char     *key, *base;
+* unsigned nel, width;
+* int      (*compar)();
+*    {
+*    unsigned i, left = 1;    /* note - nel is used for right */
+*    int      val, hit;
+*
+bsearch: pshs D,X,Y,U
+ ldu 10,S get *key
+ clra
+ clrb
+*    for (;;)
+*       {
+_1 addd #1
+ std 2,S set left
+*       if (nel < left)
+*          return (NULL); /* not here */
+ ldd 14,S get nel
+_2 subd 2,S reduce by left
+ bmi _4 indices have crossed
+*       i = (nel + left) / 2;
+ ldd 14,S nel
+ addd 2,S left
+ lsra
+ rorb /2
+ std 4,S save i
+*       val = (*compar)(key, hit = base + (i - 1) * width);
+ addd #-1 i - 1
+ pshs D
+ ldd 18,S
+ lbsr  ccmult
+ addd 12,S add on base
+ std ,S save possible hit
+ pshs U stack *key
+ jsr [20,S] call compare routine
+ std ,S++ test and clean stack
+*       if (val == 0)
+*          return (hit); /* found it */
+ beq _5
+*       if (val < 0)
+*          nel = i - 1;       /* below middle */
+*       else
+*          left = i + 1;       /* above middle */
+*       }
+ asla save sign
+ ldd 4,S get i
+ bcc _1
+ addd #-1
+ std 14,S
+ bra _2
+*    }
+_4 clra
+ clrb
+ bra _6
+
+_5 ldd ,S
+_6 leas 6,S
+ puls U,PC
+
+ endsect

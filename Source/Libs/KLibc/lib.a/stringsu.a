@@ -1,0 +1,39 @@
+********** strings_a **********
+
+ psect stringsu_a,0,0,1,0,0
+
+
+* like normal except force upper case
+
+*** strucat(s1,s2)
+*    append s2 to s1 thru null on s2
+*    returns s1
+
+strucat: pshs u
+ ldu 6,s *s2
+ ldx 4,s *s1
+strucat1 ldb ,x+
+ bne strucat1 find end of s1
+ leax -1,x back to null
+ bra strucpy1
+
+*** strucpy(s1,s2)
+*    copy s2 to s1 thru null on s2
+*    returns s1
+
+strucpy: pshs u
+ ldu 6,s *s2
+ ldx 4,s *s1
+strucpy1 ldb ,u+
+ clra
+ pshs d,x
+ lbsr toupper
+ leas 2,s
+ puls x
+ stb ,x+
+ bne strucpy1
+strucpy2 ldd 4,s *s1
+ puls u,pc
+
+
+ endsect

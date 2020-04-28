@@ -1,0 +1,114 @@
+*
+* square root routine
+*  expects long - returns int
+*
+size set 4 long integer
+shftcnt set 16 32/2
+
+resovf set 0 overflow for result
+result set 1
+tempovf set 5 overflow for temp
+temp set 6
+copy set 10
+wrksiz set 14
+
+ psect sqrt_a,0,0,1,0,0
+
+sqrt: ldb #wrksiz
+ clra
+sqrt1 pshs a
+ decb
+ bne sqrt1
+ ldd wrksiz+4,s
+ std copy+2,s copy long down
+ ldd wrksiz+2,s
+ std copy,s
+ ldx #shftcnt
+
+sqrt2
+ asl copy+3,s
+ rol copy+2,s
+ rol copy+1,s
+ rol copy,s
+ rol temp+3,s
+ rol temp+2,s
+ rol temp+1,s
+ rol temp,s
+ rol tempovf,s
+
+ asl result+3,s
+ rol result+2,s
+ rol result+1,s
+ rol result,s
+ rol resovf,s
+
+ asl copy+3,s
+ rol copy+2,s
+ rol copy+1,s
+ rol copy,s
+ rol temp+3,s
+ rol temp+2,s
+ rol temp+1,s
+ rol temp,s
+ rol tempovf,s
+
+ asl result+3,s
+ rol result+2,s
+ rol result+1,s
+ rol result,s
+ rol resovf,s
+
+ inc result+3,s
+
+ ldb #1
+ lda temp+3,s
+ suba result+3,s
+ sta temp+3,s
+ lda temp+2,s
+ sbca result+2,s
+ sta temp+2,s
+ lda temp+1,s
+ sbca result+1,s
+ sta temp+1,s
+ lda temp+0,s
+ sbca result+0,s
+ sta temp+0,s
+ lda tempovf,s
+ sbca resovf,s
+ sta tempovf,s
+ bpl sqrt3
+
+ clrb
+ lda temp+3,s
+ adda result+3,s
+ sta temp+3,s
+ lda temp+2,s
+ adca result+2,s
+ sta temp+2,s
+ lda temp+1,s
+ adca result+1,s
+ sta temp+1,s
+ lda temp+0,s
+ adca result+0,s
+ sta temp+0,s
+ lda tempovf,s
+ adca resovf,s
+ sta tempovf,s
+
+sqrt3 lsr resovf,s
+ ror result+0,s
+ ror result+1,s
+ ror result+2,s
+ ror result+3,s
+
+ addb result+3,s
+ stb result+3,s
+
+ leax -1,x
+ lbne sqrt2
+
+ ldd result+2,s result lsw
+ leas wrksiz,s de-allocate local memory
+ rts
+
+ endsect

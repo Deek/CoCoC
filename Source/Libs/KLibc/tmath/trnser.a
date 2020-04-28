@@ -1,0 +1,271 @@
+ psect trnser_a,0,0,0,0,0
+
+ use mdefs.a
+
+* SHIFT TAKES CARE OF THE SHIDT FOR CORDIC
+* SHX=2**-ITER * X
+* y gones
+
+ABS set EABS+6
+SHX set ESHX+6
+ORD set EORD+6
+SHY set ESHY+6
+ANG set EANG+6
+SHANG set ESHANG+6
+QUAD set EQUAD+6
+ITER set EITER+6
+
+_dshft: ldb ITER,s
+ leay ABS,s
+ bsr _dshft1
+ ldb ITER,s
+ leay ORD,s
+
+_dshft1: stb ,-s
+ ldd ,y++ move to sh
+ std WBC-2,y
+ ldd ,y++
+ std WBC-2,y
+ ldd ,y++
+ std WBC-2,y
+ ldd ,y++
+ std WBC-2,y
+ lda ,y+ y=y+WBC
+
+ ldb ,s+
+_dshft2: stb ,-s
+ andb #$f8 byte shift count
+ lbeq _dshft9
+ subb #8
+ lbeq _dshft8
+ subb #8
+ beq _dshft7
+ subb #8
+ beq _dshft6
+ subb #8
+ beq _dshft5
+ subb #8
+ beq _dshft4
+ subb #8
+ beq _dshft3
+
+ ldb ,y
+ sex
+ std 6,y
+ tfr a,b
+ std ,y
+ std 2,y
+ std 4,y
+ bra _dshft9
+
+_dshft3 ldd ,y
+ std 6,y
+ ldb 6,y
+ sex
+ tfr a,b
+ std ,y
+ std 2,y
+ std 4,y
+ bra _dshft9
+
+_dshft4 ldd 1,y
+ std 6,y
+ ldb ,y
+ sex
+ std 4,y
+ tfr a,b
+ std ,y
+ std 2,y
+ bra _dshft9
+
+_dshft5 ldd 2,y
+ std 6,y
+ ldd ,y
+ std 4,y
+ ldb 4,y
+ sex
+ tfr a,b
+ std ,y
+ std 2,y
+ bra _dshft9
+
+_dshft6 ldd 3,y
+ std 6,y
+ ldd 1,y
+ std 4,y
+ ldb ,y
+ sex
+ std 2,y
+ tfr a,b
+ std ,y
+ bra _dshft9
+
+_dshft7 ldd 4,y
+ std 6,y
+ ldd 2,y
+ std 4,y
+ ldd ,y
+ std 2,y
+ ldb 2,y
+ sex
+ sta ,y
+ sta 1,y
+ bra _dshft9
+
+_dshft8 ldd 5,y
+ std 6,y
+ ldd 3,y
+ std 4,y
+ ldd 1,y
+ std 2,y
+ ldb ,y
+ sex
+ std ,y
+
+_dshft9 ldb ,s+
+ andb #$07
+ beq _dshft11
+_dshft10 asr ,y
+ ror 1,y
+ ror 2,y
+ ror 3,y
+ ror 4,y
+ ror 5,y
+ ror 6,y
+ ror 7,y
+ decb
+ bne _dshft10
+
+_dshft11 rts
+
+
+
+* CORNRM  DOES THE NORAMLIZATION TO THE FORM
+* FOR THE CORDIC METHOD
+* y POINTS TO THE FLOATING POINT NUMBER
+* THE FORM IS 5 BYTES WITH DECIMAL POINT
+* AFTER FIRST NIBBLE
+
+_dcornrm: ldd 5,y shift down one byte
+ std 6,y
+ ldd 3,y
+ std 4,y
+ ldd 1,y
+ std 2,y
+ ldb ,y
+ clra
+ std ,y
+ ldb MBC+1,y get exp assume in range
+ addb #4 one nibble worth
+ beq CORNR2 quit ok
+ bmi CORNR3 shift right
+CORNR1 asl 7,y shift left
+ rol 6,y
+ rol 5,y
+ rol 4,y
+ rol 3,y
+ rol 2,y
+ rol 1,y
+ rol ,y
+ decb
+ bne CORNR1
+CORNR2 rts
+
+CORNR3 negb
+CORNR4 lsr 1,y
+ ror 2,y
+ ror 3,y
+ ror 4,y
+ ror 5,y
+ ror 6,y
+ ror 7,y
+ decb
+ bne CORNR4
+ rts
+
+
+
+* CORFIX  UNDOES WHAT CORNRM DOES
+* WORKS OFF x
+
+_dcorfix: ldd 6,x round off
+ addd #8
+ std 6,x
+ bcc CORFX0
+ ldd 4,x
+ addd #1
+ std 4,x
+ bcc CORFX0
+ ldd 2,x
+ addd #1
+ std 2,x
+ bcc CORFX0
+ ldd ,x
+ addd #1
+ std ,x
+CORFX0 clra check for zero
+ ora 6,x
+ ora 5,x
+ ora 4,x
+ ora 3,x
+ ora 2,x
+ ora 1,x
+ ora ,x
+ beq CORFX2
+ ldb #4 set init exp
+CORFX1 decb exp
+ asl 7,x shift left
+ rol 6,x
+ rol 5,x
+ rol 4,x
+ rol 3,x
+ rol 2,x
+ rol 1,x
+ rol ,x
+ bpl CORFX1
+
+ stb MBC+1,x save exp
+ sex
+ anda #^MS
+ sta MBC,x
+ rts
+
+CORFX2 sta MBC,x
+ sta MBC+1,x
+ rts
+
+
+* FACT finds integer times that number y points
+* to will go into number x points to.
+* on return x points to integer number followed by
+* remainder.
+* y saved  x=x-2*WBC
+
+_dfact: pshs y save pointer
+ tfr x,y make copy of number
+ lbsr _denter
+ ldy ,s get modulus on stack
+ lbsr _denter
+ lbsr _ddivs divide it
+ lbsr _dints make integer
+ leas -WBC,s make room for integer
+ tfr s,y
+ lbsr _dexit
+ leax -WBC,x get integer back
+ ldy WBC,s get modulus
+ lbsr _denter
+ lbsr _dmuls
+ lbsr _dsubs GET REM
+ tfr s,y
+ lbsr _denter
+ leas WBC,s clean stack
+ clrb
+ puls y,pc
+
+
+
+
+
+
+
+ endsect

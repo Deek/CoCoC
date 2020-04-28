@@ -1,0 +1,11 @@
+ psect abs_a,0,0,1,0,0
+
+abs:
+ ldd 2,s
+ bpl out
+ nega
+ negb
+ sbca #0
+out rts
+
+ endsect

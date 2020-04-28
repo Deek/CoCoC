@@ -1,0 +1,47 @@
+********** puts_a **********
+
+ psect puts_a,0,0,1,0,0
+
+*** puts(s)
+*    put null term. string to std out adding '\n'
+*    no return, no error
+*    stack   s
+*           ret
+*            u
+*            fp
+*        ->  *s (or c)
+
+puts: pshs u
+ leax _iob+13,y stdout fp
+ ldd 4,s *s
+ pshs d,x stack *s,fp
+ bsr fputs
+ ldb #$0d CR ('\n')
+ stb 1,s
+ lbsr putc
+ leas 4,s
+ puls u,pc
+
+
+*** fputs(s,fp)
+*    puts null term. string to fp
+*    no error, no return
+*    stack    fp
+*             s
+*            ret
+*        ->   u
+
+fputs: pshs u
+ ldu 4,s *s
+ ldx 6,s get fp
+ pshs d,x stack fp and make space
+ bra fputs1
+
+fputs2 stb 1,s stack char
+ lbsr putc
+fputs1 ldb ,u+
+ bne fputs2
+ leas 4,s clean off c and fp
+ puls u,pc
+
+ endsect

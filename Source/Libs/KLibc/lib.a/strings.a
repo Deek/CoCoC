@@ -1,0 +1,49 @@
+********** strings_a **********
+
+ psect strings_a,0,0,1,0,0
+
+
+*** strcat(s1,s2)
+*    append s2 to s1 thru null on s2
+*    returns s1
+*    stack   s2
+*            s1
+*           ret
+*            u
+
+strcat: pshs u
+ ldu 6,s *s2
+ ldx 4,s *s1
+ bsr strend1
+ tfr d,x
+ bra strcpy1
+
+*** strcpy(s1,s2)
+*    copy s2 to s1 thru null on s2
+*    returns s1
+*    stack   s2
+*            s1
+*           ret
+*            u
+
+strcpy: pshs u
+ ldu 6,s *s2
+ ldx 4,s *s1
+strcpy1 ldb ,u+
+ stb ,x+
+ bne strcpy1
+strcpy2 ldd 4,s *s1
+ puls u,pc
+
+
+*** strend(s)
+*    returns pointer to null on s
+
+strend: ldx 2,s
+strend1 ldb ,x+
+ bne strend1
+ leax -1,x
+ tfr x,d
+ rts
+
+ endsect

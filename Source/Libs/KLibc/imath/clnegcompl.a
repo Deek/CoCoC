@@ -1,0 +1,33 @@
+********** clnegcompl_a **********
+
+*     negation and complement of longs
+*     entry x-> long
+*     exit  x-> flacc (where new long is)
+
+ psect clnegcompl_a,0,0,1,0,0
+
+*    negation
+_lneg: lbsr _ltoacc
+_lnegx: ldd #0
+ subd 2,x LSW
+ std 2,x
+ ldd #0
+ sbcb 1,x MSW
+ sbca ,x
+ std ,x
+ rts
+
+
+*   complement a long
+_lcompl: ldd ,x MSW
+ coma
+ comb
+ std _flacc,y
+ ldd 2,x LSW
+ coma
+ comb
+ leax _flacc,y
+ std 2,x
+ rts
+
+ endsect

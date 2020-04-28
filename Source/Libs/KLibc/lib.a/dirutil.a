@@ -1,0 +1,169 @@
+ psect dirutil_a,0,0,1,0,0
+
+* #include <dir.h>
+*
+* struct direct {
+*    long  d_addr;        /* file desc addr */
+*    char  d_name[30];    /* dierctory entry name */
+*    } ;
+*
+* typedef struct {
+*    int   dd_fd;         /* fd for open directory */
+*    char  dd_buf[32];    /* a one entry buffer */
+*    } DIR;
+*
+* #define DIRECT       struct direct
+* #define rewinddir(a) seekdir(a, 0L)
+*
+* long  lseek();
+*
+* /*
+*
+* closedir(dirp)
+* DIR   *dirp;
+*    {
+*    close(dirp->dd_fd);
+*    free(dirp);
+*    }
+
+closedir:
+ ldx 2,S get dirp
+ ldd ,X get dirp->fd
+ pshs D,X set for calls
+ lbsr close
+ leas 2,S clean off first parm
+ lbsr free
+ puls X,PC clean last parm and return
+ pag
+*
+* DIR   *
+* opendir(name)
+* char  *name;
+*    {
+*    int   fd;
+*    DIR   *dirp = (DIR *) 0;
+*
+*    if ((dirp = malloc(sizeof(DIR))) != 0)
+*       if ((fd = open(name, 0x81)) >= 0)
+*          dirp->dd_fd = fd;
+*        else
+*          {
+*          free(dirp);
+*          dirp = 0;
+*          }
+*    return (dirp);
+*    }
+
+opendir:
+ pshs U
+ ldd #34 bytes we need
+ pshs D set for call
+ lbsr malloc
+ std ,S test and save
+ beq openfail
+ ldx #$81 dir + read
+ ldd 6,S prt to name
+ pshs D,X set for call
+ lbsr open
+ leas 4,S
+ std [0,S] save and test
+ bge openfail if ok
+ ldd ,S get mem ptr
+ lbsr free give it back
+ clra
+ clrb
+ std ,S return 0
+openfail puls D,U,PC clean up and return ptr
+
+ pag
+*
+* struct direct *
+* readdir(dirp)
+* DIR   *dirp;
+*    {
+*    static struct direct de;
+*
+*    do {
+*       if (read(dirp->dd_fd, dirp->dd_buf, 32) <= 0)
+*          return (0);
+*       } while (dirp->dd_buf[0] == '\0');
+*
+*    strhcpy(de.d_name, dirp->dd_buf);
+*    de.d_addr = ((dirp->dd_buf[29] & 0xff) << 8) + (dirp->dd_buf[30] & 0xff);
+*    de.d_addr = (de.d_addr << 8) + (dirp->dd_buf[31] & 0xff);
+*    return (&de);
+*    }
+
+ vsect
+de rmb 34 our hidden storage
+ endsect
+
+readdir:
+ pshs u
+ ldu 4,S get dirp
+ leau 2,U get dirp->dd_buf
+rd1 ldd #32 bytes to read
+ pshs D set for call
+ ldd -2,U fd
+ pshs D,U set for call
+ lbsr read
+ leas 6,S
+ std -2,S check ret val
+ bgt rd2 if ok
+ clra ret 0 on error
+ clrb
+ puls U,PC
+
+rd2 ldb ,U check for valid name
+ beq rd1 get another
+ leax de+4,Y dest
+ pshs X,U stack the parms
+ lbsr strhcpy
+ leas 4,S
+ leax de,Y de->d_addr
+ clra
+ ldb 29,U LSN ms byte
+ std ,X copy
+ ldd 30,U other two bytes
+ std 2,X copy
+ tfr X,D
+ puls U,PC
+ pag
+*
+* seekdir(dirp, loc)
+* DIR   *dirp;
+* long  loc;
+*    {
+*    lseek(dirp->dd_fd, loc, 0);
+*    }
+
+seekdir:
+ clra
+ clrb
+ pshs D from front
+ ldd 8,S ls word
+ pshs D
+ ldd 8,S ms word
+ bra telldir1
+
+*
+* long
+* telldir(dirp)
+* DIR   *dirp;
+*    {
+*    return (lseek(dirp->dd_fd, 0L, 1));
+*    }
+
+telldir:
+ ldd #1
+ pshs D from here
+ clrb
+ pshs D zero offset
+telldir1 pshs D
+ ldd [8,S] fp
+ pshs D
+ lbsr lseek
+ leas 8,s
+ rts X points to ret val
+
+ endsect

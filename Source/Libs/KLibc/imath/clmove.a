@@ -1,0 +1,18 @@
+********** clmove_a **********
+
+*  move 4 bytes from *x to *2,s
+
+ psect clmove_a,0,0,1,0,0
+
+_lmove: pshs y save ram pointer
+ ldy 4,s get to addr
+ ldd ,x MSW
+ std ,y
+ ldd 2,x LSW
+ std 2,y
+ puls x recover y
+ exg y,x dest->x, old y->y
+ puls b,a get retadr
+ std ,s overwrite old to adr
+ rts
+ endsect

@@ -1,0 +1,24 @@
+********** clcommon_a **********
+
+* common routines for long operations
+
+ psect clcommon_a,0,0,1,0,0
+
+_lbexit: tfr cc,a save carry
+ puls x get ret adr
+ stx 2,s overwrite ls word
+ leas 2,s clean off ms word
+ leax _flacc,y x->flacc
+ tfr a,cc
+ rts 
+
+
+*      move *x to flacc
+_ltoacc: ldd ,x
+ std _flacc,y
+ ldd 2,x
+ leax _flacc,y
+ std 2,x
+ rts 
+
+ endsect

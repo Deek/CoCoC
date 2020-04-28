@@ -1,0 +1,411 @@
+ psect printf_a,0,0,3,0,0
+
+*   printf(format, expr1, expr2, .... exprn)
+*  fprintf(stream, format, expr1, expr2, .... exprn)
+*  sprintf(buffer, format, expr1, expr2, .... exprn)
+
+ vsect
+fpmp rmb 2
+buf1 rmb 10
+ endsect
+
+_DIGIT equ $08
+
+ vsect
+dectbl fdb 10000,1000,100,10
+ endsect
+
+
+printf: pshs u
+ leau 6,s *expr
+ leax _iob+13,y
+ ldd 4,s *format
+ bra printf1
+
+fprintf: pshs u
+ leau 8,s *expr
+ ldx 4,s fp
+ ldd 6,s *format
+printf1 stx fpmp,y file pointer
+ leax >put2file,pcr handler
+ bra spf1
+
+
+sprintf: pshs u
+ ldd 4,s buffer
+ std fpmp,y buffer pointer
+ leau 8,s *expr1
+ ldd 6,s *format
+ leax >put2mem,pcr handler
+spf1 pshs d,u stack *expr and *fmt string
+ pshs x handler
+ bsr prtcom
+ leas 6,s
+ puls u,pc
+ pag
+
+*    entry:  variables  fpmp  destination - string or fp
+*            stack            file or memory pointer (2)
+*                             expr list start (2)
+*                             format string pnt (2)
+*                             handler addr (2)
+*                             return (2)
+*       local:                u (2)
+*                             ljust (1)
+*                             fill (1)
+*                             upper case flag (1)
+*                             field width (2)
+*                             fraction spec flag (1)
+*                             fraction count (2)
+
+*                local offsets
+ csect
+vstart set *
+fraccnt rmb 2 frac cnt for strings and floats
+fracflg rmb 1
+fldsiz rmb 2 field width
+upflg rmb 1 upper case in hex and floats
+fill rmb 1 fill character
+ljust rmb 1 if left just string
+vlen set *-vstart
+ rmb 2 ret addr
+prthnd rmb 2
+prtfmt rmb 2
+prtvar rmb 2
+ endsect
+
+
+prtcomx leas vlen,s
+ rts
+
+
+prtcom ldu 4,s format
+ leas -vlen,s
+ bra prtcom2
+
+case_c ldx prtvar,s
+ ldd ,x++
+ stx prtvar,s
+prtcom1 jsr [prthnd,s] call handler
+prtcom2 ldb ,u+ char from format
+ beq prtcomx
+ cmpb #'%
+ bne prtcom1
+ clrb
+ lda #$7d 32,000 chars
+ std fraccnt,s init to 32,000
+ stb ljust,s assume no ljust
+ stb fracflg,s assume no frac part
+ ldb ,u+ char
+ cmpb #'-
+ bne prtcom5
+ stb ljust,s
+ ldb ,u+
+prtcom5 cmpb #'0
+ beq prtcom6
+ ldb #$20
+prtcom6 stb fill,s
+ ldb -1,u
+ lbsr getdec always try for fldsiz
+ std fldsiz,s
+ ldb ,u+
+ cmpb #'.
+ bne switch
+ stb fracflg,s
+ ldb ,u+
+ lbsr getdec
+ std fraccnt,s
+ ldb ,u+
+switch cmpb #'c char
+ beq case_c
+ pshs u
+ cmpb #'f float (double) normal
+ beq case_f
+ cmpb #'e float (double) in scientific
+ beq case_f
+ cmpb #'g shorter of e or f
+ beq case_f
+ cmpb #'E e with upper case 'e
+ beq case_f
+ cmpb #'G g with upper case 'e
+ beq case_f
+ cmpb #'l long decimal or hex
+ beq case_l
+ cmpb #'s string
+ beq case_s
+ cmpb #'d decimal
+ beq case_d
+ cmpb #'o octal
+ lbeq case_o
+ cmpb #'x hex, lower case
+ lbeq case_x
+ cmpb #'X hex, upper case
+ lbeq case_x
+ cmpb #'u unsigned decimal
+ beq case_u
+ puls u *format string
+ bra prtcom1 default is just print
+ pag
+********** print a float
+case_f ldd fldsiz+2,s
+ pshs d stack field width
+ leax prtvar+4,s
+ ldd fraccnt+4,s
+ tst fracflg+4,s
+ bne case_f1
+ ldd #$0006
+case_f1 pshs d,x stack precision & *variable
+ ldd #$7d00
+ std fraccnt+8,s  wipe old value
+ ldb -1,u
+ clra
+ pshs d stack print spec (f,e,g)
+ lbsr pffloat
+ bra case_l2
+
+
+********* print a long
+case_l pshs u extra space
+ ldx prtvar+4,s
+ ldd 2,x
+ pshs d stack lsw
+ ldd ,x
+ pshs d stack msw
+ leax 4,x
+ stx prtvar+8,s update *variable
+ ldb ,u+ get print spec
+ stu 6,s patch up line pointer
+ pshs d stack print spec (d,x)
+ lbsr pflong
+case_l2 leas 8,s
+ tfr d,u
+ lbra case_x8
+
+
+********* print a string
+case_s bsr lodreg1 get *s in D
+ tfr d,u transfer to U
+ pshs u stack *s
+ lbsr strlen
+ leas 2,s
+ tst fracflg+2,s
+ beq case_s4 no string trunc
+ cmpd fraccnt+2,s
+ bhi case_s4 if len(s) > fractional count
+ std fraccnt+2,s update to shorter value
+case_s4 lbsr fmt_prt1 D has chars to print
+ lbra case_x9 clean up
+ pag
+********** print signed decimal
+case_d bsr lodregs
+ pshs d,x,y,u
+ tsta
+ bpl case_u2
+ nega
+ negb
+ sbca #$00
+ std ,s overwrite with new
+ ldb #'-
+ stb ,u+
+ bra case_u2
+
+
+********** print unsigned decimal
+case_u bsr lodregs
+ pshs d,x,y,u
+case_u2 ldd #5
+ std 2,s digit, count
+ sta 4,s lead 0
+ leax dectbl,y
+ puls d
+ bra case_u10
+
+case_u6 inc ,s
+case_u7 subd ,x
+ bcc case_u6
+ addd ,x++
+ pshs b
+ ldb 1,s get count
+ tst 3,s non zero yet?
+ bne case_u8
+ tstb is this non zero?
+ beq case_u9
+ inc 3,s
+case_u8 addb #'0
+ stb ,u+
+case_u9 clr 1,s
+ puls b
+case_u10 dec 1,s
+ bne case_u7
+ addb #'0
+ stb ,u+
+ clr ,u
+ leas 4,s clean off temps
+ bra case_x7
+
+
+********* point U at buffer, get a number in D
+lodregs leau buf1,y
+lodreg1 ldx prtvar+4,s
+ ldd ,x++
+ stx prtvar+4,s
+ rts
+ pag
+********** print a hex number
+case_x andb #$20 lower case bit
+ stb upflg+2,s true if lower case
+ bsr lodregs
+ pshs d,u n, *s
+case_x1 andb #$0f
+ pshs b
+ lda #'0
+ cmpb #9
+ ble case_x5
+ lda #'A-10
+ adda upflg+7,s upper case flag
+case_x5 adda ,s+
+ sta ,u+
+ ldd ,s n
+ lsra /2
+ rorb
+ lsra /4
+ rorb
+ lsra /8
+ rorb
+ lsra /16
+ rorb
+ std ,s
+ bne case_x1
+
+*        entry for octal
+case_x6 clr ,u
+ ldx 2,s
+ bsr frevers
+ leas 2,s clean off number
+
+*        entry for decimal & unsigned
+case_x7 puls u *our string
+
+*        entry for float and long
+case_x8 bsr fmt_prt
+case_x9 puls u *format string
+ lbra prtcom2 .. and go for more
+
+
+********** reverse a string
+*           0,s and x -> start
+*                   u -> end + 1
+frev1 ldb ,x
+ lda ,-u
+ sta ,x+
+ stb ,u
+frevers: pshs u
+ cmpx ,s++
+ blo frev1
+ rts
+
+
+ pag
+********** print an octal number
+case_o bsr lodregs
+ pshs d,u
+case_o1 andb #$07
+ addb #'0
+ stb ,u+
+ ldd ,s
+ lsra /2
+ rorb
+ lsra /4
+ rorb
+ lsra /8
+ rorb
+ std ,s
+ bne case_o1
+ bra case_x6
+
+
+********** universal formatter
+*              expects u = *s
+fmt_prt pshs u stack *s for strlen
+ lbsr strlen
+ leas 2,s
+fmt_prt1 nega
+ negb
+ sbca #0
+ addd fldsiz+4,s compute number of blanks
+ std fldsiz+4,s
+ tst ljust+4,s
+ bne fmt_prt4 if want left justification
+ bsr blanks lead blanks
+ bra fmt_prt4
+
+fmt_prt3 ldb ,u+
+ beq fmt_prt5 if EOS
+ jsr [prthnd+4,s] call handler
+fmt_prt4 ldd fraccnt+4,s
+ subd #1
+ std fraccnt+4,s
+ bpl fmt_prt3 if not EOS
+
+fmt_prt5 tst ljust+4,s
+ beq fmt_prt7 if want left justification
+
+ bsr blanks trailing blanks
+fmt_prt7 rts
+
+
+********** put out (fldsiz) blanks
+blanks1 ldb fill+6,s
+ jsr [prthnd+6,s] call handler
+blanks ldd fldsiz+6,s
+ subd #1
+ std fldsiz+6,s
+ bpl blanks1
+ rts
+ pag
+*    converts decmimal ascii into hex
+*     expects u -> next char
+*             b = first char
+getdec clr ,-s
+ clr ,-s
+ leau -1,u back up to char
+ leax _chcodes,y
+ bra getdec2
+
+getdec1 ldd ,s
+ aslb *2
+ rola
+ std ,s
+ aslb *4
+ rola
+ aslb *8
+ rola
+ addd ,s *10
+ addb ,u+
+ adca #0
+ subd #'0
+ std ,s
+ ldb ,u
+getdec2 lda b,x
+ anda #_DIGIT
+ bne getdec1
+ puls d,pc
+
+
+********** send (B) to file
+put2file ldx fpmp,y
+ pshs d,x
+ lbsr putc
+ leas 4,s
+ rts
+
+
+********** send (B) to memory
+put2mem ldx fpmp,y
+ stb ,x+
+ stx fpmp,y
+ clr ,x terminate string
+ rts
+
+
+ endsect

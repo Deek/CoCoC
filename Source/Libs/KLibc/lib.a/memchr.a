@@ -1,0 +1,39 @@
+ psect memchr_a,0,0,0,0,0
+
+* /*
+*  * Return pointer to 'c' in 's' if there,
+*  *  or NULL if not found in n chars; don't stop at \0.
+*  */
+*
+* char *
+* memchr(s, c, n)
+* register char *s, c;
+* int           n;
+*    {
+*    while (n-- > 0)
+*       if (*s++ == c)
+*          return (--s);
+*    return (0);
+*    }
+
+memchr:
+ pshs x,u
+ ldu 6,s *s
+ ldx 10,s n
+ beq _3 handle null count
+
+_1 lda ,u+ get a char
+ cmpa 9,s a match?
+ bne _2
+ leau -1,u back up to char
+ tfr u,d return ptr
+ bra _4
+
+_2 leax -1,x count off
+ bne _1
+
+_3 clra
+ clrb
+_4 puls x,u,pc
+
+ endsect

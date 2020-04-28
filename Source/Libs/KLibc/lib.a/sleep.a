@@ -1,0 +1,59 @@
+
+* 08-17-88  Note that sleep calls tsleep and therefore implicitly
+*           returns the ticks remaining.
+*           This hack is to try to get a better fit between sleep
+*           time and the machine it is running on.  To keep from
+*           breaking working code, I have to leave f$tps first.  I
+*           can't see how this is a problem for anybody.
+* 12-24-86  use 10 hz for LI
+
+ psect sleep_a,0,0,2,0,0
+
+f$tps set $25
+F$NMLink set $21
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+nam fcs "abba"
+
+sleep: ldd 2,s get sleep count
+ bne slp1 if a count passed
+ ldd #1 default to one tick
+ bra slp5
+
+slp1 pshs d save seconds for later
+
+*             first try my system call
+ os9 f$tps get ticks per second
+ bcc slp4 got it in d
+
+*             now see if LII or LI
+ clra
+ os9 F$ID
+ os9 F$SUser
+ bcc slp2 is LII
+
+*             all non-Syscon LI systems are 10 Hz
+ ldd #10 must be LI
+ bra slp4
+
+*             now see if coco
+slp2 leax <nam,pcr get test name
+ clra any perms
+ os9 F$NMLink see if coco 2
+ bcc slp3 wierd to find this here
+ cmpb #E$UnkSvc
+ bne slp3 call worked, is coco
+
+*             must be non-coco LII
+ ldd #100 so use 100 instead
+ bra slp4
+
+slp3 ldd #60 coco3 is 60 hz
+slp4 lbsr ccmult seconds -> ticks
+slp5 pshs d set up parm
+ lbsr tsleep
+ puls x,pc cleanup and return
+
+ endsect

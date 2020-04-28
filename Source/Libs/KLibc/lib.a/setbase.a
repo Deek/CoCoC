@@ -1,0 +1,60 @@
+ ifp1
+ use /dd/defs/stdio.a
+ endc
+ psect setbase_a,0,0,1,0,0
+
+_setbase: pshs u
+ ldu 4,s get fp
+ ldb _flag+1,u
+ bitb #_DEVMASK
+ bne setbas2 if already known
+ leas -32,s
+ leax ,s
+ ldd _fd,u get path number for fp
+ pshs d,x
+ clra get opt sect code
+ clrb
+ pshs d
+ lbsr getstat read opt section of pd
+ ldb #_SCF assume scf
+ lda 6,s type byte in opt sect
+ beq setbas1
+ ldb #_RBF
+setbas1 leas 38,s now clean stack
+ orb _flag+1,u merge
+ stb _flag+1,u
+setbas2 lda _flag,u
+ ora #_INIT
+ sta _flag,u
+ andb #_BIGBUF+_UNBUF
+ bne setbas11 if big or unbuf
+ ldd _bufsiz,u
+ bne setbas4 if buf aleady sized
+ ldd #BUFSIZ
+setbas3 std _bufsiz,u
+setbas4 ldd _base,u
+ bne setbas5 if buff aleady allocated
+ ldd _bufsiz,u
+ pshs d
+ lbsr ibrk
+ leas 2,s
+ std _base,u
+ cmpd #-1
+ beq setbas9 if no space left
+setbas5 ldb #_BIGBUF
+ bra setbas10
+
+setbas9 leax _save,u if unbuffered
+ stx _base,u
+ ldd #$0001
+ std _bufsiz,u
+ ldb #_UNBUF
+setbas10 orb _flag+1,u
+ stb _flag+1,u
+ ldd _base,u
+ addd _bufsiz,u
+ std _end,u
+ std _ptr,u
+setbas11 puls pc,u
+
+ endsect

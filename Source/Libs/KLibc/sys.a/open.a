@@ -1,0 +1,28 @@
+*
+* File access system calls
+*
+
+pmode equ $0b r/w for owner, r for others
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+ psect open_a,0,0,2,0,0
+
+* open(name,mode)
+open: ldx 2,s
+ lda 5,s
+
+ os9 I$Open
+ lbcs _os9err
+
+ tfr a,b
+ clra
+ rts
+
+* close(fd)
+close: lda 3,s
+ os9 I$Close
+ lbra _sysret
+
+ endsect

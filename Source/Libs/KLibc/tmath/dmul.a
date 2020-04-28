@@ -1,0 +1,475 @@
+ psect dmul_a,0,0,0,0,0
+
+ ifp1
+ use mdefs.a
+ endc
+
+* multiply number on stack by one X->
+
+_dmul: lbsr _aprep
+ bsr _dmuls
+ lbra _mret
+
+* NAM dmuls
+
+* multiplies two numbers pointed to by x
+* x=x+WBC on return, x points to answer
+
+* set up mul defs
+
+p7 equ 0
+p6 equ 1
+p5 equ 2
+p4 equ 3
+p3 equ 4
+p2 equ 5
+p1 equ 6
+m7 equ WBC+p7
+m6 equ WBC+p6
+m5 equ WBC+p5
+m4 equ WBC+p4
+m3 equ WBC+p3
+m2 equ WBC+p2
+m1 equ WBC+p1
+
+_dmuls: lda ,x check for zero
+ beq mul1 exit with zero
+ lda WBC,x
+ bne mul2
+mul1 clrb
+ std WBC,x
+ std WBC+2,x
+ std WBC+4,x
+ sta WBC+6,x
+ std WBC+MBC,x
+ leax WBC,x
+ rts
+
+mul2 lda p1,x
+ ldb m1,x
+ mul
+ sta ,-s
+ clr ,-s
+ clr ,-s
+ lda p2,x
+ ldb m1,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul3
+ inc ,s
+mul3 lda p1,x
+ ldb m2,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul4
+ inc ,s
+mul4 ldd ,s
+ std 1,s
+ clr ,s
+ lda p3,x
+ ldb m1,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul5
+ inc ,s
+mul5 lda p2,x
+ ldb m2,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul6
+ inc ,s
+mul6 lda p1,x
+ ldb m3,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul7
+ inc ,s
+mul7 ldd ,s
+ std 1,s
+ clr ,s
+ lda p4,x
+ ldb m1,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul8
+ inc ,s
+mul8 lda p3,x
+ ldb m2,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul9
+ inc ,s
+mul9 lda p2,x
+ ldb m3,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul10
+ inc ,s
+mul10 lda p1,x
+ ldb m4,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul11
+ inc ,s
+mul11 ldd ,s
+ std 1,s
+ clr ,s
+ lda p5,x
+ ldb m1,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul12
+ inc ,s
+mul12 lda p4,x
+ ldb m2,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul13
+ inc ,s
+mul13 lda p3,x
+ ldb m3,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul14
+ inc ,s
+mul14 lda p2,x
+ ldb m4,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul15
+ inc ,s
+mul15 lda p1,x
+ ldb m5,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul16
+ inc ,s
+mul16 ldd ,s
+ std 1,s
+ clr ,s
+ lda p6,x
+ ldb m1,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul17
+ inc ,s
+mul17 lda p5,x
+ ldb m2,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul18
+ inc ,s
+mul18 lda p4,x
+ ldb m3,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul19
+ inc ,s
+mul19 lda p3,x
+ ldb m4,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul20
+ inc ,s
+mul20 lda p2,x
+ ldb m5,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul21
+ inc ,s
+mul21 lda p1,x
+ ldb m6,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul22
+ inc ,s
+mul22 ldd ,s
+ std 1,s
+ clr ,s
+ lda p7,x
+ ldb m1,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul23
+ inc ,s
+mul23 lda p6,x
+ ldb m2,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul24
+ inc ,s
+mul24 lda p5,x
+ ldb m3,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul25
+ inc ,s
+mul25 lda p4,x
+ ldb m4,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul26
+ inc ,s
+mul26 lda p3,x
+ ldb m5,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul27
+ inc ,s
+mul27 lda p2,x
+ ldb m6,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul28
+ inc ,s
+mul28 lda p1,x
+ ldb m7,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul29
+ inc ,s
+mul29 ldd ,s
+ std 1,s
+ clr ,s
+ lda p7,x
+ ldb m2,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul30
+ inc ,s
+mul30 lda p6,x
+ ldb m3,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul31
+ inc ,s
+mul31 lda p5,x
+ ldb m4,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul33
+ inc ,s
+mul33 lda p4,x
+ ldb m5,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul34
+ inc ,s
+mul34 lda p3,x
+ ldb m6,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul35
+ inc ,s
+mul35 lda p2,x
+ ldb m7,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul36
+ inc ,s
+mul36 lda 2,s
+ sta WBC+6,x
+ ldd ,s
+ std 1,s
+ clr ,s
+ lda p7,x
+ ldb m3,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul37
+ inc ,s
+mul37 lda p6,x
+ ldb m4,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul38
+ inc ,s
+mul38 lda p5,x
+ ldb m5,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul39
+ inc ,s
+mul39 lda p4,x
+ ldb m6,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul40
+ inc ,s
+mul40 lda p3,x
+ ldb m7,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul41
+ inc ,s
+mul41 lda 2,s
+ sta WBC+5,x
+ ldd ,s
+ std 1,s
+ clr ,s
+ lda p7,x
+ ldb m4,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul42
+ inc ,s
+mul42 lda p6,x
+ ldb m5,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul43
+ inc ,s
+mul43 lda p5,x
+ ldb m6,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul44
+ inc ,s
+mul44 lda p4,x
+ ldb m7,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul45
+ inc ,s
+mul45 lda 2,s
+ sta WBC+4,x
+ ldd ,s
+ std 1,s
+ clr ,s
+ lda p7,x
+ ldb m5,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul46
+ inc ,s
+mul46 lda p6,x
+ ldb m6,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul47
+ inc ,s
+mul47 lda p5,x
+ ldb m7,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul48
+ inc ,s
+mul48 lda 2,s
+ sta WBC+3,x
+ ldd ,s
+ std 1,s
+ clr ,s
+ lda p7,x
+ ldb m6,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul49
+ inc ,s
+mul49 lda p6,x
+ ldb m7,x
+ mul
+ addd 1,s
+ std 1,s
+ bcc mul50
+ inc ,s
+mul50 lda 2,s
+ sta WBC+2,x
+ lda p7,x
+ ldb m7,x
+ mul
+ addd ,s
+ std WBC,x
+
+ bmi mul57
+ lsl WBC+6,x
+ rol WBC+5,x
+ rol WBC+4,x
+ rol WBC+3,x
+ rol WBC+2,x
+ rol WBC+1,x
+ rol WBC,x
+ ldd WBC+MBC,x dec exp
+ subd #1
+ lsla save sign
+ lsl WBC+MBC,x
+ rora
+ std WBC+MBC,x
+
+mul57 leas 3,s clean stack
+ ldd MBC,x get now exp
+ addd WBC+MBC,x
+ stb WBC+MBC+1,x
+ tfr a,b check for overflow
+ andb #EXM
+ beq mul58 exit no problem
+ cmpb #EXM
+ bne mul59 overflow
+mul58 ldb MBC,x get sign now
+ eorb WBC+MBC,x
+ lsla
+ lslb
+ rora
+ sta WBC+MBC,x
+ leax WBC,x
+ clrb
+ rts
+
+mul59
+ leax WBC,x
+ tfr a,b see if over or under
+ ldb #40 assume over
+ bita #$40 exp sign
+ beq mul60
+ ldb #43 under
+mul60 coma
+ rts
+
+
+
+ endsect

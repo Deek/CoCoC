@@ -1,0 +1,29 @@
+*
+* handler for _ss_attr, _ss_size, _ss_lock
+*
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+
+ psect ss2,0,0,1,0,0
+
+_ss_lock: pshs U
+ ldb #SS.Lock
+ bra ss1
+
+_ss_attr: pshs U
+ ldb #SS.Attr
+ bra ss2
+
+_ss_size: pshs U
+ ldb #SS.Size
+ss1 ldu 8,S
+ss2 ldx 6,S
+ lda 5,S
+ os9 I$SetStt
+ puls U
+ lbra _sysret
+
+ ends

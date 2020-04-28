@@ -1,0 +1,518 @@
+ psect utime_a,0,0,1,0,0
+* #include <utime.h>
+
+*
+* struct tm {
+* inttm_sec;           /* seconds 0-59 */
+* inttm_min;           /* minutes 0-59 */
+* inttm_hr;            /* hours 0-23 */
+* inttm_day;           /* day of month 1-31 */
+* inttm_mon;           /* month of year 0-11 */
+* inttm_yr;            /* year 70-.. */
+* inttm_wday;          /* day of week 0-6 */
+* inttm_yday;          /* day of year 0-365 */
+* };
+* 
+* /*
+* 
+* 
+* long
+* time(arg)
+* long  *arg;
+*    {
+*    char  tbuf[6];
+*    long  result, o2utime();
+*
+*    getime(tbuf);
+*    result = o2utime(tbuf);
+*    if (arg)
+*       *arg = result;
+*    return (result);
+*    }
+
+time:
+ pshs U
+ leas -6,S
+ leau ,S time buffer
+ pshs U
+ lbsr getime get system time
+ stu ,S still time buffer
+ bsr o2utime convert to unix style
+ ldu 12,S check arg
+ beq noarg
+ ldd ,X so copy over
+ std ,U
+ ldd 2,X
+ std 2,U
+noarg leas 8,S
+ puls U,PC
+ pag
+*
+* static int   monsiz[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+ vsect
+monsiz fdb 31,28,31,30,31,30,31,31,30,31,30,31
+ endsect
+yrsiz fdb 365,366
+*
+* long
+* o2utime(tp)
+* register char  *tp;                     /* remember - buf is char[6] */
+*    {
+*    int   j, leap;
+*    long  accum = 0;
+*
+o2utime:
+ pshs D,U
+ ldu 6,S get tp
+ clra
+ clrb
+ pshs D
+ pshs D
+
+*    for (j = 70; j < *tp; ++j)         /* total up days in years past */
+*       accum += ((j & 3) ? 365 : 366);     /* don't forget leap years */
+ ldb #70-1
+ ldx #0
+ bra o2ut2
+
+o2ut1 leax 365,X
+ bitb #3
+ bne o2ut2
+ leax 1,X
+o2ut2 incb
+ cmpb ,U
+ blt o2ut1
+ stx 2,S
+*
+*    monsiz[1] = (*tp++ & 3) ? 28 : 29;           /* fix for leap year */
+ leax monsiz,Y
+ lda #29 assume leap year
+ ldb ,U+
+ andb #3
+ beq o2ut3 it is a leap year
+ lda #28
+o2ut3 sta 3,X fix up table
+
+*
+*    for (j = 0; j < *tp; ++j)             /* add day1 for months past */
+*       accum += monsiz[j];
+ ldb #1
+ bra o2ut5
+
+o2ut4 ldd ,X++
+ addd 2,S
+ std 2,S
+
+ ldb 4,S
+ incb
+o2ut5 stb 4,S
+ cmpb ,U
+ blt o2ut4
+
+*
+*    ++tp;
+ leau 1,U
+
+*    accum += (*tp++ - 1);                      /* add days this month */
+ ldb ,U+
+ decb
+ clra
+ addd 2,S
+ std 2,S
+
+*    accum *= 24;                                  /* convert to hours */
+ aslb
+ rola
+ addd 2,S *3
+ aslb
+ rola
+ rol 1,S *6
+ aslb
+ rola
+ rol 1,S *12
+ aslb
+ rola
+ rol 1,S *24
+ std 2,S
+
+*
+*    accum += *tp++;                                /* add hours today */
+ ldb ,U+
+ clra
+ addd 2,S
+ std 2,S
+ ldb 1,S
+ adcb #0
+ stb 1,S
+
+*    accum *= 60;                                /* convert to minutes */
+ bsr mul60
+*
+*    accum += *tp++;                              /* add minutes today */
+ ldb ,U+
+ clra
+ addd 2,S
+ std 2,S
+ ldd ,S
+ adcb #0
+ adca #0
+ std ,S
+
+*    accum *= 60;                                /* convert to seconds */
+ bsr mul60
+
+*
+*    accum += *tp;                                /* add seconds today */
+ ldb ,U+
+ clra
+ addd 2,S
+ std 2,S
+ ldd ,S
+ adcb #0
+ adca #0
+ std ,S
+
+*
+*    return (accum);
+ leau 0,S
+ leax _flacc,Y
+ ldd ,U
+ std ,X
+ ldd 2,U
+ std 2,X
+ leas 6,S
+ puls U,PC
+
+*    }
+ pag
+mul60
+ ldx 2,S
+ ldd 4,S
+ bsr shift16
+ bsr shift16
+ addd 4,S
+ exg D,X
+ adcb 3,S
+ adca 2,S
+ exg D,X
+ stx 2,S
+ std 4,S
+ bsr shift16
+ addd 4,S
+ exg D,X
+ adcb 3,S
+ adca 2,S
+ exg D,X
+ bsr shift16
+ bsr shift16
+ stx 2,S
+ std 4,S
+ rts
+
+
+shift16
+ aslb
+ rola
+ exg D,X
+ rolb
+ rola
+ exg D,X
+ rts
+
+
+* /*
+* ** function to convert a 'tm' style time to os9 time
+* */
+*
+* u2otime(otime, tmp)
+* char        *otime
+* struct tm   *tmp;
+*    {
+*    otime->t_year = tmp->tm_year;
+*    otime->t_month = tmp->tm_mon;
+*    otime->t_day   = tmp->tm_mday;
+*    otime->t_hour  = tmp->tm_hour;
+*    otime->t_minute = tmp->tm_min;
+*    otime->t_second = tmp->tm_sec;
+*    }
+
+u2otime:
+ pshs U
+ ldu 6,S *tmp
+ ldx 4,S *otime
+ leax 6,X get to end
+ lda #6 byte to copy
+u2o1 ldb ,U+ dummy
+ ldb ,U+ get data
+ stb ,-X stash away
+ deca
+ bne u2o1
+ puls U,PC
+ pag
+* /*page*/
+* /*
+*
+* static struct tm _tm;
+ vsect
+_tm  rmb 16
+ endsect
+daylight: fdb 0
+timezone: fdb 0,0
+*
+* struct tm *
+* localtime(utime)
+* long  *utime;
+*    {
+*    register struct tm *tmp = &_tm;
+*    long  ticks = *utime;
+*    int   days;
+*    int   fac;
+*
+localtim:
+ pshs D,U save U and allocate some scratch
+ leau _tm,Y
+
+*    tmp->tm_sec = ticks % 60;                      /* split out seconds */
+*    ticks /= 60;
+ ldx 6,S point to utime
+ ldd 2,X copy to local storage
+ pshs D
+ ldd ,X
+ pshs D
+ leax ,S point to our copy
+ ldd #60
+ bsr div32
+ std 0,U seconds
+*
+*    tmp->tm_min = ticks % 60;                      /* split out minutes */
+*    ticks /= 60;
+ ldd #60
+ bsr div32
+ std 2,U minutes
+*
+*    tmp->tm_hr = ticks %24;                          /* split out hours */
+*    days = ticks / 24;
+ ldd #24
+ bsr div32
+ std 4,U hours
+ ldd 2,X get days total
+ std 4,S save days for later
+*
+*    for (tmp->tm_yr = 70; days >= 0; ++tmp->tm_yr)
+*       days -= (fac = ((tmp->tm_yr & 3) ? 365 : 366));
+*    tmp->tm_yr -= 1;
+*    tmp->tm_yday = (days += fac);               /* adjust for overshoot */
+ ldd #70
+ std 10,U iniz the year
+lt1 leax yrsiz,PCR
+ ldb 11,U get current year
+ andb #3
+ bne lt2
+ leax 2,X use leap size
+lt2 ldd 4,S get saved days
+ subd ,X one years worth of days
+ inc 11,U bump year
+ std 4,S save remainder
+ bcc lt1
+ addd ,X fix up days left
+ std 4,S
+ dec 11,U unbump year
+ std 14,U day of year
+*
+*    monsiz[2] = (tmp->tm_yr & 3) ? 28 : 29;
+ ldb 11,U
+ leax monsiz,Y
+ lda #29 assume leap year
+ andb #3
+ beq lt3
+ lda #28
+lt3 sta 3,X
+
+*    for (tmp->tm_mon = 1; days >= monsiz[tmp->tm_mon]; ++tmp->tm_mon)
+*       days -= monsiz[tmp->tm_mon];
+*    tmp->tm_day = days;
+ ldd #$00ff month -1 for pre-incr
+ std 8,U
+ ldd 4,S get days left
+lt4 inc 9,U count up months
+ subd ,X++
+ bcc lt4
+ addd -2,X fix up days
+ addd #1 make one based
+ std 6,U
+
+*    tmp->tm_wday = (days + 4) % 7;           /* extract the day of week */
+ leax ,S point to utime again
+ ldd 2,X
+ addd #4
+ std 2,X
+ ldd #7
+ bsr div32
+ std 12,U day of week
+*
+*    return (tmp);
+ tfr U,D
+ leas 6,S clean up stack
+ puls U,PC recover U and go home
+
+*    }
+ pag
+
+div32
+ clr ,-S set up remainder
+ clr ,-S and clear carry
+ pshs D save dsor
+ ldb #33 loop count
+ pshs B
+ bra div32b
+
+div32a ldd 3,S get remainder
+ subd 1,S subract dsor
+ bcs div32b underflow
+ std 3,S update remainder
+div32b rol 3,X shift ddend
+ rol 2,X
+ rol 1,X
+ rol ,X
+ rol 4,S shift remainder
+ rol 3,S
+ dec ,S count off
+ bne div32a
+ com 3,X fix up dsor
+ com 2,X
+ com 1,X
+ com ,X
+ lsr 3,S fix up remainder
+ ror 4,S
+ leas 3,S clean off counter and dsor
+ puls D,PC get remainder and return
+
+*
+ pag
+* /*
+*
+*
+* static   char  xx[26];
+ vsect
+xx  rmb 26
+ endsect
+*
+* 
+* char   *
+* asctime(tmp)
+* struct tm *tmp;
+*    {
+*    sprintf(xx, "%s %s %2d %02d:%02d:%02d 19%02d\n",
+*       days[tmp->tm_wday], months[tmp->tm_mon - 1], tmp->tm_day,
+*       tmp->tm_hr, tmp->tm_min, tmp->tm_sec, tmp->tm_yr);
+*    return (xx);
+*    }
+
+asctime:
+ pshs u
+ ldu 4,S
+ ldd 10,U tm_yr
+ pshs D
+ ldd ,U tm_sec
+ pshs D
+ ldd 2,U tm_min
+ pshs D
+ ldd 4,U tm_hr
+ pshs D
+ ldd 6,U tm_day
+ pshs D
+ ldd 8,U tm_mon
+* subd #1 fix the basing *+crk+ this needed fixed too
+ nop
+ nop
+ nop
+ aslb
+ rola
+ aslb
+ rola
+ leax months,PCR
+ leax D,X
+ pshs X month string
+ ldd 12,U tm_wday
+ aslb
+ rola
+ aslb
+ rola
+ leax days,PCR
+ leax D,X
+ pshs X day of week string
+ leax datfmt,PCR
+ pshs X sprintf spec string
+ leax xx,Y
+ pshs X dest buffer
+ lbsr sprintf
+ leas 18,S
+ leax xx,Y
+ tfr X,D
+ puls U,PC
+
+
+* 
+* 
+* char  *
+* ctime(ticks)
+* long   *ticks;
+*    {
+*    struct tm *tmp;
+* 
+*    return (asctime(localtime(ticks)));
+*    }
+
+ctime:
+ ldd 2,S
+ pshs D
+ lbsr localtim
+ std ,S
+ lbsr asctime
+ puls X,PC
+
+
+days fcc "Sun"
+ fcb $0
+ fcc "Mon"
+ fcb $0
+ fcc "Tue"
+ fcb $0
+ fcc "Wed"
+ fcb $0
+ fcc "Thu"
+ fcb $0
+ fcc "Fri"
+ fcb $0
+ fcc "Sat"
+ fcb $0
+
+months fcc "Jan"
+ fcb $0
+ fcc "Feb"
+ fcb $0
+ fcc "Mar"
+ fcb $0
+ fcc "Apr"
+ fcb $0
+ fcc "May"
+ fcb $0
+ fcc "Jun"
+ fcb $0
+ fcc "Jul"
+ fcb $0
+ fcc "Aug"
+ fcb $0
+ fcc "Sep"
+ fcb $0
+ fcc "Oct"
+ fcb $0
+ fcc "Nov"
+ fcb $0
+ fcc "Dec"
+ fcb $0
+
+datfmt fcc "%s %s %2d %02d:%02d:%02d 19%02d"
+ fcb $d,0
+
+ endsect

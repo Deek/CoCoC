@@ -1,0 +1,33 @@
+ psect strpbrk_a,0,0,0,0,0
+
+*
+* function to check a string for one of a set of chars
+*  char *strpbrk(s1, s2)
+*        char *s1, s2;        s1 = string, s2 = char set
+*
+
+s2       set   4
+s1       set   2
+stacked  set   0
+
+strpbrk: pshs  X,U      need a pointer and space
+stacked  set   stacked+4
+
+         ldx   s2+stacked,S   pointer to char set
+         ldu   s1+stacked,S   pointer to string
+         pshs  X              stack char set ptr
+stacked  set   stacked+2
+
+_1       clra                 in case set is null
+         ldb   ,U+            get a char from string
+_2       beq   _4             if end of string
+         stb   3,S            stack up char
+         lbsr  index          ptr (if any) ret in D
+         beq   _1             if not there
+
+         leau  -1,U           fix overshoot
+         tfr   U,D            return string ptr
+_4       leas  stacked-2,S    D clear if via _2
+         puls  U,PC
+
+         endsect

@@ -1,0 +1,89 @@
+ psect ccdiv_a,0,0,0,0,0
+
+* entry  d = divisor
+*      s+2 = dividend
+* exit   d = quotient
+*        x = remainder
+
+*   working stack   6  quotient
+*                   4  return addr
+*                   2  divisor
+*                   1  composite sign
+*                   0  shift count
+
+*  8-13-85 change inc to com to fix sign - dp.
+
+*           d = dividend
+ccudiv: subd #0
+ beq ccudiv1
+ pshs b,a
+ leas -2,s
+ clr ,s
+ clr 1,s
+ bra ccdiv2
+ccudiv1 puls b,a
+ std ,s
+ ldd #45
+ lbra _rpterr
+
+ccdiv: subd #0
+ beq ccudiv1
+ pshs b,a
+ leas -2,s
+ clr ,s
+ clr 1,s
+ tsta 
+ bpl ccdiv1
+ nega 
+ negb 
+ sbca #0
+ com 1,s  was inc - dp
+ std 2,s
+ccdiv1 ldd 6,s
+ bpl ccdiv2
+ nega 
+ negb 
+ sbca #0
+ com 1,s
+ std 6,s
+ccdiv2 lda #1
+
+ccdiv3 inca
+ asl 3,s
+ rol 2,s
+ bpl ccdiv3
+ sta ,s
+ ldd 6,s ddend
+ clr 6,s zero qoutient
+ clr 7,s
+ pag
+ccdiv4 subd 2,s sub off dsor
+ bcc ccdiv5
+ addd 2,s add back
+ andcc #$fe
+ bra ccdiv6
+ccdiv5 orcc #$01
+ccdiv6 rol 7,s roll in result
+ rol 6,s
+ lsr 2,s shift dsor
+ ror 3,s
+ dec ,s count off passes
+ bne ccdiv4
+ std 2,s save remainder
+ tst 1,s
+ beq ccdiv7 no sign change
+ ldd 6,s quot
+ nega
+ negb 
+ sbca #0
+ std 6,s
+ccdiv7 ldx 4,s ret addr
+ ldd 6,s quot
+ std 4,s over ret
+ stx 6,s over dsor
+ ldx 2,s get remainder
+ ldd 4,s get quot
+ leas 6,s clean stack
+ rts
+
+ endsect

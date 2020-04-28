@@ -1,0 +1,98 @@
+ psect dinc_a,0,0,0,0,0
+
+ ifp1
+ use mdefs.a
+ endc
+
+* increment or decrement double pointed to by x
+
+_dinc: pshs x,y
+ exg x,y
+ leax _mthtop,x
+ lbsr _denter
+ lbsr _dconv
+ leay EIN,pcr
+ lbsr _denter
+ lbsr _dadds
+ bra _ddec1
+
+_ddec: pshs x,y
+ exg x,y
+ leax _mthtop,x
+ lbsr _denter
+ lbsr _dconv
+ leay EIN,pcr
+ lbsr _denter
+ lbsr _dsubs
+_ddec1
+ ldy 2,s recover static (perserves carry bit)
+ lbsr _mret
+ ldy 0,s get original x
+ ldd ,x
+ std ,y
+ ldd 2,x
+ std 2,y
+ ldd 4,x
+* std 6,y oops.... 92/05/28
+ std 4,y
+ ldd 6,x
+ std 6,y
+ puls x,y,pc
+
+ pag
+
+* increment or decrement float pointed to by x
+
+_finc: pshs x,y
+ exg x,y
+ leax _mthtop,x
+ lbsr _denter
+ lda 3,x
+ sta 7,x
+* ldd #0
+* sta 3,x
+* std 4,x
+* std 6,x
+ clra
+ clrb
+ std 3,x
+ std 5,x
+ lbsr _dconv
+ leay EIN,pcr
+ lbsr _denter
+ lbsr _dadds
+ bra _fdec1
+
+
+_fdec: pshs x,y
+ exg x,y
+ leax _mthtop,x
+ lbsr _denter
+ lda 3,x
+ sta 7,x
+* ldd #0
+* sta 3,x
+* std 4,x
+* std 6,x
+ clra
+ clrb
+ std 3,x
+ std 5,x
+ lbsr _dconv
+ leay EIN,pcr
+ lbsr _denter
+ lbsr _dsubs
+_fdec1 ldy 2,s recover static (preserves carry bit)
+ lbsr _mret
+ ldy 0,s get original x
+ ldd ,x
+ std ,y
+ lda 2,x
+* sta 2,y
+ ldb 7,x
+ std 2,y
+ puls x,y,pc
+
+EIN fcb $80,0,0,0,0,0,0,0,1
+
+ endsect

@@ -1,0 +1,31 @@
+ psect strclr_a,0,0,0,0,0
+ nam strclr_c
+* */*
+* *
+* *strclr(s, cnt)
+* *char *s;
+* *int cnt;
+* *   {
+ ttl strclr
+strclr:
+ pshs u
+
+* *   register char *pnt = s;
+ ldu 4,s
+ clrb
+ ldx 6,s
+ beq _1
+
+* *   while (cnt--)
+* *      *pnt++ = '\0';
+_3
+ stb ,u+
+ leax -1,x
+ bne _3
+* *   return (s);
+_1
+ ldd 4,s
+ puls u,pc
+
+* *   }
+ endsect

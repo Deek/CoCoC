@@ -1,0 +1,26 @@
+********** clcompare_a **********
+
+*  compares 4 bytes on stack to 4 bytes *x
+
+ psect clcompare_a,0,0,1,0,0
+
+_lcmpr: ldd 2,s MSW
+ cmpd ,x
+ bne lcmpr2 ret .NE
+ ldd 4,s LSW
+ cmpd 2,x
+ beq lcmpr2 ret .EQ
+ bcs lcmpr1 (d) < (2,x)
+ lda #1 (d) > (2,x)
+ andcc #$fe CLC
+ bra lcmpr2
+
+lcmpr1 clra z=1, nvc=0
+ cmpa #1
+lcmpr2 pshs cc save cc
+ ldd 1,s get ret addr
+ std 5,s overwrite long on stack
+ puls cc recover cc
+ leas 4,s fix stack
+ rts
+ endsect

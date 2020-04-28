@@ -1,0 +1,105 @@
+ psect patmatch_a,0,0,0,0,0
+ nam patmatch_a
+ ttl patmatch
+* /*
+* patmatch(p, s, f)
+* char   *p;                                               /* pattern */
+* register char *s;                                /* string to match */
+* char   f;                                    /* flag for case force */
+*    {
+
+patmatch:
+ pshs u
+ ldu 6,s
+*    char   pc;                    /* a single character from pattern */
+ leas -2,s
+*
+*    while (pc = (f ? toupper(*p++) : *p++))
+*       {
+ bra _3
+
+*       if (pc == '*')
+*             {
+_4 cmpb #42
+ bne _6
+
+*             do
+*                if (patmatch (p, s, f))
+*                      return (1);
+_9 ldb 11,s
+ clra
+ pshs d
+ pshs u
+ ldd 10,s
+ pshs d
+ bsr patmatch
+ leas 6,s
+ bne _28
+
+*             while (*s++);
+ ldb ,u+
+ bne _9
+
+*             return (0);
+ bra _27
+
+*             }
+*          else
+*             if (!*s)
+*                   return (0);
+_6 tst 0,u
+ beq _27
+
+*                else
+*                   if (pc == '?')
+ cmpb #63
+ bne _17
+
+*                         s++;
+ leau 1,u
+ bra _3
+
+*                      else
+*                         if (pc != (f ? toupper(*s++) : *s++))
+*                               return (0);
+_17 ldb ,u+
+ tst 11,s
+ beq _23
+ clra
+ pshs d
+ lbsr toupper
+ leas 2,s
+_23 cmpb 1,s
+ bne _27
+
+
+_3 ldx 6,s *** body of outer while ***
+ ldb ,x+
+ stx 6,s
+ tst 11,s
+ beq _26
+ clra
+ pshs d
+ lbsr toupper
+ leas 2,s
+_26 stb 1,s
+ bne _4
+
+
+*       }
+*       return (!*s);
+_2 ldb 0,u
+ bne _27
+
+_28 ldd #1
+ bra _29
+
+_27 clra
+ clrb
+
+_29 leas 2,s
+ puls u,pc
+
+*    }
+
+ endsect

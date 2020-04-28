@@ -1,0 +1,19 @@
+ psect strhcpy_a,0,0,1,0,0
+
+*** strhcpy(t, f)
+*    copy parity terminated string
+*    return s1
+
+strhcpy: pshs u
+ ldu 4,s t
+ ldx 6,s f
+strhcpy1 ldb ,x+
+ stb ,u+
+ bpl strhcpy1
+ andb #$7f
+ stb -1,u patch up
+ clr ,u terminate
+ ldd 4,s return t
+ puls u,pc
+
+ endsect

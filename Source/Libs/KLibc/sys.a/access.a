@@ -1,0 +1,45 @@
+*
+* File access system calls
+*
+
+pmode equ $0b r/w for owner, r for others
+
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+ psect access_a,0,0,2,0,0
+
+* access(name,mode)
+access: ldx 2,s
+ lda 5,s
+
+ os9 I$Open
+
+ bcs access10
+ os9 I$Close
+access10 lbra _sysret
+
+* mknod(name,mode)
+mknod: ldx 2,s
+ ldb 5,s
+ os9 I$MakDir
+ lbra _sysret
+
+* unlinkx(fname, mode)  where mode is execute for cmds
+unlinkx: lda 5,s
+ bra unlink2
+
+* unlink(fname)
+unlink: lda #2 write permission
+unlink2 ldx 2,s
+ os9 I$DeletX
+ lbra _sysret
+
+* dup(fildes)
+dup: lda 3,s
+ os9 I$Dup
+ lbcs _os9err
+ tfr a,b
+ clra
+ rts
+ endsect

@@ -1,0 +1,206 @@
+*
+* The purpose of this code to setup initialized
+* data (if any) and adjust any addresses in that
+* initialized data to reflect the absolute address
+* of the reference.  Any uninitialized data area is
+* explicitly cleared to zero (for C compatability).
+*
+* The linker supplies the following values for use
+* in setting up the initialized data:
+*
+*    (indexed off data reg)
+*    dpsiz - end of uninitialized direct page data
+*    end   - end of uninitialized data
+*    edata - end of initialized data
+*
+*    (indexed off pcr reg)
+*    btext - beginning of code
+*    etext - end of code
+*
+* Get some system definitions
+*
+ ifp1
+ use /dd/defs/os9defs.a
+ endc
+
+ 
+TypeLang equ $11
+Attrrev equ $81
+Edition equ 1
+Stacksiz equ 200 Memory for stack
+ 
+ psect root_a,TypeLang,Attrrev,Edition,Stacksiz,_start
+
+*
+* The following vsect reserves an initialized
+* direct-page byte (initialized direct-page data
+* is assigned the lowest data address) so it will be
+* impossible for a pointer to contain the
+* value 0.  This convention is used by C.  If
+* no C routines will be called, this vsect can
+* be removed.
+
+ vsect dp
+_$_$ fcb 0
+ endsect
+
+*
+* Entered here from OS-9 Fork
+*
+*
+_start
+ pshs y save the top of mem
+ pshs u save the data beginning address
+
+*
+* This code segment initializes the first 256
+* (possible) direct page bytes
+*
+ clra setup to clear
+ clrb 256 bytes
+csta05 sta ,u+ clear dp bytes
+ decb
+ bne csta05
+
+*
+* This code segment sets up to move the
+* initialized data from the code section
+* to the data area.
+*
+csta10 ldx 0,s get the beginning of data address
+ leau 0,x (tfr x,u)
+ leax end,x get the end of bss address
+ pshs x save it
+ leay etext,pcr point to dp-data count word
+
+*
+* now move the initialized direct-page
+* data into position.
+*
+ ldx ,y++  get count of dp-data to be moved
+ beq csta15 bra if none
+ bsr movbytes move dp data into position
+
+*
+* put the non-direct-page data after
+* the uninitialized direct-page data.
+*
+ ldu 2,s get beginning address again
+csta15 leau dpsiz,u point to where non-dp should start
+ ldx ,y++ get count of non-dp data to be moved
+ beq clrbss
+ bsr movbytes move non-dp data into position
+
+*
+* now clear out the rest of the uninitialized
+* data area.
+*
+ clra
+clrbss cmpu 0,s reached the end?
+ beq reldt bra if so
+ sta ,u+ clear it
+ bra clrbss
+
+*
+* The linker cannot know the final absolute
+* addresses of any data in the data area that
+* refers to other data or code.  The next section
+* of code will add the base of the text area to
+* data pointers pointing to text (data-text references)
+* and add the base of the data area to data pointers
+* pointing to other data (data-data references).
+* The linker leaves a list of the offsets at the end
+* object code module.
+
+*
+* now relocate the data-text references
+*
+reldt ldu 2,s restore to data bottom
+ ldd ,y++ get dat-text ref. count
+ beq reldd
+ leax btext,pcr point to text
+ lbsr patch patch them
+
+*
+* and the data-data refs.
+*
+reldd ldd ,y++ get the count of data refs.
+ beq restack bra if none
+ leax 0,u u was already pointing there
+ lbsr patch
+
+restack leas 4,s return scratch
+ leay 0,u tfr u,y (base addr of data to y)
+ puls u high end of allocated data area
+ leax 0,s point to parameters
+
+*
+* Registers at this point:
+*
+*    X = Pointer to parameter area
+*    U = Pointer to top of data allocated
+*        by the linker.
+*    Y = Pointer to bottom of data area
+*   DP = Same as high byte of Y-reg
+*
+* The linker has adjusted
+* all non-direct-page data references to reflect
+* the data memory as we have set up here.  The
+* data-index register choice here is arbitrary,
+* but must be used consistently.  To maintain
+* compatability with code produced by the C compiler,
+* the Y register is used here as the data pointer.
+*
+* The actual program code should replace the
+* next code segment.
+
+ lbsr main call main program
+ os9 F$Exit return to OS-9
+
+*************
+* Subroutines
+*
+
+*
+* move bytes (Y=From addr, U=To addr, X=Count)
+*
+movbytes
+ lda ,y+ get a byte
+ sta ,u+ put a byte
+ leax -1,x dec the count
+ bne movbytes and round again
+ rts
+
+*
+* patch - adjust initialised data which refer to memory locations.
+* entry:
+*       y -> list of offsets in the data area to be patched
+*       u -> base of data
+*       x -> base of either text or data area as appropriate
+*       d =  count of offsets in the list
+*
+* exit:
+*       u - unchanged
+*       y - past the last entry in the list
+*       x and d mangled
+
+patch pshs x save the base
+ leax d,y half way up the list
+ leax d,x top of list
+ pshs x save it as place to stop
+
+* we do not come to this routine with
+* a zero count (check!) so a test at the loop top
+* is unnecessary
+patch10 ldd ,y++ get the offset
+ leax d,u point to location
+ ldd 0,x get the relative reference
+ addd 2,s add in the base
+ std 0,x store the absolute reference
+ cmpy 0,s reached the top?
+ bne patch10 no - round again
+
+ leas 4,s reset the stack
+ rts and return
+
+ endsect

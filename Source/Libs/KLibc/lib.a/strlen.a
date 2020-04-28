@@ -1,0 +1,18 @@
+ psect strlen_a,0,0,1,0,0
+
+*** strlen(s)
+*    returns count of non-null characters in "s"
+*    stack   s
+*           ret
+*        ->  u
+
+strlen: pshs u
+ ldu 4,s *s
+strlen1 ldb ,u+
+ bne strlen1
+ leau -1,u don't count null
+ tfr u,d
+ subd 4,s len = end - start
+ puls u,pc
+
+ endsect

@@ -1,0 +1,108 @@
+ psect cldiv_a,0,0,0,0,0
+
+ vsect
+sign rmb 1
+ endsect
+
+_ldiv: bsr _div1
+ lda 1,s
+ beq _ldiv2
+_ldiv1 lbsr _lnegx
+_ldiv2 leas 8,s
+ lbra _lbexit
+
+_lmod: lda ,x
+ ora 1,x
+ ora 2,x
+ ora 3,x
+ bne _lmod1
+ ldd ,x
+ std _flacc,y
+ ldd 2,x
+ leax _flacc,y
+ std 2,x
+ lbra _lbexit
+
+_lmod1 lda 2,s
+ sta sign,y
+ bsr div2
+ ldd 10,s
+ leax _flacc,y
+ std ,x
+ ldd 12,s
+ std 2,x
+ tst sign,y
+ bmi _ldiv1
+ leas 8,s
+ lbra _lbexit
+
+_div1 lda ,x
+ ora 1,x
+ ora 2,x
+ ora 3,x
+ bne div2
+ ldd 2,s
+ std 6,s
+ leas 6,s
+ ldd #45
+ lbra _rpterr
+
+div2 ldd ,x
+ ldx 2,x
+ pshs x,b,a
+ ldd #$0000
+ pshs b,a
+ std _flacc,y
+ std _flacc+2,y
+ tst 2,s
+ bpl div3
+ leax 2,s
+ lbsr _lnegx
+*+crk+ inc 1,s
+ com 1,s *+crk+
+div3 tst 10,s
+ bpl div4
+ leax 10,s
+ lbsr _lnegx
+ com 1,s
+div4 leax _flacc,y
+ lda #1
+div5 inca
+ asl 5,s
+ rol 4,s
+ rol 3,s
+ rol 2,s
+ bpl div5
+ sta ,s
+div6 ldd 12,s
+ subd 4,s
+ std 12,s
+ ldd 10,s
+ sbcb 3,s
+ sbca 2,s
+ std 10,s
+ bcc div7
+ ldd 12,s
+ addd 4,s
+ std 12,s
+ ldd 10,s
+ adcb 3,s
+ adca 2,s
+ std 10,s
+ andcc #$fe
+ bra div8
+
+div7 orcc #$01
+div8 rol 3,x
+ rol 2,x
+ rol 1,x
+ rol ,x
+ lsr 2,s
+ ror 3,s
+ ror 4,s
+ ror 5,s
+ dec ,s
+ bne div6
+ jmp [6,s]
+
+ endsect

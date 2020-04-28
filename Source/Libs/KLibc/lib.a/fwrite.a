@@ -1,0 +1,41 @@
+ psect fwrite_a,0,0,2,0,0
+
+*     fwrite(buffer, size, number, fp)
+
+*         for j=1 to n
+*           for k=1 to size
+*             put a char
+*           next k
+*         next j
+
+fwrite: pshs d,x,u
+ ldu 8,s
+ clra  for J
+ clrb
+ bra fwrite5
+
+fwrite1 ldd 10,s for K
+ bra fwrite4
+
+fwrite2 ldx 14,s get fp
+ ldb ,u+
+ pshs d,x
+ lbsr putc
+ leas 4,s
+ cmpd #-1 error?
+ beq fwrite6
+ ldd ,s next K
+ subd #1
+fwrite4 std ,s
+ bne fwrite2
+ ldd 2,s next J
+ addd #1
+fwrite5 std 2,s
+ cmpd 12,s
+ blt fwrite1
+fwrite6 leas 2,s waste K
+ puls d,u,pc return J
+
+
+
+ endsect

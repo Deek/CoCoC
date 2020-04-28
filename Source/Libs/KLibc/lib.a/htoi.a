@@ -1,0 +1,47 @@
+ psect htoi_a,0,0,0,0,0
+
+*                htoi(s)
+*                char *s;         /* returns int for hex ascii in s */
+
+htoi:
+ clra
+ clrb
+ pshs d,u
+ ldu 6,s *s
+ leax _chcodes,y
+_$1 ldb ,u
+ cmpb #$20 space?
+ beq _$2
+ cmpb #$09 tab?
+ bne _$5 must be good
+_$2 leau 1,u bump ptr
+ bra _$1
+
+_$3 ldd 0,s
+ aslb
+ rola
+ aslb
+ rola
+ aslb
+ rola
+ aslb
+ rola
+ std 0,s
+ ldb ,u+
+ subb #'0
+ cmpb #9
+ ble _$4
+ subb #7 fix for alpha
+ cmpb #15
+ ble _$4
+ subb #32 fix for case
+_$4 clra
+ addd 0,s
+ std 0,s
+ ldb ,u
+_$5 ldb b,x
+ andb #$40
+ bne _$3
+ puls d,u,pc
+
+ endsect

@@ -1,0 +1,397 @@
+ psect daddsub_a,0,0,0,0,0
+
+ ifp1
+ use mdefs.a
+ endc
+
+
+* dneg negate double x points to
+* on return
+_dneg: ldb #7 double byte index
+ clra accumulator
+_dneg1 ora b,x
+ decb
+ bpl _dneg1
+ tsta is it zero?
+ lbeq _xtofla just copy it
+ ldd ,x else flip sign bit
+ eora #$80
+ lbra _xtofla1
+
+
+_dadd: lbsr _aprep
+ bsr _dadds
+ lbra _mret
+
+
+_dsub: lbsr _aprep
+ bsr _dsubs
+ lbra _mret
+
+
+
+* dnorm  two bytes on stack is pointer to double
+* x points to answer in flacc
+_dnorm:
+ pshs y save y
+ leax _mthtop,y
+ ldy 4,s get pointer to double
+ lbsr _denter
+ ldb 7,x get exp
+ subb #$80 extra 128
+ sex
+ anda #^MS
+ std MBC,x
+ lbsr _dnorms
+ puls y
+ lbra _mret
+ pag
+* This routine adds two doubles pointed
+* to by x .
+* X=X+WBC on return. x points to answer
+* c=1 if overrange exp>511
+
+_dsubs: lda MBC,x change sign for subtract
+ eora #MS
+ sta MBC,x
+
+_dadds: lda ,x check for zero
+ beq add2 exit
+ lda WBC,x
+ beq add1 just zero, don't add
+ pshs y save static pointer
+ ldd WBC+MBC,x get exponent diff
+ subd MBC,x
+ lsla move sign
+ asra
+ tfr x,y save point to num to adjust
+ bpl add4
+ pshs d fix exp
+ ldd MBC,x
+ lsla get sign
+ lsl WBC+MBC,x
+ rora
+ std WBC+MBC,x
+ puls d
+ leay WBC,x
+ nega
+ negb
+ sbca #0 make diff pos
+add4 cmpd #MBC*8 see if to much
+ bls add5
+ pshs y see which operand to small
+ cmpx ,s++
+ puls y recover static pointer
+ beq add2
+add1 ldd ,x use op1
+ std WBC,x
+ ldd 2,x
+ std WBC+2,x
+ ldd 4,x
+ std WBC+4,x
+ lda 6,x
+ sta WBC+6,x
+ ldd MBC,x
+ std WBC+MBC,x
+add2 leax WBC,x
+ clrb
+ rts
+ pag
+
+add5 lbsr _dshift now shift number y points to
+ puls y restore static pointer
+ lda MBC,x check signs now
+ eora WBC+MBC,x
+ bmi sub1 go subtract
+ ldd 5,x now add
+ addd WBC+5,x
+ std WBC+5,x
+ lda 4,x
+ adca WBC+4,x
+ sta  WBC+4,x
+ ldd 2,x
+ adcb WBC+3,x
+ adca WBC+2,x
+ std  WBC+2,x
+ ldd ,x
+ adcb WBC+1,x
+ adca WBC,x
+ std WBC,x
+ bcc add8 exit
+ ror WBC,x take care of overflow
+ ror WBC+1,x
+ ror WBC+2,x
+ ror WBC+3,x
+ ror WBC+4,x
+ ror WBC+5,x
+ ror WBC+6,x
+ ldd MBC+WBC,x adjust exp
+ addd #1
+ stb WBC+MBC+1,x
+ tfr a,b check overflow
+ andb #EXM
+ beq add6 ok
+ cmpb #EXM
+ bne add7 exit with error
+add6 lsla get sign now
+ lsl WBC+MBC,x
+ rora
+ sta WBC+MBC,x
+ clrb
+ bra add8
+
+add7 comb
+ ldb #40 overflow
+add8 leax WBC,x
+ rts
+ pag
+
+sub1 ldd WBC+5,x subtract
+ subd 5,x
+ std WBC+5,x
+ lda WBC+4,x
+ sbca 4,x
+ sta WBC+4,x
+ ldd WBC+2,x
+ sbcb 3,x
+ sbca 2,x
+ std WBC+2,x
+ ldd WBC,x
+ sbcb 1,x
+ sbca 0,x
+ std WBC,x
+ bcc sub2 done now normalize
+ ldd #0 negate answer
+ subd WBC+5,x
+ std WBC+5,x
+ lda #0
+ sbca WBC+4,x
+ sta WBC+4,x
+ ldd #0
+ sbcb WBC+3,x
+ sbca WBC+2,x
+ std WBC+2,x
+ ldd #0
+ sbcb WBC+1,x
+ sbca WBC,x
+ std WBC,x
+ lsl WBC+MBC,x switch signs
+ lsl MBC,x
+ ror WBC+MBC,x
+sub2 leax WBC,x fall to normalize
+ pag
+
+_dnorms: lda ,x see if anything nec
+ bmi norm1 exit
+ ora 1,x check for zero
+ ora 2,x
+ ora 3,x
+ ora 4,x
+ ora 5,x
+ ora 6,x
+ bne norm2 go shift
+ sta MBC,x clear exp
+ sta MBC+1,x
+norm1 clrb
+ rts
+
+norm2 clrb shift counter
+ lda ,x
+ bne norm9
+ lda 1,x
+ bne norm8
+ lda 2,x
+ bne norm7
+ lda 3,x
+ bne norm6
+ lda 4,x
+ bne norm5
+ lda 5,x
+ bne norm4
+ lda 6,x
+ sta ,x
+ ldd #0
+ std 1,x
+ std 3,x
+ std 5,x
+ ldb #6*8
+ bra norm9
+
+norm4 ldd 5,x
+ std ,x
+ ldd #0
+ sta 2,x
+ std 3,x
+ std 5,x
+ ldb #5*8
+ bra norm9
+
+norm5 sta ,x
+ ldd 5,x
+ std 1,x
+ ldd #0
+ std 3,x
+ std 5,x
+ ldb #4*8
+ bra norm9
+
+norm6 ldd 3,x
+ std ,x
+ ldd 5,x
+ std 2,x
+ ldd #0
+ sta 4,x
+ std 5,x
+ ldb #3*8
+ bra norm9
+
+norm7 sta ,x
+ ldd 3,x
+ std 1,x
+ ldd 5,x
+ std 3,x
+ ldd #0
+ std 5,x
+ ldb #2*8
+ bra norm9
+
+norm8 ldd 1,x
+ std ,x
+ ldd 3,x
+ std 2,x
+ ldd 5,x
+ std 4,x
+ clr 6,x
+ ldb #1*8
+
+norm9 lda ,x
+ bmi norm11
+norm10 incb
+ lsl 6,x shift
+ rol 5,x
+ rol 4,x
+ rol 3,x
+ rol 2,x
+ rol 1,x
+ rol ,x
+ bpl norm10
+
+norm11 clra subtract form exp
+ pshs d
+ ldd MBC,x
+ subd ,s++
+ stb MBC+1,x save
+ tfr a,b
+ andb #EXM see if overflow
+ beq norm12 ok
+ cmpb #EXM
+ bne norm13 problem
+norm12 lsla get sign now
+ lsl MBC,x
+ rora
+ sta MBC,x
+ clrb
+ rts
+
+norm13 comb return with error
+ ldb #43 underflow
+ rts
+
+
+
+* shift shifts the number pointed to by y by amount
+* in b. exponent left alone
+
+_dshift tstb
+ lbeq shift9
+ tfr b,a
+ andb #$07
+ pshs b
+ anda #$f8
+ lbeq shift7
+ suba #8
+ beq shift6
+ suba #8
+ beq shift5
+ suba #8
+ beq shift4
+ suba #8
+ beq shift3
+ suba #8
+ beq shift2
+ suba #8
+ beq shift1
+ ldb ,s+
+ ldd #0
+ sta ,y
+ std 1,y
+ std 3,y
+ std 5,y
+ rts
+
+shift1 lda ,y
+ sta 6,y
+ ldd #0
+ std ,y
+ std 2,y
+ std 4,y
+ bra shift7
+
+shift2 ldd ,y
+ std 5,y
+ ldd #0
+ std ,y
+ std 2,y
+ sta 4,y
+ bra shift7
+
+shift3 ldd 1,y
+ std 5,y
+ lda ,y
+ sta 4,y
+ ldd #0
+ std ,y
+ std 2,y
+ bra shift7
+
+shift4 ldd 2,y
+ std 5,y
+ ldd ,y
+ std 3,y
+ ldd #0
+ std ,y
+ sta 2,y
+ bra shift7
+
+shift5 ldd 3,y
+ std 5,y
+ ldd 1,y
+ std 3,y
+ lda ,y
+ sta 2,y
+ ldd #0
+ std ,y
+ bra shift7
+
+shift6 ldd 4,y
+ std 5,y
+ ldd 2,y
+ std 3,y
+ ldd ,y
+ std 1,y
+ clr ,y
+
+shift7  ldb ,s+
+ beq shift9
+shift8 lsr ,y
+ ror 1,y
+ ror 2,y
+ ror 3,y
+ ror 4,y
+ ror 5,y
+ ror 6,y
+ decb
+ bne shift8
+shift9 rts
+
+ endsect
