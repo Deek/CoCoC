@@ -1,0 +1,677 @@
+ psect printf_c,0,0,2,0,0
+
+*   printf(format, expr1, expr2, .... exprn)
+*  fprintf(stream, format, expr1, expr2, .... exprn)
+*  sprintf(buffer, format, expr1, expr2, .... exprn)
+
+ vsect
+fpmp rmb 2
+buf1 rmb 10
+buf2 rmb 10
+ljust rmb 2
+fill rmb 2
+ endsect
+
+_DIGIT equ $08
+_UPPER equ $02
+
+ vsect
+dectbl fdb 10000,1000,100,10
+dectble fdb dectble
+ endsect
+
+
+printf: pshs u
+ leax _iob+13,y
+ stx fpmp,y
+ leax 6,s first expr
+ pshs x
+ ldd 6,s format
+ bra printf1
+
+fprintf: pshs u
+ ldd 4,s fp
+ std fpmp,y
+ leax 8,s first expr
+ pshs x
+ ldd 8,s format
+printf1 pshs d
+ leax >put2file,pcr
+ pshs x
+ bsr prtcom
+ leas 6,s
+ puls pc,u
+
+
+sprintf: pshs u
+ ldd 4,s buffer
+ std fpmp,y
+ leax 8,s expr1
+ pshs x
+ ldd 8,s format
+ pshs d
+ leax >put2mem,pcr
+ pshs x
+ bsr prtcom
+ leas 6,s
+ clra
+ clrb
+ stb [fpmp,y] terminate string
+ ldd 4,s return fp or mp
+ puls pc,u
+ pag
+
+*    entry:  variables  fpmp  destination - string or fp
+*            stack            expr list start (2)
+*                             format string pnt (2)
+*                             handler addr (2)
+*                             return (2)
+*       local:                u (2)
+*                             char (1)
+*                             digit count (2)
+*                             fraction spec flag (2)
+*                             fraction count (2)
+*                             huh
+
+*                local offsets
+ csect
+vstart set *
+ rmb 2
+fraccnt rmb 2
+fracflg rmb 2
+digcnt rmb 2
+c1 rmb 1
+s1 rmb 2
+vlen set *-vstart
+ rmb 2 usave
+ rmb 2 ret addr
+prthnd rmb 2
+prtfmt rmb 2
+prtvar rmb 2
+ endsect
+
+
+
+prtcom pshs u
+ ldu 6,s format
+ leas -vlen,s
+ bra prtcom2
+
+prtcom1 ldb c1,s char
+ lbeq prtcomx
+ ldb c1,s char
+ sex
+ pshs d
+ jsr [prthnd+2,s] call handler
+ leas 2,s
+prtcom2 ldb ,u+ char from format
+prtcom3 stb c1,s save
+ cmpb #'%
+ bne prtcom1
+ ldb ,u+
+ stb c1,s
+ clra
+ clrb
+ std fraccnt,s init to 0
+ std digcnt,s same
+ ldb c1,s char
+ cmpb #'-
+ bne prtcom4
+ ldd #1
+ std ljust,y
+ ldb ,u+
+ stb c1,s
+ bra prtcom5
+
+prtcom4 clra
+ clrb 
+ std ljust,y
+prtcom5 ldb c1,s
+ cmpb #'0
+ bne prtcom6
+ ldd #'0
+ bra prtcom7
+
+prtcom6 ldd #$20
+prtcom7 std fill,y
+ bra prtcom9
+
+prtcom8 ldd digcnt,s
+ pshs d
+ ldd #10
+ lbsr ccmult
+ pshs d
+ ldb c1+2,s
+ sex 
+ addd #-'0
+ addd ,s++
+ std digcnt,s
+ ldb ,u+
+ stb c1,s
+prtcom9 ldb c1,s
+ sex 
+ leax _chcodes,y
+ leax d,x
+ ldb ,x
+ clra 
+ andb #_DIGIT
+ bne prtcom8
+ ldb c1,s
+ cmpb #'.
+ bne prtcom12
+ ldd #1
+ std fracflg,s
+ bra prtcom11
+
+prtcom10 ldd fraccnt,s
+ pshs d
+ ldd #10
+ lbsr ccmult
+ pshs d
+ ldb c1+2,s
+ sex 
+ addd #-'0
+ addd ,s++
+ std fraccnt,s
+prtcom11 ldb ,u+
+ stb c1,s
+ ldb c1,s
+ sex 
+ leax _chcodes,y
+ leax d,x
+ ldb ,x
+ clra 
+ andb #_DIGIT
+ bne prtcom10
+ bra prtcom13
+
+prtcom12 clra 
+ clrb 
+ std fracflg,s
+prtcom13 ldb c1,s
+ sex 
+ tfr d,x
+ lbra switch
+ pag
+case_d ldd digcnt,s
+ pshs d
+ ldx prtvar+2,s
+ leax 2,x
+ stx prtvar+2,s
+ ldd -2,x
+ pshs d
+ lbsr fmt_d
+ bra case_o1
+
+case_o ldd digcnt,s
+ pshs d
+ ldx prtvar+2,s
+ leax 2,x
+ stx prtvar+2,s
+ ldd -2,x
+ pshs d
+ lbsr fmt_o
+case_o1 std ,s
+ lbra case_l4
+
+case_x ldd digcnt,s
+ pshs d
+ ldb c1+2,s
+ sex 
+ leax _chcodes,y
+ leax d,x
+ ldb ,x
+ clra 
+ andb #_UPPER
+ pshs d
+ ldx prtvar+4,s
+ leax 2,x
+ stx prtvar+4,s
+ ldd -2,x
+ pshs d
+ lbsr fmt_x
+ lbra case_l2
+
+case_u ldd digcnt,s
+ pshs d
+ ldx prtvar+2,s
+ leax 2,x
+ stx prtvar+2,s
+ ldd -2,x
+ pshs d
+ leax buf1,y
+ pshs x
+ lbsr fmt_d3
+ lbra case_l2
+
+case_f ldd fracflg,s
+ bne case_f1
+ ldd #$0006
+ std fraccnt,s
+case_f1 ldd digcnt,s
+ pshs d
+ leax prtvar+2,s
+ pshs x
+ ldd fraccnt+4,s
+ pshs d
+ ldb c1+6,s
+ sex 
+ pshs d
+ lbsr pffloat
+ leas 6,s
+ lbra case_l3
+
+case_c ldx prtvar,s
+ leax 2,x
+ stx prtvar,s
+ ldd -2,x
+ lbra case_de1
+
+case_s ldx prtvar,s
+ leax 2,x
+ stx prtvar,s
+ ldd -2,x
+ std s1,s
+ ldd fracflg,s
+ beq case_s4
+ ldd s1,s
+ std fracflg,s
+ bra case_s2
+
+case_s1 ldb [s1,s]
+ beq case_s3
+ ldd s1,s
+ addd #1
+ std s1,s
+case_s2 ldd fraccnt,s
+ addd #-1
+ std fraccnt,s
+ subd #-1
+ bne case_s1
+case_s3 ldd digcnt,s
+ pshs d
+ ldd s1+2,s
+ subd fracflg+2,s
+ pshs d
+ ldd fracflg+4,s
+ pshs d
+ ldd prthnd+6,s
+ pshs d
+ lbsr fmt_s
+ leas 8,s
+ bra case_l5
+
+case_s4 ldd digcnt,s
+ pshs d
+ ldd s1+2,s
+ bra case_l3
+
+case_l ldb ,u+
+ stb c1,s
+ bra case_l1
+
+ leas -vlen,x
+case_l1 ldd digcnt,s
+ pshs d
+ leax prtvar+2,s
+ pshs x
+ ldb c1+4,s
+ sex 
+ pshs d
+ lbsr pflong
+case_l2 leas 4,s
+case_l3 pshs d
+case_l4 ldd prthnd+4,s
+ pshs d
+ lbsr fmt_prt
+ leas 6,s
+case_l5 lbra prtcom2
+
+case_def ldb c1,s
+ sex 
+case_de1 pshs d
+ jsr [prthnd+2,s] call handler
+ leas 2,s
+ lbra prtcom2
+
+switch cmpx #'d decimal
+ lbeq case_d
+ cmpx #'o octal
+ lbeq case_o
+ cmpx #'x hex, lower case
+ lbeq case_x
+ cmpx #'X hex, upper case
+ lbeq case_x
+ cmpx #'u unsigned decimal
+ lbeq case_u
+ cmpx #'f float (double) normal
+ lbeq case_f
+ cmpx #'e float (double) in scientific
+ lbeq case_f
+ cmpx #'g shorter of e or f
+ lbeq case_f
+ cmpx #'E e with upper case 'e
+ lbeq case_f
+ cmpx #'G g with upper case 'e
+ lbeq case_f
+ cmpx #'c char
+ lbeq case_c
+ cmpx #'s string
+ lbeq case_s
+ cmpx #'l long decimal or hex
+ lbeq case_l
+ bra case_def
+
+prtcomx leas vlen,s
+ puls pc,u
+
+ pag
+*        d,u,ret,variable,digcnt
+fmt_d pshs u,b,a
+ leax buf1,y
+ stx ,s
+ ldd 6,s n
+ bge fmt_d2
+ ldd 6,s
+ nega 
+ negb 
+ sbca #$00
+ std 6,s
+ bge fmt_d1
+ leax >tminint,pcr
+ pshs x
+ leax buf1,y
+ pshs x
+ lbsr strcpy
+ leas 4,s
+ lbra fmt_o5
+
+fmt_d1 ldd #'-
+ ldx ,s
+ leax 1,x
+ stx ,s
+ stb -1,x
+fmt_d2 ldd 6,s n
+ pshs d
+ ldd 2,s s
+ pshs d
+ bsr fmt_d3
+ leas 4,s
+ lbra fmt_o4
+
+*    digit, lead0_flg, tblpnt, u, ret, s, n
+fmt_d3 pshs u,y,x,b,a
+ ldu 10,s s
+ clra
+ clrb
+ std 2,s lead0
+ clra
+ clrb
+ std ,s digit
+ bra fmt_d5
+
+fmt_d4 ldd ,s
+ addd #1
+ std ,s
+ ldd 12,s
+ subd dectbl,y
+ std 12,s
+fmt_d5 ldd 12,s
+ blt fmt_d4
+ leax dectbl,y
+ stx 4,s
+ bra fmt_d10
+
+fmt_d6 ldd ,s
+ addd #1
+ std ,s
+fmt_d7 ldd 12,s n
+ subd [4,s]
+ std 12,s
+ bge fmt_d6
+ ldd 12,s
+ addd [4,s]
+ std 12,s
+ ldd ,s
+ beq fmt_d8
+ ldd #1
+ std 2,s
+fmt_d8 ldd 2,s
+ beq fmt_d9
+ ldd ,s
+ addd #'0
+ stb ,u+
+fmt_d9 clra 
+ clrb 
+ std ,s
+ ldd 4,s bump tbl pnt
+ addd #2
+ std 4,s
+fmt_d10 ldd 4,s
+ cmpd dectble,y
+ bne fmt_d7
+ ldd 12,s n
+ addd #'0
+ stb ,u+
+ clra 
+ clrb 
+ stb ,u
+ ldd 10,s ret s
+ leas 6,s
+ puls pc,u
+ pag
+*       s, u, ret, n, digcnt
+fmt_o pshs u,b,a
+ leax buf1,y
+ stx ,s
+ leau buf2,y
+fmt_o1 ldd 6,s n
+ clra 
+ andb #$07
+ addd #'0
+ stb ,u+
+ ldd 6,s
+ lsra 
+ rorb 
+ lsra 
+ rorb 
+ lsra 
+ rorb 
+ std 6,s
+ bne fmt_o1
+ bra fmt_o3
+
+fmt_o2 ldb ,u
+ ldx ,s
+ leax 1,x
+ stx ,s
+ stb -1,x
+fmt_o3 leau -1,u
+ pshs u
+ leax buf2,y
+ cmpx ,s++
+ bls fmt_o2
+ clra 
+ clrb 
+ stb [,s]
+fmt_o4 leax buf1,y ret s
+ tfr x,d
+fmt_o5 leas 2,s
+ puls pc,u
+ pag
+*           dig, buf1, ret, n, upper_flg, dicgnt
+fmt_x pshs u,x,b,a
+ leax buf1,y
+ stx 2,s
+ leau buf2,y
+fmt_x1 ldd 8,s n
+ clra 
+ andb #$0f
+ std ,s
+ pshs d
+ ldd 2,s
+ cmpd #$0009
+ ble fmt_x4
+ ldd 12,s upper_flg
+ beq fmt_x2
+ ldd #'A
+ bra fmt_x3
+
+fmt_x2 ldd #'a
+fmt_x3 addd #-10
+ bra fmt_x5
+
+fmt_x4 ldd #'0
+fmt_x5 addd ,s++
+ stb ,u+
+ ldd 8,s n
+ lsra 
+ rorb 
+ lsra 
+ rorb 
+ lsra 
+ rorb 
+ lsra 
+ rorb 
+ anda #$0f
+ std 8,s
+ bne fmt_x1
+ bra fmt_x7
+
+fmt_x6 ldb ,u
+ ldx 2,s buf1
+ leax 1,x
+ stx 2,s
+ stb -1,x
+fmt_x7 leau -1,u now reverse
+ pshs u
+ leax buf2,y
+ cmpx ,s++
+ bls fmt_x6
+ clra 
+ clrb 
+ stb [2,s]
+ leax buf1,y
+ tfr x,d return s
+ lbra put2com
+ pag
+*        u, ret, prthnd, s, len, digcnt
+fmt_s pshs u
+ ldu 6,s
+ ldd 10,s
+ subd 8,s
+ std 10,s
+ ldd ljust,y
+ bne fmt_s4
+ bra fmt_s2
+
+fmt_s1 ldd fill,y lead blanks
+ pshs d
+ jsr [6,s] call handler
+ leas 2,s
+fmt_s2 ldd 10,s
+ addd #-1
+ std 10,s
+ subd #-1
+ bgt fmt_s1
+ bra fmt_s4
+
+fmt_s3 ldb ,u+ now string
+ sex 
+ pshs d
+ jsr [6,s] call handler
+ leas 2,s
+fmt_s4 ldd 8,s
+ addd #-1
+ std 8,s
+ subd #-1
+ bne fmt_s3
+ ldd ljust,y
+ beq fmt_s7
+ bra fmt_s6
+
+fmt_s5 ldd fill,y trailing blanks
+ pshs d
+ jsr [6,s] call handler
+ leas 2,s
+fmt_s6 ldd 10,s
+ addd #-1
+ std 10,s
+ subd #-1
+ bgt fmt_s5
+fmt_s7 puls pc,u
+ pag
+*           u, ret, handler, s, digcnt
+fmt_prt pshs u
+ ldu 6,s s
+ ldd 8,s digcnt
+ pshs d
+ pshs u
+ lbsr strlen
+ leas 2,s
+ nega 
+ negb 
+ sbca #$00
+ addd ,s++
+ std 8,s
+ ldd ljust,y
+ bne fmt_prt4
+ bra fmt_prt2
+
+fmt_prt1 ldd fill,y
+ pshs d
+ jsr [6,s] call handler
+ leas 2,s
+fmt_prt2 ldd 8,s
+ addd #-1
+ std 8,s
+ subd #-1
+ bgt fmt_prt1
+ bra fmt_prt4
+
+fmt_prt3 ldb ,u+
+ sex 
+ pshs d
+ jsr [6,s] call handler
+ leas 2,s
+fmt_prt4 ldb ,u
+ bne fmt_prt3
+ ldd ljust,y
+ beq fmt_prt7
+ bra fmt_prt6
+
+fmt_prt5 ldd fill,y
+ pshs d
+ jsr [6,s] call handler
+ leas 2,s
+fmt_prt6 ldd 8,s
+ addd #-1
+ std 8,s
+ subd #-1
+ bgt fmt_prt5
+fmt_prt7 puls pc,u
+
+
+put2file pshs u
+ ldd fpmp,y
+ pshs d
+ ldd 6,s
+ pshs d
+ lbsr putc
+put2com leas 4,s
+ puls pc,u
+
+
+put2mem pshs u
+ ldd 4,s
+ ldx fpmp,y
+ leax 1,x
+ stx fpmp,y
+ stb -1,x
+ puls pc,u
+
+
+tminint fcc /-32768/
+ fcb 0
+
+ endsect

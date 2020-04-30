@@ -1,0 +1,326 @@
+ psect pflinit_c,0,0,1,0,0
+
+ vsect
+buf1 rmb 20
+buf2 rmb 20
+ endsect
+
+
+ vsect
+ldectbl fdb $3b9a,$ca00
+ fdb $05f5,$e100
+ fdb $0098,$9680
+ fdb $000f,$4240
+ fdb $0001,$86a0
+ fdb $0000,10000
+ fdb $0000,1000
+ fdb $0000,100
+ fdb $0000,10
+dtsz fdb dtsz
+ endsect
+
+
+pflinit: pshs u
+ puls u,pc
+
+
+pflong: pshs u
+ ldb 5,s
+ sex
+ tfr d,x
+ lbra switch
+
+case_d ldx [6,s]
+ leax 4,x
+ stx [6,s]
+ leax -4,x
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ lbsr do_d
+ bra case_o1
+
+case_o ldx [6,s]
+ leax 4,x
+ stx [6,s]
+ leax -4,x
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ lbsr do_o
+case_o1 leas 4,s
+ lbra pflxit
+
+case_x ldb 5,s
+ sex 
+ leax _chcodes,y
+ leax d,x
+ ldb ,x
+ clra 
+ andb #$02
+ pshs d
+ ldx [8,s]
+ leax 4,x
+ stx [8,s]
+ leax -4,x
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ lbsr do_x
+ leas 6,s
+ bra pflxit
+
+default ldd #'l
+ stb buf2,y
+ ldb 5,s
+ stb buf2+1,y
+ clra 
+ clrb 
+ stb buf2+2,y
+ bra pflxit
+
+switch cmpx #'d
+ lbeq case_d
+ cmpx #'o
+ lbeq case_o
+ cmpx #'x
+ beq case_x
+ cmpx #'X
+ lbeq case_x
+ bra default
+
+pflxit leax buf2,y
+ tfr x,d
+ puls u,pc
+
+
+do_d pshs d,u
+ leax buf2,y
+ stx ,s
+ leax 6,s
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ bsr do_d1
+  fdb 0,0
+do_d1 puls x
+ lbsr _lcmpr
+ bge do_d4
+ leax 6,s
+ pshs x
+ leax 8,s
+ lbsr _lneg
+ lbsr _lmove
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ bsr do_d2
+  fdb 0,0
+do_d2 puls x
+ lbsr _lcmpr
+ bge do_d3
+ leax >tminlong,pcr
+ pshs x
+ leax buf2,y
+ pshs x
+ lbsr strcpy
+ leas 4,s
+ lbra do_o5
+
+do_d3 ldd #'-
+ ldx ,s
+ leax 1,x
+ stx ,s
+ stb -1,x
+do_d4 leax 6,s
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ ldd 4,s
+ pshs d
+ bsr do_d5
+ leas 6,s
+ lbra do_o5
+
+do_d5 pshs u,y,x,b,a
+ ldu 10,s
+ clra 
+ clrb
+ std 2,s
+ leax ldectbl,y
+ stx 4,s
+ lbra do_d11
+
+do_d6 clra 
+ clrb 
+ std ,s
+ bra do_d8
+
+do_d7 ldd ,s
+ addd #1
+ std ,s
+ leax 12,s
+ pshs x
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ ldx 10,s
+ lbsr _lsub
+ lbsr _lmove
+do_d8 leax 12,s
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ ldx 8,s
+ lbsr _lcmpr
+ bge do_d7
+ ldd ,s
+ beq do_d9
+ ldd #1
+ std 2,s
+do_d9 ldd 2,s
+ beq do_d10
+ ldd ,s
+ addd #'0
+ stb ,u+
+do_d10 ldd 4,s
+ addd #4
+ std 4,s
+do_d11 ldd 4,s
+ cmpd dtsz,y
+ lbne do_d6
+ ldd 14,s
+ addd #'0
+ stb ,u+
+ clra 
+ clrb 
+ stb ,u
+ ldd 10,s
+ leas 6,s
+ puls u,pc
+
+
+do_o pshs d,u
+ leax buf2,y
+ stx ,s
+ leau buf1,y
+do_o1 ldd 8,s
+ clra 
+ andb #$07
+ addd #'0
+ stb ,u+
+ leax 6,s
+ pshs x
+ leax 8,s
+ pshs x
+ ldd #3
+ lbsr _lshr
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ bsr do_o2
+ fdb $1fff,$ffff
+do_o2 puls x
+ lbsr _land
+ lbsr _lmove
+ lda ,x
+ ora 1,x
+ ora 2,x
+ ora 3,x
+ bne do_o1
+ bra do_o4
+
+do_o3 ldb ,u
+ ldx ,s
+ leax 1,x
+ stx ,s
+ stb -1,x
+do_o4 leau -1,u
+ pshs u
+ leax buf1,y
+ cmpx ,s++
+ bls do_o3
+ clra 
+ clrb 
+ stb [,s]
+do_o5 leas 2,s
+ puls u,pc
+
+
+do_x pshs u,x,b,a
+ leax buf2,y
+ stx 2,s
+ leau buf1,y
+do_x1 ldd 10,s
+ clra 
+ andb #$0f
+ std ,s
+ pshs d
+ ldd 2,s
+ cmpd #$0009
+ ble do_x4
+ ldd 14,s
+ beq do_x2
+ ldd #'A
+ bra do_x3
+
+do_x2 ldd #'a
+do_x3 addd #-10
+ bra do_x5
+
+do_x4 ldd #'0
+do_x5 addd ,s++
+ stb ,u+
+ leax 8,s
+ pshs x
+ leax 10,s
+ pshs x
+ ldd #4
+ lbsr _lshr
+ ldd 2,x
+ pshs d
+ ldd ,x
+ pshs d
+ bsr do_x6
+ fdb $0fff,$ffff
+do_x6 puls x
+ lbsr _land
+ lbsr _lmove
+ lda ,x
+ ora 1,x
+ ora 2,x
+ ora 3,x
+ lbne do_x1
+ bra do_x8
+
+do_x7 ldb ,u
+ ldx 2,s
+ leax 1,x
+ stx 2,s
+ stb -1,x
+do_x8 leau -1,u
+ pshs u
+ leax buf1,y
+ cmpx ,s++
+ bls do_x7
+ clra 
+ clrb 
+ stb [2,s]
+ leas 4,s
+ puls u,pc
+
+
+tminlong
+ fcc '-2147483648'
+ fcb 0
+
+ endsect

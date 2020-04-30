@@ -1,0 +1,25 @@
+/*
+** save the current status of the pause flag
+**  and then turn off
+*/
+
+pause_off()
+   {
+   getstat(SS_OPT, STDOUT, &optbuf);              /* shut pause off */
+   pause_save = optbuf.sg_pause;
+   optbuf.sg_pause = 0;
+   setstat(SS_OPT, STDOUT, &optbuf);
+   }
+
+
+/*
+** restore pause to it's prior status
+*/
+
+pause_on()
+   {
+   optbuf.sg_pause = pause_save;                   /* restore pause */
+   setstat(SS_OPT, STDOUT, &optbuf);
+   }
+
+

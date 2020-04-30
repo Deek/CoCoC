@@ -1,0 +1,19 @@
+/*
+** seek to the LSN specified by the 3 char string 'pos'
+*/
+
+l3seek(pn, pos)
+int   pn;
+char  *pos;
+   {
+   long  lpos;
+   int   j;
+   register char *p = &lpos;
+
+   for (j = 3; j ; j--)
+      *p++ = *pos++;
+   *p = 0;                                          /* zero ls byte */
+   lseek(pn, lpos, 0);
+   }
+
+

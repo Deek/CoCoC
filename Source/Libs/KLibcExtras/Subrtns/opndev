@@ -1,0 +1,22 @@
+/*
+**  open the device on which file 's' resides
+*/
+opndev(s, fmode, rmode)
+char  *s;
+int   fmode, rmode;
+   {
+   char  temp[32];
+   char  buf[8];
+   int   pn;
+
+   if ((pn = open(s, fmode)) == -1)
+         return (-1);
+   getstat(SS_DEVNM, pn, temp);
+   buf[0] = '/';
+   strhcpy(&buf[1], temp);                    /* now copy first item */
+   strcat(buf, "@");                                  /* and set raw */
+   close(pn);                                   /* close up file/dir */
+   return (open(buf, rmode));                     /* open the device */
+   }
+
+

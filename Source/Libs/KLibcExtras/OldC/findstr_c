@@ -1,0 +1,88 @@
+ psect findstr_c,0,0,0,0,0
+********** findstr_c **********
+*** findstr(pos,s,pat)
+findstr pshs u
+ ldu 4,s
+ ldd 6,s
+ pshs b,a
+ pshs u
+ ldd #-1
+ addd ,s++
+ addd ,s++
+ std 6,s
+ bra findst2
+
+findst1 ldd 8,s
+ pshs b,a
+ ldd 8,s
+ addd #$0001
+ std 8,s
+ subd #$0001
+ pshs b,a
+ bsr findnst5
+ leas 4,s
+ std -2,s
+ bne findnst2
+ leau 1,u
+findst2 ldb [6,s]
+ bne findst1
+ lbra findnst7
+
+
+*** findnstr(pos,s,pat,size)
+findnstr pshs u
+ ldu 4,s
+ ldd 6,s
+ pshs b,a
+ pshs u
+ ldd #-1
+ addd ,s++
+ addd ,s++
+ std 6,s
+ bra findnst4
+
+findnst1 ldd 8,s
+ pshs b,a
+ ldd 8,s
+ addd #$0001
+ std 8,s
+ subd #$0001
+ pshs b,a
+ bsr findnst5
+ leas 4,s
+ std -2,s
+ beq findnst3
+findnst2 tfr u,d
+ puls pc,u
+
+
+findnst3 leau 1,u
+findnst4 cmpu $0A,s
+ ble findnst1
+ bra findnst7
+
+findnst5 pshs u
+ ldu 4,s
+ bra findnst8
+
+findnst6 ldb ,u+
+ sex 
+ pshs b,a
+ ldx 8,s
+ leax 1,x
+ stx 8,s
+ ldb -1,x
+ sex 
+ cmpd ,s++
+ beq findnst8
+findnst7 clra 
+ clrb 
+ puls pc,u
+
+
+findnst8 ldb [6,s]
+ bne findnst6
+ ldd #$0001
+ puls pc,u
+
+ endsect

@@ -1,0 +1,55 @@
+
+
+
+The following are disassembled from the origional library.
+   All were written in assembler.
+   All are virgin except for ccdiv.a and dneg, which had bugs fixed.
+
+   Integer Math
+      ccdiv.a ccmod.a ccmult.a cshifts.a
+
+   Long Math
+      claddsub.a clbits.a clcommon.a clcompare.a clconvert.a
+      cldiv.a clmove.a clmul.a clnegcompl.a clshifts.a
+
+   Floating Point Math
+      cfloats.a
+
+   Common
+      rpterr.a
+
+
+The following are parts of Dan Poole's math library.
+   All are written in assembler.
+
+      daddsub.a ddiv.a dmul.a dser.a dsqrt.a
+      dtype.a log.a math.h mdefs.a sqrt.a
+      trans_lib.doc trig.a trnser.a
+
+
+The following were written in assembler after disassembly of the
+   C versions from the origional library and replaced same.
+
+      atoi.a atol.a case.a chcodes.a findstr.a flshdummy.a
+      fopen.a fread.a fseek.a ftelldummy.a fwrite.a getc.a
+      gets.a index.a iob_data.a memory.a mktemp.a pffdummy.a
+      pfldummy.a pflinit.a printf.a putc.a puts.a setbase.a
+      setbuf.a sleep.a strass.a strcat.a strcmp.a strcpy.a
+      strhcpy.a strlen.a strncat.a strncmp.a strncpy.a
+      system.a prof.a
+
+
+The following are additions to the library written in assembler
+   by Carl Kreider.
+
+      htoi.a htol.a itoa.a ltoa.a minmax.a movmem.a patmatch.a
+      pmatch.a pwcryp.a rand.a reverse.a setmem.a skip.a
+      strclr.a strucat.a strucpy.a strnucmp.a strucmp.a swab.a
+      uminmax.a xtoa.a (itoa, utoa)
+      sets.a (allocset addc2set adds2set rmfmset smember sunion
+      sintersect sdifference copyset dupset)
+
+
+The following are additions to the library written in C by Carl
+
+      _dump getopt

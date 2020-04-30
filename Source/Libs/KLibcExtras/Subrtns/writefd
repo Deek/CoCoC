@@ -1,0 +1,11 @@
+/*
+** read the file desc for file 'fd' into 'fdbuf'
+*/
+writefd(fd, fdbuf)
+char  fd;
+struct fildes *fdbuf;
+   {
+   lsetstat(fd, SS_FD, fdbuf, 16, 0);
+   }
+
+

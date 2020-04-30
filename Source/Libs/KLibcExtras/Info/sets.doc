@@ -1,0 +1,58 @@
+/* allocset allocates memory for a set of 256 elements             */
+/*  success returns a pointer to the set, NULL on error.           */
+
+char *allocset()
+
+
+/* addc2set adds the char 'c' to the set 's', no error possible.   */
+
+char *addc2set(s, c)
+char  *s, c;
+
+
+/* adds2set adds string 'p' to the set 's', no error possible.     */
+
+char *adds2set(s, p)
+char  *s, *p;
+
+
+/* rmfmset removes char 'c' from the set 's', no error possible.   */
+
+char *rmfmset(s, c)
+char  *s, c;
+
+
+/* member returns TRUE if 'c' is a member of set 's', else FALSE.  */
+
+smember(s, c)
+char  *s, c;
+
+
+/* union - merge second set into first                             */
+
+char *sunion(s1, s2)
+char  s1[], s2[];
+
+
+/*  intersect - set1 returns elements only existing in both        */
+
+char *sintersect(s1, s2)
+char  s1[], s2[];
+
+
+/* difference - returns unique elts of both in first set           */
+
+char *sdifference(s1, s2)
+char  s1[], s2[];
+
+
+/* copyset - duplicates set2 into set1                             */
+
+char *copyset(s1, s2)
+char  s1[], s2[];
+
+
+/* dupset - allocates a new set and copies 'set' to it.            */
+
+char *dupset(s)
+char  s[];

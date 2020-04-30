@@ -1,0 +1,16 @@
+
+Data equ $40
+ReEnt equ $80
+Rev equ 1
+Edit equ 1
+
+ mod ModEnd,ModNam,Data,ReEnt+Rev,ModEnt,0
+
+ModNam fcs "common.dat"
+ fcb Edit
+
+ModEnt bsz 4096-*-3
+
+ emod
+ModEnd equ *
+ end

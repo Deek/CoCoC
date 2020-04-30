@@ -1,0 +1,43 @@
+
+* data module handler package
+*
+*  entry points:
+*   int   datlink(name, datptr, space)
+*   char  *name, **datptr;
+*   int   *space;
+*      Loads (if necessary) and links the file "name".
+*      "datptr" is set to the address of the data section.
+*      "space" is set to the free space available.
+*      Return value is:
+*         -1 for error (errno set as required)
+*          0 for successful link
+*          1 if load was required (ie cold start)
+*
+*   int   dunlink(datptr)
+*   char  *datptr;
+*      Unlinks the module belonging to "datptr"
+*      Returns -1 if error (errno set) else 0
+*
+*   int   lockdata(datptr)
+*   char  *datptr;
+*      Attmpts to lock the data module (*datptr is
+*      considered to be the lock byte) by changing
+*      the lock byte (normally -1) to 0.  Returns
+*      process stack level on failure, else 0
+*      Errno is not set.
+*
+*   int   unlkdata(datptr)
+*   char  *datptr;
+*      Unlocks the data module.
+*      Returns -1 on attempt to unlock an unlocked
+*      module, else 0;
+
+
+* A data module is locked when loaded.  It must be set
+*  for use by a call to unlkdata after the origional
+*  loader is done with any initialization required.
+
+
+* In all cases, 'datptr' points to the lock byte.
+*  User space starts at 'datptr' + 1
+

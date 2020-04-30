@@ -1,0 +1,90 @@
+    C GET/SETSTA CALLS, including new ones               10/30/84
+                        add SS_BLKRD, SS_BLKWR           01/09/85
+
+
+ ***  note that all require an os9 path number, not C iob pointer ***
+
+
+
+getstat(SS_OPT, filenum, buffer)
+int  code, filenum
+char *buffer
+
+getstat(SS_READY, filenum)
+int  code, filenum
+
+getstat(SS_SIZE, filenum, size)
+int  code, filenum
+long *size
+
+getstat(SS_POS, filenum, position)
+int  code, filenum
+long *position
+
+getstat(SS_EOF, filenum)
+int  code, filenum
+
+getstat(SS_DEVNAM, filenum, buffer)
+int  code, filenum
+char *buffer
+
+getstat(SS_FD, filenum, buffer, count)
+int  code, filenum
+char *buffer
+int  count
+
+
+setstat(SS_OPT, filenum, buffer)
+int  code, filenum
+char *buffer
+
+setstat(SS_SIZE, filenum, size)
+int  code, filenum
+long size
+
+setstat(SS_RESET, filenum, code)
+int  code, filenum, code
+
+setstat(SS_WTRK, filenum, buffer, track_number, side/density)
+int  code, filenum
+char *buffer
+int  track_number, side/density
+
+setstat(SS_FRZ, filenum)
+int  code, filenum
+
+setstat(SS_SPT, filenum, sect/track)
+int  code, filenum, sect/track
+
+setstat(SS_SQD, filenum)
+int  code, filenum
+
+setstat(SS_DCMD, code, filenum, parm1, parm2, parm3)
+int  code, code, filenum, parm1, parm2, parm3
+
+setstat(SS_FD, filenum, buffer)
+int  code, filenum
+char *buffer
+
+setstat(SS_TICK, filenum, count)
+int  code, filenum, count
+
+setstat(SS_LOCK, filenum, position)
+int  code, filenum
+long position
+
+setstat(SS_BLKRD, filenum, buffer, track_sector, track_den/side/density)
+int  code, filenum
+char *buffer
+int  track_sector, track_den/side/density
+
+setstat(SS_BLKWR, filenum, buffer, track_sector, track_den/side/density)
+int  code, filenum
+char *buffer
+int  track_sector, trask_den/side/density
+
+setstat(SS_SSIG, filenum, code)
+int  code, filenum, code
+
+setstat(SS_RELEA, filenum)
+int  code, filenum

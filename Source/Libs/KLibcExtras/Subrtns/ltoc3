@@ -1,0 +1,15 @@
+/*
+** convert long to 3 byte OS9 char array
+*/
+
+ltoc3(s, l)
+register char  *s;
+long  l;
+   {
+   char  *p = &l;
+
+   p++;
+   *s++ = *p++;
+   *s++ = *p++;
+   *s++ = *p++;
+   }

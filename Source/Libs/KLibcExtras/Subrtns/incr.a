@@ -1,0 +1,65 @@
+ psect incrtime_a,0,0,0,0,0
+
+D.Sec equ 5
+D.Min equ 4
+D.Hour equ 3
+D.Day equ 2
+D.Month equ 1
+D.Year equ 0
+
+months
+ fcb $00
+ fcb 31 jan
+ fcb 28 feb
+ fcb 31 mar
+ fcb 30 apr
+ fcb 31 may
+ fcb 30 jun
+ fcb 31 jul
+ fcb 31 aug
+ fcb 30 sep
+ fcb 31 oct
+ fcb 30 nov
+ fcb 31 dec
+
+incrtime:
+ pshs U
+ ldu 4,S
+ ldd D.Min,U get minutes, seconds
+ incb secs+1
+ cmpb #60 minute yet?
+ blo incr6 ..no
+ inca minute+1
+ cmpa #60 hour yet?
+ blo incr5 ..no
+ ldd D.Day,U get day, hour
+ incb hour+1
+ cmpb #24 day yet?
+ blo incr4 ..no
+ inca day+1
+ leax >months,pcr point to months table
+ ldb D.Month,U this month
+ cmpa B,X end of month?
+ bls incr3 ..no
+ cmpb #2 yes, is it Feb?
+ bne incr1 ..no, ok
+ ldb D.Year,U else get year
+ andb #$03 check for leap year
+ cmpd #$1D00 29th on leap year?
+ beq incr3 ..yes, skip it
+incr1 ldd D.Year,U else month+1
+ incb
+ cmpb #13 end of year?
+ blo incr2 ..no
+ inca year+1
+ ldb #$01 set month to jan
+incr2 std D.Year,U save year, month
+ lda #$01 day=1st
+incr3 clrb hour=midnite
+incr4 std D.Day,U save day,hour
+ clra minute=00
+incr5 clrb seconds=00
+incr6 std D.Min,U save min,secs
+ puls U,PC
+
+ endsect

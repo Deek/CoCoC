@@ -1,0 +1,188 @@
+.m1 3
+.he ''****************** library additions ******************''
+.dm pp
+.ne 5
+.sp 2
+..
+.nf
+The following functions are like the Sys V functions with the
+same names.  All are defined in 'memory.h'.
+.pp
+   char  *memccpy(s1, s2, c, n)
+   char  *s1, *s2;
+   int   c, n;
+
+   Memccpy copies bytes from s2 to s1, stopping after the first
+   occurrrence of 'c' or after 'n' bytes have been copied.  It
+   returns a pointer to the first byte past 'c' if found or NULL.
+.pp
+   char  *memcpy(s1, s2, n)
+   char  *s1, *s2;
+   int   n;
+
+   Memcpy copies 'n' bytes from s2 to s1, and returns s1.
+.pp
+   char  *memchr(s, c, n)
+   char  *s;
+   int   c, n;
+
+   Memchr returns a pointer to the first occurrence of 'c' in the
+   first 'n' bytes of 's', or NULL if not found.
+.pp
+   int   memcmp(s1, s2, n)
+   char  *s1, *s2;
+   int   n;
+
+   Memcmp looks at the first 'n' bytes of 's1' and 's2' and returns
+   an integer less than, equal to, or greater than 0, according as
+   's1' is lexicographically less than, equal to, or greater than 's2'.
+.pp
+   char  *memset(s, c, n)
+   char  *s;
+   int   c, n;
+
+   Memset sets the first 'n' bytes of 's' to 'c'.  It returns 's'.
+.pp
+.pg
+The following are modeled after the Sys V time functions.  Definitions
+and structures are in 'utime.h'.
+.pp
+   long  time((char *) 0)
+   long  time(utimep)
+   long  *utimep;
+
+   Time returns the value of time in seconds since 00:00:00,
+   Jan 1, 1970.  If a non-null argument is passed, it is taken
+   as the place to put the long time.  In either case, the time
+   is collected from the system and converted.
+.pp
+   char  *ctime(utimep)
+   long  *utimep;
+
+   Ctime converts a long integer, pointed to by 'utimep', and
+   returns a pointer to a static 26 character string in the
+   following form:
+      Sun Sep 16 01:03:52 1973\n\0
+   All fields have constant width.  The string is overwritten by
+   each call.
+.pp
+   struct tm *localtime(utimep)
+   long  *utimep;
+
+   Localtime converts the long integer pointed to by 'utimep'
+   to broken down time/date in a static 'tm' structure (see
+   utime.h).  The structure is overwritten on each call.
+.pp
+   char  *asctime(tmp)
+   struct tm *tmp;
+
+   Asctime converts a broken down time in a 'tm' structure into
+   a string of the above format.  The same restrictions regarding
+   volitility apply here.
+.pp
+   long o2utime(os9_time)
+   struct sgtbuf  *os9_time;
+
+   Converts the 6 character os9_time into a Unix style long as in
+   'time()' above.
+.pp
+   void  u2otime(os9_time, tmp)
+   struct sgtbuf  *os9_time;
+   struct tm      *tmp;
+
+   Copies a broken down Unix style time from 'tmp' struct into the
+   OS9 style 'sgtbuf' struct.
+.pp
+.pg
+.pp
+   int   getopt(argc, argv, options)     /* parse options from args */
+   int   argc;                        /* modeled after the ATT spec */
+   char  ** argv, *options;
+.pp
+   int   htoi(s)                            /* convert hex s to int */
+   long  htol(s)                           /* convert hex s to long */
+   char  *s;
+.pp
+   char  *itoa(n, s)                     /* convert n to ascii in s */
+   char  *utoa(n, s)                         /* return pointer to s */
+   int   n;
+   char  *s;
+.pp
+   char  *ltoa(n, s)                     /* convert n to ascii in s */
+   long  n;                                  /* return pointer to s */
+   char  *s;
+.pp
+   int   max(v1, v2)                  /* select larger of v1 and v2 */
+   int   min(v1, v2)                 /* select smaller of v1 and v2 */
+   int   v1, v2
+.pp
+   movmem(from, to, count)               /* moves a block of memory */
+   char  *from, *to                            /* no returned value */
+   int   count
+.pp
+   int   patmatch(pat, s, flag) /* searches 's' for 'pat', ignoring */
+   char  *s, *pat               /*  case if flag is true.  returns  */
+   int   flag         /*  true on match.  accepts * and ? wildcards */
+.pp
+   char  *pwcryp(string)                         /* encrypts string */
+   char  *string                                       /* returns s */
+.pp
+   char  *reverse(s)                 /* reverses a string in memory */
+   char  *s                                            /* returns s */
+.pp
+   setmem(start, count, fill)                       /* fills memory */
+   char  *start                                        /* no return */
+   int   count
+   char  fill
+.pp
+   char  *skipbl(s)                        /* skips spaces and tabs */
+   char  *s                              /* returns updated pointer */
+.pp
+   char  *skipwd(s)                /* skips all but spaces and tabs */
+   char  *s                              /* returns updated pointer */
+.pp
+   int   sqrt(n)                          /* square root of integer */
+   int   n
+.pp
+   char  *strclr(s, count)                       /* clears a string */
+   char  *s                                            /* returns s */
+   int   count
+.pp
+   char  *strend(s)          /* returns a pointer to the string end */
+   char  *s
+.pp
+   char  *strchr(s1, c)                                /* aka index */
+   char  *s1, c
+.pp
+   char  *strrchr(s1, c)                              /* aka rindex */
+   char  *s1, c
+.pp
+   char  *strpbrk(s1, s2)       /* finds an occurance of one of the */
+   char  *s1, *s2                              /* char set s2 in s1 */
+.pp
+   char  *strucat(s1, s2)                   /* strcat with upcasing */
+   char  *s1, *s2                                     /* returns s1 */
+.pp
+   int   strucmp(s1, s2)                    /* strcmp with upcasing */
+   char  *s1, *s2
+.pp
+   char  *strucpy(s1, s2)                   /* strcpy with upcasing */
+   char  *s1, *s2                                     /* returns s1 */
+.pp
+   int   strnucmp(s1, s2)                  /* strncmp with upcasing */
+   char  *s1, *s2
+.pp
+   int   swab(n)                              /* swaps nibbles of n */
+   int   n
+.pp
+   int   umin(v1, v2)                          /* unsigned min, max */
+   int   umax(v1,v2)
+   unsigned v1, v2
+.pp
+   _dump(s, addr, count)    /* prints title 's', and count bytes .. */
+   char  *s, *addr                          /* ... starting at addr */
+   int   count
+.pp
+   _strass(to, from, count)                  /* moves memory around */
+   char  *to, *from
+   int   count

@@ -1,0 +1,8 @@
+ psect getsp_a,0,0,0,0,0
+
+_getsp:
+ leax 2,s above return
+ tfr x,d get in primary register
+ rts
+
+ endsect

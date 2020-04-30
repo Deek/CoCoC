@@ -1,0 +1,20 @@
+/*
+** seek to 'pos' on device 'pn' and read
+**  'fildes' bytes into 'buf'
+*/
+get_fd(pn, buf, pos)
+int   pn;
+struct fildes  *buf;
+char  *pos;
+   {
+   long  lpos;
+   int   j;
+   register char *p = &lpos;
+
+   for (j = 3; j ; j--)
+      *p++ = *pos++;
+   *p = 0;                                          /* zero ls byte */
+   lseek(pn, lpos, 0);
+   if ((read(pn, buf, sizeof(struct fildes))) == -1)
+         excant("Can't read file desc.\n");
+   }

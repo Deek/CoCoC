@@ -1,0 +1,19 @@
+/*
+**  return in 'buf' the device name where
+**   file 's' resides.
+*/
+get_dev(s, buf)
+char  *s,   *buf;
+   {
+   char  temp[32];
+   int   pn;
+
+   if ((pn = open(s, S_DIR+S_READ)) == -1)
+      excant(s);
+   lgetstat(pn, SS_DEVNM, temp, 0, 0);
+   *buf++ = '/';
+   strhcpy(buf, temp);                       /* now copy first item */
+   close(pn);
+   }
+
+

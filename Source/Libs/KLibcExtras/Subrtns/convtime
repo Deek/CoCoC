@@ -1,0 +1,5 @@
+long convtime(time)
+char  time[];
+   {
+   return (time[3] * 3600 + time[4] * 60 + time[5]);
+   }

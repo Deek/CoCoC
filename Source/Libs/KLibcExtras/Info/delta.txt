@@ -1,0 +1,114 @@
+ x> get/set stuff
+ x> _dump
+xx> _errmsg
+xx> _prgname
+ x> asetuid
+ x> create
+xx> getopt
+
+ x> htoi
+ x> htol
+ x> itoa
+ x> ltoa
+ x> utoa
+
+ x> max
+ x> min
+ x> umax
+ x> umin
+
+ x> ocreat
+xx> patmatch
+xx> pwcryp
+ x> rand
+ x> srand
+ x> realloc
+xx> skipbl
+xx> skipwd
+ x> sqrt
+ x> swab
+ x> unbrk
+ x> unlinkx
+
+ x> addc2set
+ x> adds2set
+ x> allocset
+ x> copyset
+ x> dupset
+ x> rmfmset
+ x> sdiffere
+ x> sinterse
+ x> smember
+ x> sunion
+
+xx> asctime
+xx> ctime
+xx> localtim
+xx> time
+ x> o2utime
+ x> u2otime
+
+xx> memccpy
+xx> memchr
+xx> memcmp
+xx> memcpy
+xx> memset
+
+ x> devtyp
+ x> isatty
+
+ x> endpwent
+ x> getpwdlm
+ x> getpwent
+ x> getpwnam
+ x> getpwuid
+ x> setpwent
+
+xx> strchr
+xx> strrchr
+
+xx> strcspn
+xx> strpbrk
+xx> strspn
+xx> strtok
+
+xx> reverse
+xx> strclr
+xx> strend
+
+xx> strucmp
+xx> strnucmp
+xx> strucat
+xx> strucpy
+
+ x> lockdata
+ x> unlkdata
+ x> datlink
+ x> dunlink
+
+xx> closedir
+xx> opendir
+xx> readdir
+xx> rewinddir
+xx> seekdir
+xx> telldir
+
+ x> _ss_rel
+ x> _ss_rest
+ x> _ss_opt
+ x> _ss_pfd
+ x> _ss_ssig
+ x> _ss_tiks
+ x> _ss_lock
+ x> _ss_attr
+ x> _ss_size
+ x> _ss_wtrk
+ x> _gs_size
+ x> _gs_pos
+ x> _gs_rdy
+ x> _gs_eof
+ x> _gs_opt
+ x> _gs_devn
+ x> _gs_gfd
+
+ x> bsearch

@@ -1,0 +1,59 @@
+ psect qrand_c,0,0,0,0,0
+ nam qrand_c
+ vsect
+randx
+ fdb 0,1
+ endsect
+ ttl srand
+srand:
+ pshs u
+ ldd #_1
+ lbsr _stkcheck
+ leax randx,y
+ pshs x
+ ldd 6,s
+ lbsr  _lutol
+ lbsr  _lmove
+ puls u,pc
+
+_1 equ -66
+
+ ttl rand
+rand:
+ pshs u
+ ldd #_2
+ lbsr _stkcheck
+ leax randx,y
+ pshs x
+ leax randx,y
+ ldd 2,x
+ pshs d
+ ldd 0,x
+ pshs d
+ bsr _3
+ fdb 16838,20077
+_3 puls x
+ lbsr  _lmul
+ ldd 2,x
+ pshs d
+ ldd 0,x
+ pshs d
+ bsr _4
+ fdb 0,12345
+_4 puls x
+ lbsr  _ladd
+ lbsr  _lmove
+ ldd 2,x
+ pshs d
+ ldd 0,x
+ pshs d
+ bsr _5
+ fdb 32767,-1
+_5 puls x
+ lbsr  _land
+ ldd _flacc+2,y
+ puls u,pc
+
+_2 equ -70
+
+ endsect

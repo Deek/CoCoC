@@ -1,0 +1,32 @@
+
+             CHANGES TO SYS.A
+
+access.a    split into open.a and creat.a
+
+change.a    split into chown.a and chmod.a
+
+id.a        new call added
+
+io.a        split into read.a, write.a, and lseek.a
+
+mem.a       modified to work running under debug
+            added unbrk
+
+stat.a      many new calls added
+
+
+
+
+            NEW CALLS ADDED
+
+create(fname, mode, pmode)            /* accepts file mode and perms */
+char  *fname, mode, pmode;           /* returns error if file exists */
+
+ocreat(fname, mode, pmode)            /* accepts file mode and perms */
+char  *fname, mode, pmode;                  /* deletes old if exists */
+
+unlinkx(fname, mode)                        /* accepts mode argument */
+char  *fname, mode;          /* uses cmds if mode is exec, else data */
+
+unbrk(pnt)                       /* returns memory gotten with sbrk */
+char  *pnt;                     /* returns -1 on fail, 0 on success */

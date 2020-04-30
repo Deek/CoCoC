@@ -1,0 +1,11 @@
+/*
+** read the file desc for file 'fd' into 'fdbuf'
+*/
+readfd(fd, fdbuf)
+char  fd;
+struct fildes *fdbuf;
+   {
+   lgetstat(fd, SS_FD, fdbuf, 16, 0);
+   }
+
+

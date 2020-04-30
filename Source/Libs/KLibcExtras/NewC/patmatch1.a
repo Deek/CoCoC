@@ -1,0 +1,201 @@
+ psect patmatch_a,0,0,2,0,0
+
+ csect
+_compl rmb 1
+_found rmb 1
+_sc rmb 1
+_pc rmb 1
+locals equ *
+_usave rmb 2
+_retadr rmb 2
+_p rmb 2
+_s rmb 2
+_f rmb 2
+ endsect
+
+*
+* #define ifup(a) (f ? toupper(a) : a)
+*
+* patmatch(p, s, f)
+* char           *p;                                       /* pattern */
+* register char  *s;                               /* string to match */
+* int            f;                            /* flag for case force */
+*    {
+*    char  pc,                     /* a single character from pattern */
+*          sc;                      /* a single character from string */
+*    int   found, compl;
+patmatch:
+ pshs U
+ ldu 6,S get pointer to s
+ ldx 4,S get pointer to p
+ leas -locals,S
+*
+*    while (pc = ifup(*p++))
+*       {
+ lbra _3 jump to condtitional part
+*
+*       if (pc == '*')
+*          {
+* here lies the body of the while
+_4 cmpb #'*
+ bne _6
+
+*          do {                    /* look for match till s exhausted */
+*             if (patmatch (p, s, f))
+*                return (1);
+*             } while (*s++);
+*          return (0);
+*          }
+_9 ldd _f,S
+ pshs D,X
+ ldd _p+4,S four bytes stacked already
+ pshs D,U
+ bsr patmatch
+ leas 6,S
+ puls X
+ lbne ret1
+ ldb ,U+
+ bne _9
+ lbra ret0
+
+*       else
+*          if (*s == 0)
+*             return (0);                       /* s exhausted, p not */
+_6 tst ,U
+ lbeq ret0
+
+*          else
+*             if (pc == '?')
+*                s++;                       /* matches all, just bump */
+ cmpb #'?
+ bne _17
+ leau 1,U
+ lbra _3
+
+*             else
+*                if (pc == '[')                    /* character class */
+*                   {
+_17 cmpb #'[
+ lbne _20
+
+*                   sc = ifup(*s++);
+ ldb ,U+
+ lbsr ifup
+ stb _sc,S
+
+*                   if (compl = (*p == '^'))      /* class inversion? */
+*                      p++;
+ clr _compl,S assume false
+ ldb ,X
+ cmpb #'^
+ bne _25
+ inc _compl,S really was true
+ leax 1,X so skip '^'
+
+*                   found = 0;
+_25 clr _found,S
+
+*                   while ((pc = ifup(*p++)) != ']')
+* jump to condtitional part of while
+ bra _30
+
+*                      if (pc == 0)                  /* check for end */
+_31 tstb
+ bne _33
+
+*                         {                     /* no terminating ']' */
+*                         --p;
+*                         break;
+*                         }
+ leax -1,X back up 'p'
+ lbra _29 and bail out
+
+*                      else
+*                         if (*p == '-')           /* check for range */
+*                            {
+*                            ++p;
+*                            found |= ((pc <= sc) && (sc <= ifup(*p++)));
+*                            }
+_33 ldb ,X
+ cmpb #'-
+ bne _35
+ leax 1,X eat '-'
+ clra
+ ldb _sc,S
+ cmpb _pc,S
+ blt _44 is false
+ ldb ,X+ get char
+ lbsr ifup
+ cmpb _sc,S
+ blt _44 is false
+ bra _36 is true
+
+*                         else
+*                            found |= (pc == sc);
+_35 clra assume false
+ ldb _sc,S
+ cmpb _pc,S
+ bne _44
+_36 inca make true
+_44 ora _found,S
+ sta _found,S
+
+*  conditional part of while ((pc = ifup(*p++)) != ']')
+_30 ldb ,X+
+ lbsr ifup
+ stb _pc,S
+ cmpb #']
+ bne _31
+
+*                   if (!found ^ compl)
+*                      return (0);
+_29 clra
+ tst _found,S
+ bne _53
+ inca make complement
+_53 eora _compl,S
+ sta -2,S
+ beq _3
+ bra ret0
+
+*                   }
+*                else
+*                   if (pc != ifup(*s++))
+*                      return (0);
+_20 ldb ,U+
+ lbsr ifup
+ cmpb _pc,S
+ lbne ret0
+
+* conditional part of while (pc = ifup(*p++))
+_3 ldb ,X+
+ lbsr ifup
+ stb _pc,S
+ lbne _4
+*       }
+*    return (*s == 0);        /* p exhausted, ret true if s exhausted */
+_2 ldb 0,U
+ bne ret0
+ret1
+ ldd #1
+ bra _67
+
+ret0
+ clra
+ clrb
+_67 leas locals,S
+ puls U,PC
+
+*    }
+
+
+ifup pshs X
+ tst _f+5,S x+ret on stack
+ beq ifup1 if nothing to do
+ clra
+ pshs D,X
+ lbsr toupper
+ leas 2,S
+ifup1 puls X,PC
+
+ endsect

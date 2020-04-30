@@ -1,0 +1,33 @@
+
+* prototype data module
+* the size is user defined, but might as well be a
+*  multiple of the system memory granularity
+* the two name size equates need set to match your name size
+
+Data equ $40
+ReEnt equ $80
+Rev equ 1
+Edit equ 1
+
+MODSIZE equ 4096 user defined
+
+HSize equ 14 module header size, including edition byte
+MNSize equ 7 os9 module name size ("datamod")
+FrtStuff equ HSize+MNSize
+
+MyStuff equ 3
+
+CPtrs equ 8 init data etc pointers
+CNSize equ 8 C module name size ("datamod\0")
+CRCSize equ 3
+EndStuff equ CPtrs+CNSize+CRCSize
+
+OVERHEAD equ FrtStuff+MyStuff+EndStuff
+
+ psect datamod,Data,ReEnt+Rev,Edit,0,datbeg
+
+datbeg:
+ fdb 0 my pointer to the header
+ fcb -1 the lock byte
+ rzb MODSIZE-OVERHEAD
+ endsect

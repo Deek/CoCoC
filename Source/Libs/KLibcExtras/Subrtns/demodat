@@ -1,0 +1,20 @@
+
+Data equ $40
+ReEnt equ $80
+Rev equ 1
+Edit equ 1
+
+modsiz equ 4096
+namsiz equ 10
+crcsiz equ 3
+hdrsiz equ 13
+edsiz equ 1
+fudge equ 8 a fudge factor
+
+used equ hdrsiz+namsiz+edsiz+(namsiz+1)+crcsiz+fudge
+
+ psect common.dat,Data,ReEnt+Rev,Edit,0,datbeg
+
+datbeg:
+ rzb modsiz-used
+ endsect

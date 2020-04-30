@@ -1,0 +1,12 @@
+/*
+** convert 3 byte char array into long
+*/
+
+c3tol(l, s)
+register char  *l, *s;
+   {
+   *l++ = '\0';
+   *l++ = *s++;
+   *l++ = *s++;
+   *l++ = *s++;
+   }

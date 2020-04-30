@@ -1,0 +1,1 @@
+rma -o=datamod.r datamod.a;c.link -o=datamod datamod.r

@@ -1,0 +1,134 @@
+
+                    Transcendental Math C Library
+
+       The various transcendental math functions are implemented using 
+the  CORDIC  method.  Accuracy  is to sixteen decimal places. The four 
+basic  math  functions  are  rewritten  to  optimize  for speed at the 
+expense  of  program length. This gives at least a factor of two speed 
+improvement.  Externally all numbers look just like normal C doubles but
+internally, an extra byte is used to permit an exponent range of 511.
+The following errors are reported and left in 'errno' :
+
+   EFPOVR  40  floating point overflow
+   EDIVERR 41  divide by zero
+   EINTERR 42  overflow on conversion of double to integer
+   EFPUND  43  floating point underflow (does not abort program)
+               zero is returned
+   EILLARG 44  illegal function arguement e.g. sqrt(-1)
+
+         These should be added to errno.h. The following functions are 
+implemented:
+
+rad()
+          change trigometric functions to radians
+
+deg()
+          change trigometric functions to degrees
+
+double acos(x)
+double x;
+          arc cosine of x
+
+double asin(x)
+double x;
+          arc sine of  x
+
+double atan(x)
+double x;
+          arc tangent of x
+
+double cos(x)
+double x;
+          cosine of x
+
+double sin(x)
+double x;
+          sine of  x
+
+double tan(x)
+double x;
+          tangent of x
+
+double acosh(x)
+double x;
+          arc hyperbolic cosine of x
+
+double asinh(x)
+double x;
+          arc hyperbolic sine of  x
+
+double atanh(x)
+double x;
+          arc hyperbolic tangent of x
+
+double cosh(x)
+double x;
+           hyperbolic cosine of x
+
+
+
+
+
+
+double sinh(x)
+double x;
+           hyperbolic sine of  x
+
+double tanh(x)
+double x;
+           hyperbolic tangent of x
+
+double pow(x,y)
+double x,y;
+           take x to y power
+
+double exp(x)
+double x;
+           e to x power
+
+double antilg(x)
+double x;
+           10 to x power
+
+double log10(x)
+double x;
+           logarithm base 10 of x
+
+double log(x)
+double x;
+           logarithm base e of x
+
+double sqrt(x)
+double x;
+           square root of x
+
+double sqr(x)
+double x;
+           square of x
+
+double inv(x)
+double x;
+           1 divided by x
+
+double dabs(x)
+double x;
+           take absolute value of x
+
+double dexp(x,i)
+double x;
+int i;
+           multiply x by 2 to the i power, this is very fast since it
+           is a matter of only adding i to the double exponent.
+
+
+
+
+
+
+
+
+
+
+
+
+

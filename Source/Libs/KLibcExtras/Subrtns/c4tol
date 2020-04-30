@@ -1,0 +1,17 @@
+/*
+**  convert a long read from disk as an array of char
+**   back to a long.
+*/
+
+long
+c4tol(s)
+char  *s;
+   {
+   long  x = 0;
+
+   x = (x + (*s++ &0xff)) << 8;
+   x = (x + (*s++ &0xff)) << 8;
+   x = (x + (*s++ &0xff)) << 8;
+   x = (x + (*s &0xff));
+   return (x);
+   }

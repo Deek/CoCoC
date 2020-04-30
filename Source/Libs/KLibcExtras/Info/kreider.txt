@@ -1,0 +1,151 @@
+Mark:
+
+          Your documentation of Carl Kreider's c library is is a
+great help. However, I got frustrated locating specific functions
+in the 64 pages of documentation and decided to make up an index
+of Carl's library as reflected in the documentation. A copy of my
+index sorted into ASCII order is below. If it looks generally
+useful, you are free to include it in the documentation file for
+others to use.
+
+                              Ken Drexler
+
+
+INDEX TO KREIDER LIBRARY (ASCII Order)
+
+  Name             LIB   Include File   Page
+_________          _____ _____________  _____
+_dump              clib                  35
+_errmsg            clib                  36
+_gs_devn           clib                  18
+_gs_eof            clib                  16
+_gs_gfd            clib  direct.h        20
+_gs_opt            clib  sgstat.h        19
+_gs_pos            clib                  21
+_gs_rdy            clib                  17
+_gs_size           clib                  22
+_prgname           clib                  46
+_ss_attr           clib  modes.h          1
+_ss_lock           clib                   2
+_ss_opt            clib  sgstat.h         3
+_ss_pfd            clib  direct.h         4
+_ss_rel            clib                   5
+_ss_rest           clib                   6
+_ss_size           clib                   7
+_ss_ssig           clib                   8
+_ss_tiks           clib                   9
+_ss_wtrk           clib                  10
+acos               clibt                 61
+acosh              clibt                 61
+addc2set           clib                  48
+adds2set           clib                  48
+allocset           clib                  48
+antilg             clibt                 62
+asctime            clib  utime.h         30
+asetuid            clib                  26
+asin               clibt                 61
+asinh              clibt                 61
+atan               clibt                 61
+atanh              clibt                 61
+bsearch            clib                  27
+closedir           clib  dir.h           33
+copyset            clib                  48
+cos                clibt                 61
+cosh               clibt                 61
+create             clib                  29
+ctime              clib  utime.h         30
+dabs               clibt                 62
+datlink            clib                  32
+deg                clibt                 61
+dexp               clibt                 62
+dunlink            clib                  32
+dupset             clib                  48
+endpwent           clib  password.h      43
+exp                clibt                 62
+getopt             clib                  37
+getpwdlm           clib  password.h      43
+getpwent           clib  password.h      43
+getpwnam           clib  password.h      43
+getpwuid           clib  password.h      43
+getstat            clib  os9.h  +        23
+htoi               clib                  28
+htol               clib                  28
+inv                clibt                 62
+itoa               clib                  28
+localtime          clib  utime.h         30
+lockdata           clib                  32
+log                clibt                 62
+log10              clibt                 62
+ltoa               clib                  28
+max                clib                  39
+memccpy            clib  memory.h        40
+memchr             clib  memory.h        40
+memcmp             clib  memory.h        40
+memcpy             clib  memory.h        40
+memset             clib  memory.h        40
+min                clib                  39
+o2utime            clib  utime.h time.h  59
+ocreat             clib                  29
+opendir            clib  dir.h           33
+patmatch           clib                  42
+pow                clibt                 62
+pwcryp             clib  string.h        53
+rad                clibt                 61
+rand               clib                  39
+readdir            clib  dir.h           33
+realloc            clib                  47
+reverse            clib  string.h        53
+rewinddir          clib  dir.h           33
+rmfrmset           clib                  48
+rtime              clib                  60
+sdifference        clib                  48
+seekdir            clib  dir.h           33
+setpwent           clib  password.h      43
+setstat            clib  os9.h  +        11
+sin                clibt                 61
+sinh               clibt                 61
+sintersect         clib                  48
+skipbl             clib                  50
+skipwd             clib                  51
+smember            clib                  48
+sqr                clibt                 62
+sqrt               clib                  39
+sqrt               clibt                 62
+srand              clib                  39
+strcat             clib  string.h        52
+strchr             clib  string.h        52
+strclr             clib  string.h        53
+strcmp             clib  string.h        52
+strcpy             clib  string.h        52
+strcspn            clib  string.h        53
+strend             clib  string.h        53
+strlen             clib  string.h        52
+strncat            clib  string.h        52
+strncmp            clib  string.h        52
+strncpy            clib  string.h        52
+strnucmp           clib  string.h        52
+strpbrk            clib  string.h        53
+strrchr            clib  string.h        53
+strspn             clib  string.h        53
+strtok             clib  string.h        53
+strucat            clib  string.h        52
+strucmp            clib  string.h        52
+strucpy            clib  string.h        52
+sunion             clib                  48
+tan                clibt                 61
+tanh               clibt                 61
+telldir            clib  dir.h           33
+time               clib                  56
+u2otime            clib  utime.h time.h  59
+unbrk              clib                  57
+unlinkx            clib                  58
+unlkdata           clib                  32
+unmax              clib                  39
+unmin              clib                  39
+utoa               clib                  28
+
+
+          I have run across one error in the documentation: The
+return from strucmp() is an int not a pointer to a char as
+indicated on page 52.
+

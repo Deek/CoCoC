@@ -1,0 +1,6 @@
+char  *
+bsearch(key, base, nel, width, compar)
+char  *key, *base;
+int   nel, width;
+int   (*compar)();
+   {
