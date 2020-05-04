@@ -75,13 +75,23 @@ char *name;
 #endif
 
 
-#ifdef PROF
+#ifdef REGPARMS
+# ifdef PROF
 startfunc(name,flag,paramreg,lab)
-#else
+# else
 startfunc(name,flag,paramreg)
+# endif
+#else
+# ifdef PROF
+startfunc(name,flag,lab)
+# else
+startfunc(name,flag)
+# endif
 #endif
 register char *name;
+#ifdef REGPARMS
 int paramreg;
+#endif
 {
 #ifdef FUNCNAME
     extern direct int fnline;
@@ -92,10 +102,15 @@ int paramreg;
 #endif
     nlabel(name,flag);
 
+#ifdef REGPARMS
     /* push possible register variables */
     if (paramreg == DREG) ol("pshs d,u");
     else ol("pshs u");
     if (paramreg == UREG) ol("tfr d,u");
+#else
+    ol("pshs u");
+#endif
+
     if (!sflag)
         fprintf(code," ldd #_%d\n lbsr _stkcheck\n",stklab=getlabel());
 

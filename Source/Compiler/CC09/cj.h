@@ -4,6 +4,7 @@
 # include <string.h>
 #endif
 #include <stdio.h>
+#include <stdlib.h>
 
 #undef getline
 
@@ -437,8 +438,10 @@ extern  char    strname[];      /* string file name */
 typedef struct {
     int     labnum,
             labsp;
+#ifdef REGCONTS
     expnode *labdreg,
             *labxreg;
+#endif
 } labstruc;
 
 

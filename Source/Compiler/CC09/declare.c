@@ -359,41 +359,44 @@ symnode *fptr;
 #endif
 
     paramlev = 0;
-    if (p1 = arglist) {
-#ifdef DEBUG
-if (dflag) {printf("newfunc node:\n"); pnode(p1);}
-#endif
+
+    p1 = arglist;
+#ifdef REGPARMS /* FIXME: see if we can do this for static funcs */
+    if (p1) {
+# ifdef DEBUG
+        if (dflag) {printf("newfunc node:\n"); pnode(p1);}
+# endif
         switch (p1->type) {
             case LONG:
-#ifdef DOFLOATS
+# ifdef DOFLOATS
             case FLOAT:
             case DOUBLE:
-#endif
+# endif
                 /* generate register save & stack checking */
-#ifdef PROF
+# ifdef PROF
                 startfunc(cp,(sclass != STATIC),0,prlab);
-#else
+# else
                 startfunc(cp,(sclass != STATIC),0);
-#endif
+# endif
                 break;
             default:
                 switch (p1->storage) {
                     case UREG:
                     case YREG:
-#ifdef PROF
+# ifdef PROF
                         startfunc(cp,(sclass != STATIC),p1->storage,prlab);
-#else
+# else
                         startfunc(cp,(sclass != STATIC),p1->storage);
-#endif
+# endif
                         break;
                     case ARG:
                         p1->storage = AUTO;
                     case AUTO:
-#ifdef PROF
+# ifdef PROF
                         startfunc(cp,(sclass != STATIC),DREG,prlab);
-#else
+# else
                         startfunc(cp,(sclass != STATIC),DREG);
-#endif
+# endif
                         p1->offset = (paramlev -= 2);
                         if (p1->type == CHAR) p1->offset += 1;
                         break;
@@ -403,12 +406,19 @@ if (dflag) {printf("newfunc node:\n"); pnode(p1);}
                 p1 = p1->snext;
         }
     } else {
-#ifdef PROF
-        startfunc(cp,(sclass != STATIC),0,prlab);
-#else
-        startfunc(cp,(sclass != STATIC),0);
-#endif
+# ifdef PROF
+        startfunc(cp,(sclass != STATIC),prlab);
+# else
+        startfunc(cp,(sclass != STATIC));
+# endif
     }
+#else   /* !REGPARMS */
+# ifdef PROF
+    startfunc(cp,(sclass != STATIC),prlab);
+# else
+    startfunc(cp,(sclass != STATIC));
+# endif
+#endif
 
     stlev = sp = paramlev;
     offset = 2 + (MAXREG * 2);
@@ -447,7 +457,9 @@ if (dflag) {printf("newfunc node:\n"); pnode(p1);}
     p2 = arglist;
     arglist = NULL;
 
+#ifdef REGCONTS
     clrconts();         /* clear register contents */
+#endif
     block(-paramlev);
 
     clear(&p2);
@@ -496,7 +508,9 @@ int stkadj;
 
     while (sym != RBRACE && sym != EOF) statement();
 
+#ifdef REGCONTS
     if (vlist) clrconts();
+#endif
      clear(&vlist);
      vlist = varlist;
      --blklev;

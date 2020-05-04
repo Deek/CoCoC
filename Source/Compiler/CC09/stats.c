@@ -39,8 +39,10 @@ static int
 static labstruc *breakptr,      /* break label */
                 *contptr;       /* continue label */
 
+#ifdef REGCONTS
 extern  expnode *dregcont,      /* D register content */
                 *xregcont;      /* X register content */
+#endif
 
 static  expnode *emit(), *getptest(), *gettest(), *sidexp();
 
@@ -116,7 +118,9 @@ doif()
     ptr = getptest();
 
     tl.labnum = fl.labnum = 0;
+#ifdef REGCONTS
     tl.labdreg = tl.labxreg = fl.labdreg = fl.labxreg = NULL;
+#endif
 
     if (et = (sym == SEMICOL)) {
         getsym();
@@ -133,10 +137,12 @@ doif()
             if (et == 0) {
                 et = 1;
                 gen(JMP,tl.labnum = getlabel(),0);
+#ifdef REGCONTS
                 tl.labdreg = dregcont;
                 tl.labxreg = xregcont;
                 dregcont = treecopy(fl.labdreg);
                 xregcont = treecopy(fl.labxreg);
+#endif
                 uselabel(&fl);
             }
             statement();
@@ -160,11 +166,15 @@ dowhile()
     getsym();
 
     brk.labnum =  0;
+#ifdef REGCONTS
     brk.labdreg = brk.labxreg = NULL;
+#endif
     cnt.labnum = getlabel();
+#ifdef REGCONTS
     cnt.labdreg = dregcont;
     cnt.labxreg = xregcont;
     dregcont = xregcont = NULL;
+#endif
     brk.labsp = cnt.labsp = sp;
 
     ptr = getptest();
@@ -205,7 +215,9 @@ doswitch()
     breakptr = &brk;
 
     brk.labnum = deflabel = 0;
+#ifdef REGCONTS
     brk.labdreg = brk.labxreg = NULL;
+#endif
     brk.labsp = sp;
 
     need(LPAREN);
@@ -240,11 +252,15 @@ doswitch()
         cptr = temp;
     }
 
+#ifdef REGCONTS
     clrconts();
+#endif
     if (deflabel) {
         gen(JMP,deflabel,0);
+#ifdef REGCONTS
         dregcont = treecopy(brk.labdreg);
         xregcont = treecopy(brk.labxreg);
+#endif
     }
     uselabel(&brk);
 
@@ -265,7 +281,9 @@ docase()
     getsym();
     val=constexp(0);
     need(COLON);
+#ifdef REGCONTS
     clrconts();     /* clear register contents */
+#endif
 
     if (swflag) {
         if (ptr = freecase) freecase = ptr->clink;
@@ -290,7 +308,9 @@ dodefault()
     if (deflabel) error("multiple defaults");
     else label(deflabel = getlabel());
     need(COLON);
-    clrconts();         /* clear register contents */
+#ifdef REGCONTS
+    clrconts();     /* clear register contents */
+#endif
 }
 
 
@@ -312,8 +332,10 @@ dodo()
 
     brk.labsp = cnt.labsp = sp;
     brk.labnum = cnt.labnum = 0;
+#ifdef REGCONTS
     brk.labdreg = brk.labxreg = cnt.labdreg = cnt.labxreg = NULL;
     clrconts();         /* clear register contents */
+#endif
     getsym();
     label(looptop=getlabel());
     statement();
@@ -343,8 +365,10 @@ dofor()
 
     brk.labsp = cnt.labsp = sp;
     brk.labnum = cnt.labnum = tst.labnum = 0;
+#ifdef REGCONTS
     brk.labdreg = brk.labxreg = cnt.labdreg =
                 cnt.labxreg = tst.labdreg = tst.labxreg = NULL;
+#endif
     slab = getlabel();
 
     getsym();
@@ -367,7 +391,9 @@ dofor()
     need(RPAREN);
 
     /* statement */
+#ifdef REGCONTS
     clrconts();         /* clear register contents */
+#endif
     label(slab);
     statement();
 
@@ -502,7 +528,9 @@ dolabel()
             ptr->x.labflg |= DEFINED;
         }
     }
+#ifdef REGCONTS
     clrconts();         /* clear register contents */
+#endif
     getsym();
     getsym();
 }

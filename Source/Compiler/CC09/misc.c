@@ -300,7 +300,7 @@ getkeys()
     for(i=c=0; ++i<200 && c!=EOF ;){
         for (p=kname; (c=getc(in1))!='\n' && c!=EOF ; *p++=c) ;
         *p='\0';
-//		fprintf (stderr, "read string: %d[%s]\n", i, kname);
+//      fprintf (stderr, "read string: %d[%s]\n", i, kname);
         if(*kname)
             kw[i] = strcpy(grab(strlen(kname)+1),kname);
     }
@@ -315,7 +315,7 @@ char *title;
         fflush(stdout);
         printf("%s\naddress  op        value           type     size sux left     right\n",title);
         ptree(node);
-	}
+    }
 }
 
 

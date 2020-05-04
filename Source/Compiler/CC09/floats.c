@@ -129,6 +129,8 @@ register expnode *node;
             }
             comperr(node,"floats");
     }
+#ifdef REGCONTS
     clrconts();              /* clear D contents */
+#endif
 }
 #endif

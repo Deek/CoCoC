@@ -1,7 +1,9 @@
 #include "cj.h"
 
 direct int shiftflag;
+#ifdef REGCONTS
 extern direct expnode *dregcont,*xregcont,*currexpr;
+#endif
 extern expnode *transexp();
 
 #define swap(x,y) {expnode *t; t=x; x=y; y=t;}
@@ -18,7 +20,11 @@ register expnode *tree;
     loadexp(tree);
     if (tree->op != DREG) {
         gen(LOAD,DREG,NODE,tree);
+#ifdef  REGCONTS
         setdreg(tree);
+#else
+        tree->op = DREG;
+#endif
     }
 }
 
@@ -29,7 +35,11 @@ register expnode *tree;
     tranxexp(tree);
     if (tree->op != XREG) {
         gen(LOAD,XREG,NODE,tree);
+#ifdef  REGCONTS
         setxreg(tree);
+#else
+        tree->op = XREG;
+#endif
     }
 }
 
@@ -60,24 +70,28 @@ register expnode *tree;
     switch (tree->op) {
         case STRING:
             gen(LOAD,XREG,NODE,tree);
+#ifdef REGCONTS
             setxreg(NULL);
+#endif
             tree->op = XREG;
             tree->val.num = 0;
             break;
         case AMPER:
             gen(LOADIM,XREG,NODE,tree->left);
+#ifdef REGCONTS
             setxreg(tree);
+#else
+            tree->op = XREG;
+#endif
             tree->val.num = 0;
             break;
         default:
+#ifdef REGCONTS // yeah, yeah, I know...
 /*          if (cmptrees(tree,dregcont)) {
                 rplcnode(tree,DREG);
             } else
 */
-            if (tree->op == CTOI) {
-                gen(LOAD,DREG,NODE,tree);
-                setdreg(tree->left);
-            } else {
+#endif
 #ifdef DEBUG
 /*              prtree(tree,"doload (before gen)");*/
 #endif
@@ -85,8 +99,15 @@ register expnode *tree;
 #ifdef DEBUG
 /*              prtree(tree,"doload (after gen)");  */
 #endif
+#ifdef REGCONTS
+            if (tree->op == CTOI) {
+                setdreg(tree->left);
+            } else {
                 setdreg(tree);
             }
+#else
+            tree->op=DREG;
+#endif
             break;
         case XREG:
         case DREG:
@@ -105,6 +126,8 @@ register expnode *tree;
 #ifdef DEBUG
     prtree(tree,"tranexp (before):");
 #endif
+
+#ifdef  REGCONTS
     setcurr(NULL);      /* clear current expression */
     if (cmptrees(tree,dregcont)) {
         rplcnode(tree,DREG);
@@ -112,7 +135,9 @@ register expnode *tree;
     } else if (cmptrees(tree,xregcont)) {
         rplcnode(tree,XREG);
         shiftflag = 1;
-    } else if ((op=tree->op) == COMMA) {
+    } else
+#endif  /* REGCONTS */
+    if ((op=tree->op) == COMMA) {
         expnode *p = tree->right;
 
         reltree(tranexp(tree->left));
@@ -163,7 +188,11 @@ register expnode *tree;
             case NEG:
                 lddexp(tree->left);
                 gen(op);
+#ifdef REGCONTS
                 setdreg(tree);      /* set D contents */
+#else
+                tree->op = DREG;
+#endif
                 break;
             case QUERY:
                 doquery(tree,lddexp);
@@ -261,10 +290,13 @@ expnode *node;
                 }
             }
             gen(op,DREG,NODE,rhs);
+#ifdef  REGCONTS
             setdreg(node);
             shiftflag = 0;
             return;
-
+#else
+            break;
+#endif
         case EQ:
         case NEQ:
         case GT:
@@ -323,7 +355,9 @@ rest:       loadexp(lhs);
             gen(PUSH,lhs->op);
             lddexp(rhs);
             gen(op);
+#ifdef  REGCONTS
             setxreg(NULL);  /* clear X contents */
+#endif
             break;
 
         default:
@@ -333,8 +367,9 @@ rest:       loadexp(lhs);
 out: shiftflag = 0;
 
 out1: node->op = DREG;
-
+#ifdef  REGCONTS
     setdreg(NULL);  /* clear D contents */
+#endif
 }
 
 
@@ -363,7 +398,9 @@ register expnode *tree;
     labstruc l1,l2;
 
     l1.labnum = l2.labnum = 0;
+#ifdef  REGCONTS
     l1.labdreg = l1.labxreg = l2.labdreg = l2.labxreg = NULL;
+#endif
 
     /*  use jumping code to evaluate */
     tranbool(tree,&l1,&l2,TRUE);
@@ -380,7 +417,9 @@ register expnode *tree;
     /* finally the end label */
     label(l1.labnum);
     tree->op = DREG;
+#ifdef  REGCONTS
     setdreg(NULL);         /* clear D contents */
+#endif
 }
 
 
@@ -391,7 +430,9 @@ int (*loadfunc)();
     labstruc l1,l2;
 
     l1.labnum = l2.labnum = 0;
+#ifdef  REGCONTS
     l1.labdreg = l1.labxreg = l2.labdreg = l2.labxreg = NULL;
+#endif
 
     /* emit code for test */
     tranbool(tree->left,&l1,&l2,TRUE);
@@ -413,7 +454,9 @@ int (*loadfunc)();
 
     /* finally the end label */
     label(l1.labnum);
+#ifdef  REGCONTS
     clrconts();         /* clear register contents */
+#endif
 }
 
 
@@ -441,7 +484,9 @@ expnode *node;
         }
 #endif
         else {
-            if (rhs->right == NULL) break;
+#ifdef REGPARMS
+            if (rhs->right == NULL) break;  // don't push the first argument
+#endif
             tranexp(lhs);
             switch (lhs->op) {
                 default:
@@ -457,6 +502,7 @@ expnode *node;
     }
 
     tranexp(node->left);
+#ifdef REGPARMS
     if (rhs) {
         lhs = rhs->left;
         if (isdleaf(lhs)) lddexp(lhs);
@@ -466,12 +512,15 @@ expnode *node;
             lddexp(lhs);
         }
     }
+#endif
     gen(CALL,NODE,node->left);
 
     sp = modstk(oldsp);
 
     node->op = DREG;
+#ifdef REGCONTS
     clrconts();         /* clear register contents */
+#endif
 }
 
 
@@ -565,23 +614,27 @@ register expnode *node;
             default:
                 gen(LOAD,lhs->op,NODE,rhs);
         }
+#ifdef REGCONTS
         if (treecont(dregcont,lhs->op)) setdreg(NULL);
         if (treecont(xregcont,lhs->op)) setxreg(NULL);
+#endif
         node->op=lhs->op;
         node->val.num=0;
         return;
     } else {
+#ifdef REGCONTS
         savlhs = treecopy(lhs);
+#endif
         if (isdleaf(lhs) && lhs->type != CHAR
                         && (regandcon(rhs) || isaddress(rhs))){
-            transexp(lhs);
+            transexp(lhs);  /* this is tranexp in other source */
             loadxexp(rhs);
         } else if (isreg(rhs->op)) {
-            transexp(lhs);
+            transexp(lhs);  /* this is tranexp in other source */
             if (lhs->type==CHAR) lddexp(rhs);
         } else if (isxleaf(lhs)) {
             lddexp(rhs);
-            transexp(lhs);
+            transexp(lhs);  /* this is tranexp in other source */
         } else {
             tranexp(lhs);
             if (!isdleaf(rhs))
@@ -595,6 +648,8 @@ register expnode *node;
             loadexp(rhs);
         }
     }
+
+#ifdef REGCONTS
     if (dregcont) {
         if (!(rhs->op == DREG && cmptrees(savlhs,dregcont)))
             if (subtree(savlhs,dregcont)) setdreg(NULL);
@@ -604,6 +659,8 @@ register expnode *node;
             if (subtree(savlhs,xregcont)) setxreg(NULL);
     }
     reltree(savlhs);
+#endif
+
     gen(STORE,rhs->op,NODE,lhs);
     node->op=rhs->op;
     node->val.num=0;
@@ -637,15 +694,20 @@ assop(node,op)
 expnode *node;
 {
     register expnode *lhs,*rhs;
+#ifdef REGCONTS
     int inreg;
+#endif
 
     lhs = node->left;
     rhs = node->right;
 
+#ifdef REGCONTS
     inreg = 0;
     if (cmptrees(lhs,dregcont)) inreg = DREG;
     else if (cmptrees(lhs,xregcont)) inreg = XREG;
-    else tranexp(lhs);
+    else 
+#endif
+    tranexp(lhs);
 
     op += (PLUS - ASSPLUS);
     if (lhs->type == UNSIGN)
@@ -671,7 +733,9 @@ expnode *node;
                     lddexp(rhs);
                     if (op == MINUS) {
                         gen(NEG);
+#ifdef REGCONTS
                         setdreg(NULL);
+#endif
                     }
                     gen(LEA,lhs->op,DREG);
                 }
@@ -688,16 +752,20 @@ expnode *node;
                 gen(op);
         }
     } else {
+#ifdef REGCONTS
         if (inreg == XREG) {
             node->op = XREG;
             node->val.num = 0;
             gen(LOAD,DREG,NODE,node);
             setdreg(NULL);
         } else if (inreg == 0) {
+#endif
 ord:
             gen(LOAD,DREG,NODE,lhs);
+#ifdef REGCONTS
             setdreg(NULL);
         }
+#endif
         if (lhs->type == CHAR) gen(CTOI);
         switch (op) {
             case AND:
@@ -717,7 +785,11 @@ ord:
                     break;
                 }
             default:
-                if (inreg == 0 && (lhs->op & NOTIND) != YIND
+                if (
+#ifdef REGCONTS
+                    inreg == 0 && 
+#endif
+                    (lhs->op & NOTIND) != YIND
                         && (lhs->op & NOTIND) != UIND) stackx(lhs);
                 gen(PUSH,DREG);
                 lddexp(rhs);
@@ -725,6 +797,7 @@ ord:
                 gen(op,DREG,STACK);
         }
     }
+#ifdef REGCONTS
     if (inreg) {
         if (!isaleaf(lhs)) {
             gen(PUSH,DREG);
@@ -732,9 +805,12 @@ ord:
             gen(LOAD,DREG,STACK);
         } else transexp(lhs);
     }
+#endif
     gen(STORE,DREG,NODE,lhs);
     node->op=DREG;
+#ifdef REGCONTS
     setdreg(lhs);   /* set D contents */
+#endif
 
 }
 
@@ -763,14 +839,15 @@ register expnode *node;
     op = lhs->op;
     if (op & INDIRECT) {
         switch(op & NOTIND) {
-            case NAME :
+#ifdef REGCONTS
+            case NAME:
             case YIND:
             case UIND:
                 if (currexpr) {
                     currexpr = newnode(STAR,currexpr,0,0,0,0);
-#ifdef DEBUG
+# ifdef DEBUG
                     prtree(currexpr,"current expression (by dostar):");
-#endif
+# endif
                 }
                 setxreg(currexpr);
                 gen(LOAD,XREG,op,lhs->val.num);
@@ -778,14 +855,24 @@ register expnode *node;
             case XIND:
                 if (xregcont) {
                     xregcont = newnode(STAR,xregcont,0,0,0,0);
-#ifdef DEBUG
+# ifdef DEBUG
                     prtree(xregcont,"X given (by dostar):");
-#endif
+# endif
                 }
                 gen(LOAD,XREG,op,lhs->val.num);
                 break;
             default:
-            comperr(lhs,"indirection");
+                comperr(lhs,"indirection");
+#else /* !REGCONTS */
+            case NAME:
+            case XIND:
+            case YIND:
+            case UIND:
+                gen(LOAD,XREG,op&NOTIND,lhs->val.num);
+                break;
+            default:
+                comperr(lhs,"indirection");
+#endif
         }
         op = XIND;
     } else {
@@ -811,12 +898,17 @@ fix:            node->val.sp = lhs->val.sp;
                 break;
             case DREG:
                 gen(LOAD,XREG,NODE,lhs);
+#ifdef REGCONTS
                 setxreg(NULL);
+#else
+                node->val.num = 0;
+#endif
                 op = XIND;
                 break;
             case CONST:
                 op = NAME;
                 node->modifier = lhs->val.num;
+//                node->val.num = 0;
                 break;
             default:
                 comperr(node,"indirection");
@@ -834,18 +926,29 @@ dotoggle(node,dest)
 register expnode *node;
 register int dest;
 {
-    register expnode *lhs, *temp;
-    int op, size, reg, inreg;
+    register expnode *lhs;
+    int op, size, reg;
+#ifdef REGCONTS
+    register expnode *temp;
+    int inreg;
+#endif
 
 #ifdef DEBUG
 /*  prtree(node,"dotoggle (before):");*/
 #endif
-    temp = treecopy(lhs = node->left);
+
+    lhs = node->left;
+#ifdef REGCONTS
+    temp = treecopy(lhs);
     tranexp(lhs);
     if (lhs->op != DREG && lhs->op != XREG) {
         reltree(temp);
         temp = NULL;
     }
+#else
+    tranexp(lhs);
+#endif
+
     op = node->op;
     if (isreg(reg = lhs->op)) {
         switch (op) {
@@ -859,7 +962,9 @@ register int dest;
         }
     } else {
         if (dest == XREG && (reg & NOTIND) != NAME) dest = DREG;
+#ifdef REGCONTS
         if (reg = XREG) setxreg(NULL);
+#endif
         gen(LOAD,dest,NODE,lhs);
         reg = dest;
     }
@@ -880,11 +985,13 @@ register int dest;
                         : gen(LEA,reg,CONST,size);
     }
 
+#ifdef REGCONTS
     if (temp) {
         nodecopy(temp,lhs);
         release(temp);
         transexp(lhs);
     }
+#endif
     gen(STORE,reg,NODE,lhs);
 
     switch (op) {
@@ -892,11 +999,15 @@ register int dest;
         case DECAFT:
             if (reg == DREG) {
                 gen(MINUS,DREG,CONST,size);
+#ifdef REGCONTS
                 setdreg(NULL);
+#endif
             } else node->val.num = -size;
             break;
         default:
+#ifdef REGCONTS
             if (reg == DREG) setdreg(lhs);
+#endif
             node->val.num=0;
             break;
     }
@@ -914,7 +1025,9 @@ register expnode *p;
     tranxexp(p);
     if (p->op != XREG || p->val.num) {
         gen(LOAD,XREG,NODE,p);
+#ifdef REGCONTS
         setxreg(NULL);
+#endif
     }
     p->op = XREG;
 }
@@ -925,11 +1038,14 @@ expnode *node;
     register expnode *lhs,*rhs;
     int lhsval,rhsval,op,newop;
 
+#ifdef REGCONTS
     setcurr(NULL);
     if (cmptrees(node,xregcont)) {
         rplcnode(node,XREG);
         return;
     }
+#endif
+
     lhs = node->left;
     rhs = node->right;
     newop = XREG;
@@ -950,7 +1066,9 @@ expnode *node;
             prtree(node,"tranxexp (before AMPER):");
 #endif
             gen(LOADIM,XREG,NODE,lhs);
+#ifdef REGCONTS
             setxreg(node);      /* set X contents */
+#endif
             node->val.num = 0;
             break;
         case CTOI:
@@ -965,7 +1083,9 @@ expnode *node;
 #endif
                 if (rhs->op == CONST) {
                     tranxexp(lhs);
+#ifdef REGCONTS
                     setcurr(node);
+#endif
                     newop = lhs->op;
                     rhsval = rhs->val.num;
                 } else {
@@ -973,10 +1093,14 @@ expnode *node;
                     tranxexp(lhs);
                     if (op == MINUS) {
                         gen(NEG);
+#ifdef REGCONTS
                         setdreg(NULL);
+#endif
                     }
                     gen(LEAX,DREG,lhs->op);
+#ifdef REGCONTS
                     setxreg(node);
+#endif
                     rhsval = 0;
                 }
                 lhsval = lhs->val.num;
@@ -986,9 +1110,11 @@ expnode *node;
 #ifdef DEBUG
                 prtree(node,"tranxexp (before):");
 #endif
+#ifdef REGCONTS
                 if (cmptrees(lhs,xregcont)) {
                     lhsval = 0;
                 } else {
+#endif
                     tranxexp(lhs);
                     lhsval = lhs->val.num;
                     switch(lhs->op & NOTIND) {
@@ -1004,7 +1130,9 @@ expnode *node;
                         case YIND:
                         case UIND:
                             gen(LOAD,XREG,NODE,lhs);
+#ifdef REGCONTS
                             setxreg(lhs);
+#endif
                             lhsval = 0;
                         case XREG:
                             break;
@@ -1015,16 +1143,22 @@ expnode *node;
                         default:
                             comperr(lhs,"x translate");
                     }
+#ifdef REGCONTS
                 }
+#endif
                 if (rhs->op == CONST) rhsval = rhs->val.num;
                 else {
                     lddexp(rhs);
                     if (op == MINUS) {
                         gen(NEG,0,0);
+#ifdef REGCONTS
                         setdreg(NULL);
+#endif
                     }
 done:               gen(LEAX,DREG,newop);
+#ifdef REGCONTS
                     setxreg(node);
+#endif
                     newop=XREG;
                     rhsval = 0;
                 }

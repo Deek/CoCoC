@@ -11,7 +11,9 @@
 #include "cj.h"
 
 extern direct int shiftflag;
+#ifdef REGCONTS
 extern direct expnode *dregcont,*xregcont;
+#endif
 
 
 expnode *
@@ -23,7 +25,9 @@ labstruc *tlab,*flab;
     labstruc second;
 
     second.labnum = second.labsp = 0;
+#ifdef REGCONTS
     second.labdreg = second.labxreg = NULL;
+#endif
     switch(op=node->op){
         case DBLAND:
             tranbool(node->left,&second,flab,TRUE);
@@ -116,7 +120,11 @@ labstruc *tlab,*flab;
                 goto ok;
             case CTOI:
                 gen(LOAD,DREG,NODE,rhs);
+#ifdef REGCONTS
                 setdreg(rhs);
+#else
+                rhs->op = DREG;
+#endif
             case XREG:
             case YREG:
             case UREG:
@@ -156,6 +164,7 @@ register labstruc *lab;
     if (lab) {
         if (lab->labnum == 0) {
             lab->labnum = getlabel();
+#ifdef REGCONTS
             lab->labdreg = treecopy(dregcont);
             lab->labxreg = treecopy(xregcont);
         } else {
@@ -167,9 +176,11 @@ register labstruc *lab;
                 reltree(lab->labxreg);
                 lab->labxreg = NULL;
             }
+#endif
         }
         return lab->labnum;
     }
+    return 0;
 }
 
 
@@ -177,11 +188,13 @@ uselabel(lab)
 register labstruc *lab;
 {
     if (lab->labnum) {
+#ifdef REGCONTS
         if (!cmptrees(lab->labdreg,dregcont)) setdreg(NULL);
         if (!cmptrees(lab->labxreg,xregcont)) setxreg(NULL);
         reltree(lab->labdreg);
         reltree(lab->labxreg);
         lab->labdreg = lab->labxreg = NULL;
+#endif
         label(lab->labnum);
     }
 }
@@ -253,13 +266,17 @@ register expnode *node;
             break;
         case CTOI:
             node=node->left;
+#ifdef REGCONTS
             if (node->op == DREG) {
                 if (shiftflag) gen(COMPARE,node->op,CONST,0);
                 break;
             }
+#endif  // otherwise fall through, because of what's below
         default:
             gen(LOAD,DREG,NODE,node);
+#ifdef REGCONTS
             setdreg(node);
+#endif
     }
 }
 

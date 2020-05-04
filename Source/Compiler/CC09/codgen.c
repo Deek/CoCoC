@@ -346,10 +346,15 @@ int *arg;
             nl();
             break;
     }
+#ifdef REGCONTS
     setdreg(NULL);
+#endif
 }
 
-
+/*
+    In the decompiled source (which doesn't use register contents), all of
+    these breaks are returns, because setdreg() isn't used.
+*/
 #ifdef  DOFLOATS
 dofloats(op,arg)
 register int arg;
@@ -392,7 +397,9 @@ register int arg;
             od(op);
             nl();
     }
+#ifdef REGCONTS
     setdreg(NULL);
+#endif
 }
 #endif
 

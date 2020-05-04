@@ -1,3 +1,4 @@
+#ifdef REGCONTS
 #include "cj.h"
 
 static wlktr(tree);
@@ -255,3 +256,4 @@ register expnode *tree;
         (*walkfunc)(tree);
     }
 }
+#endif  /* REGCONTS */

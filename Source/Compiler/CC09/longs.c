@@ -178,7 +178,10 @@ shifts:
             }
             comperr(node,"longs");
     }
+
+#ifdef REGCONTS
     clrconts();          /* clear D contents */
+#endif
 }
 
 
@@ -188,12 +191,16 @@ register expnode *ptr;
     switch(ptr->op) {
         case NAME:
             gen(LOADIM,XREG,NODE,ptr);
+#ifdef REGCONTS
             setxreg(ptr);
+#endif
             break;
         case YIND:
         case UIND:
             gen(LEAX,NODE,ptr);
+#ifdef REGCONTS
             setxreg(ptr);
+#endif
             break;
     }
 }

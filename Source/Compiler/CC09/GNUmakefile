@@ -1,4 +1,4 @@
-CFLAGS	= -g -m32 -DUNIX -DPTREE -DDEBUG -DPROF -DREGCONTS -DREGPARMS \
+CFLAGS	= -g -m32 -DUNIX -DPTREE -DDEBUG -DPROF -DREGCONTS \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type \
