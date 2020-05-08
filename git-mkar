@@ -1,0 +1,13 @@
+#! /bin/sh
+ARPATH=".."
+ARNAME="cococ.ar"
+
+if [ ! -d .git ]; then	# we're not in the repository root
+	echo "Cowardly refusing to run from an unexpected location. Run me from"
+	echo "the root of a git checkout."
+	exit 1
+fi
+
+[ -f "$ARPATH/$ARNAME" ] && mv -f "$ARPATH/$ARNAME" "$ARPATH/$ARNAME.backup"
+
+git ls-files --exclude-standard | grep -v git | xargs ar2 -uoss "$ARPATH/$ARNAME"

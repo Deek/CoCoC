@@ -1,0 +1,45 @@
+#! /bin/sh
+DSKPATH=".."
+DSKNAME="cococ.dsk"
+DTEMP=".tmp-dsave"
+MKDIRS=".tmp-makdir"
+COPIES=".tmp-copies"
+
+# 569 tracks makes for a 2.5MB disk, useful for CoCoSDC images but it's too big 
+# to work as a "floppy" on most emulators I know of. As the repo gets bigger, 
+# this number will need to increase. The formula I use is:
+#
+# N * 2^20
+# -------- = sector count, where N is a number in megabytes.
+# 256 * 18
+TRACKS="569"
+
+if [ ! -d .git ]; then	# we're not in the repository root
+	echo "Cowardly refusing to run from an unexpected location. Run me from"
+	echo "the root of a git checkout."
+	exit 1
+fi
+
+git pull --ff-only
+
+# move previous disk out of the way
+[ -f "$DSKPATH/$DSKNAME" ] && mv -f "$DSKPATH/$DSKNAME" "$DSKPATH/$DSKNAME.backup"
+
+os9 format  "$DSKPATH/$DSKNAME" -bs256 -e -nCoCoC -ssdd -t$TRACKS -st18
+
+[ -d .temp ] && rm -rf .temp/
+
+git ls-files --exclude-standard | sort | grep -v git | xargs -IXX install -m644 -D "XX" ".temp/XX"
+
+chmod +x .temp/Cmds/*
+
+os9 dsave .temp "$DSKPATH/$DSKNAME," > "$DTEMP"
+grep makdir < "$DTEMP" | sort > "$MKDIRS"
+grep copy < "$DTEMP" | sort > "$COPIES"
+
+sh "$MKDIRS"
+sh "$COPIES"
+
+# cleanup
+rm -f "$MKDIRS" "$COPIES" "$DTEMP"
+rm -rf .temp/
