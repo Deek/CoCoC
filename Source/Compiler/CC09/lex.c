@@ -16,7 +16,6 @@
 
 #include "cj.h"
 
-static numshf(n);
 static double normaliz(n);
 
 #define     isdigit(c)  (chartab[c]==DIGIT)
@@ -489,12 +488,12 @@ register numptrs np;
                 getch();
             }
 
-        if (cc == 'L' || cc == 'l') {
+        if (cc == 'L' || cc == 'l') {   /* explicit long */
             getch();
             goto retlong;
         }
 
-        if ((i & 0xFFFF0000) == 0) {
+        if ((i & 0xFFFF0000) == 0) {    /* number is <= 16 bits */
             *np.ip = i;
             return INT;
         }
@@ -559,25 +558,42 @@ fraction:
         return DOUBLE;
     }
 
-    if (*((long*)&n)) return 0;     /*  overflow  */
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+    if (*(int64_t *)&n > __INT32_MAX__) return 0;
+    *np.lp = *((long*)&n);
     if (cc=='l' || cc=='L') {       /* explicitly long */
         getch();
 longint:
-#ifdef DEBUG
-# if defined (OS9) || defined (OSK)
-    pflinit();
+# ifdef DEBUG
+        fprintf(stderr,"number: n=%08lX\n",*((long*)&n));
 # endif
-    fprintf(stderr,"number: n=%08lX%08lX\n",*((long*)&n),*((long*)&n+1));
-#endif
+        return LONG;
+    } else if (*np.lp > __INT16_MAX__) {    /* implicitly long */
+        goto longint;
+    } else {    /*  int  */
+        return INT;
+    }
+#else
+    if (*((long*)&n)) return 0;     /*  overflow  */
+    if (cc=='l' || cc=='L') {   /* explicitly long */
+        getch();
+longint:
+# ifdef DEBUG
+#  if defined(OS9) || defined(_OSK)
+        pflinit();
+#  endif
+        fprintf(stderr,"number: n=%08lX%08lX\n",*((long*)&n),*((long*)&n+1));
+# endif
         *np.lp = *((long*)&n+1);
         return LONG;
-    } else if (*((short*)&n+2)) goto longint;   /*  implicitly long  */
-    else {                          /*  int  */
+    } else if (*((short*)&n+2)) {
+        goto longint;   /* too big for int */
+    } else {
         *np.ip = *((short*)&n+3);
         return INT;
     }
+#endif
 }
-
 
 #ifndef SPLIT
 double
@@ -902,6 +918,9 @@ long n[];
 }
 
 
+#if defined(OS9) || defined(_OSK)
+static numshf(n);
+
 addin(n,c)
 register char n[];
 char c;
@@ -935,3 +954,21 @@ register char n[];
     return x;
 }
 
+#else   /* portable but needs long long integers */
+
+addin(n,c)
+int64_t *n;
+char c;
+{
+    int64_t val = *n;
+
+    val = val * 10 + (c - '0');
+
+    *n = val;
+    if (val < 0)    /* we wrapped around */
+        return 1;
+
+    return 0; /* assume we didn't wrap around */
+}
+
+#endif
