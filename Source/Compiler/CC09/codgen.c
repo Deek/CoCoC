@@ -690,7 +690,11 @@ os(s)
 
 od(n)
 {
+#ifdef OS9
     fprintf(code,"%d",n & 0xFFFF);
+#else
+    fprintf(code,"%hd",n & 0xFFFF);
+#endif
 }
 
 
