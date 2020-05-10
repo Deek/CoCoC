@@ -174,6 +174,7 @@ showhead()
      printf("  Stack:     %04x\n",hd.h_stack);
      printf("Entry point: %04x\n",hd.h_entry);
 }
+
 showglobs()
 {
      register unsigned count,offset;
@@ -231,6 +232,7 @@ int ref;
      }
      putchar('\n');
 }
+
 showrefs()
 {
      register unsigned count,rcount;
@@ -263,6 +265,7 @@ showrefs()
                putchar('\n');
      }
 }
+
 showlcls()
 {
      register unsigned count;
@@ -322,6 +325,7 @@ error(s1,s2,s3,s4)
      putc('\n',stderr);
      exit(1);
 }
+
 ferr(s)
 {
      error("error reading '%s'",s);
