@@ -301,7 +301,7 @@ showcomm()
           rsize=getw(in);
           rcount=getw(in);
           if(rflag)
-               printf(" %9s, size %d, %d reference%s:\n",sym,rsize,rcount,plural(rcount));
+               printf(" %9s, size %u, %u reference%s:\n",sym,rsize,rcount,plural(rcount));
           fflag=1;
           while(rcount--) {
                fread(&ref,sizeof(ref),1,in);
@@ -330,3 +330,4 @@ ferr(s)
 {
      error("error reading '%s'",s);
 }
+
