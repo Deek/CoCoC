@@ -91,11 +91,19 @@ char **argv;
                done: ;
           }
           else {
-               if(scount==MAXSOURCE) error(0,"too many source files");
+               if(scount==MAXSOURCE) error("too many source files");
                snames[scount++]=*argv;
           }
      }
      pass1();
+}
+
+plural(num)
+{
+     static char *yes = "s";
+     static char *no = "";
+
+     return num==1 ? no : yes;
 }
 
 pass1()
@@ -173,7 +181,7 @@ showglobs()
 
      count=getw(in);          /* global def count */
      if(gflag)
-          printf("\n%u global symbols defined:\n",count);
+          printf("\n%u global symbol%s defined:\n",count,plural(count));
 
      while(count--) {
           getname(sym);
@@ -232,7 +240,7 @@ showrefs()
 
      count=getw(in);
      if(rflag)
-          printf("\n%u external references:\n",count);
+          printf("\n%u external reference%s:\n",count, plural(count));
 
      while(count--) {
           getname(sym);
@@ -262,7 +270,7 @@ showlcls()
 
      count=getw(in);
      if(oflag)
-          printf("\n%u local references\n",count);
+          printf("\n%u local reference%s:\n",count, plural(count));
 
      while(count--) {
           fread(&ref,sizeof(ref),1,in);
@@ -283,14 +291,14 @@ showcomm()
 
      count=getw(in);
      if(rflag)
-          printf("\n%u common blocks:\n",count);
+          printf("\n%u common block%s:\n",count, plural(count));
 
      while(count--) {
           getname(sym);
           rsize=getw(in);
           rcount=getw(in);
           if(rflag)
-               printf(" %9s, size %d, %d references:\n",sym,rsize,rcount);
+               printf(" %9s, size %d, %d reference%s:\n",sym,rsize,rcount,plural(rcount));
           fflag=1;
           while(rcount--) {
                fread(&ref,sizeof(ref),1,in);
