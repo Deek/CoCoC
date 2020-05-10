@@ -130,7 +130,14 @@ pass1()
                showrefs();
                showlcls();
 
-               if (hd.h_vers) fseek(in, 2L, 1);
+               switch (hd.h_vers) {
+                    case 1:
+                         showcomm();
+			     case 0:
+                         break;
+                    default:
+                         error("can't process version %d object files", hd.h_vers);
+               }
           }
           fclose(in);
      }
@@ -266,6 +273,40 @@ showlcls()
           }
      }
 }
+
+showcomm()
+{
+     register unsigned count,rcount,rsize;
+     def_ref ref;
+     char sym[SYMLEN+1];
+     int fflag;
+
+     count=getw(in);
+     if(rflag)
+          printf("\n%u common blocks:\n",count);
+
+     while(count--) {
+          getname(sym);
+          rsize=getw(in);
+          rcount=getw(in);
+          if(rflag)
+               printf(" %9s, size %d, %d references:\n",sym,rsize,rcount);
+          fflag=1;
+          while(rcount--) {
+               fread(&ref,sizeof(ref),1,in);
+               if(ferror(in)) ferr(fname);
+               if(rflag && oflag) {
+                    puts("           ");
+                    printf("%04x ",ref.r_offset);
+                    ftext(ref.r_flag,REF);
+               }
+          }
+          if(rflag && !oflag)
+               putchar('\n');
+     }
+}
+
+
 error(s1,s2,s3,s4)
 {
      fprintf(stderr,"rdump: ");
