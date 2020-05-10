@@ -48,7 +48,7 @@ typedef struct {
      char h_valid;
      char h_date[5];
      char h_edit;
-     char h_spare;
+     char h_vers;
      unsigned h_glbl;
      unsigned h_dglbl;
      unsigned h_data;
@@ -130,6 +130,7 @@ pass1()
                showrefs();
                showlcls();
 
+               if (hd.h_vers) fseek(in, 2L, 1);
           }
           fclose(in);
      }
@@ -150,7 +151,7 @@ showhead()
           &("JanFebMarAprMayJunJulAugSepOctNovDec"[(mc(hd.h_date[1])-1)*3]),
           mc(hd.h_date[2]),1900+mc(hd.h_date[0]),
           mc(hd.h_date[3]),mc(hd.h_date[4]));
-     printf("Edition:     %2d\n",hd.h_edit);
+     printf("Edition/ROF: %0.3d/%0.3d\n",hd.h_edit,hd.h_vers);
        puts("  Section    Init Uninit\n");
      printf("   Code:     %04x\n",hd.h_ocode);
      printf("     DP:       %02x   %02x\n",hd.h_ddata,hd.h_dglbl);
