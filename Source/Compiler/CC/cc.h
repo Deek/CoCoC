@@ -2,7 +2,11 @@
 
 #define  VERSION     2
 #define  MAJREV      2
-#define  MINREV      0
+#define  MINREV      1
+
+#define  TWOPASS     TRUE    /* change to FALSE for one pass compiler */
+#define  ASSEMBLER   "rma"   /* change to "c.asm" if not dev pak */
+#define  LINKER      "rlink" /* change to "c.link" if not dev pak */
 
 direct int  aflag = FALSE,
             bflag = FALSE,
@@ -43,6 +47,7 @@ direct char *frkprmp = 0;
 char        *tmproot[] = { "/R", "/R0", "/DD/TMP"} ;
 char        tmptail[] = "ctmp.XXXXXX";
 char        tmpname[64] = "";
+char        rlib[60] = "";
 
 char        mainline[20] = "cstart.r";
 

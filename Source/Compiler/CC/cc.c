@@ -9,6 +9,7 @@
 **  ??-??-??  ll option for lex lib
 **  07-30-86  P option for special debug and z for debug
 **  03-24-87  don't optimize ".o" files, but accept as ".a"
+**  03-12-88  Added two pass (CoCo) compiler support.  Bill Dickhaus
 */
 
 #include "cc.h"
@@ -90,7 +91,7 @@ char  **argv;
                               goto saver;
                          ++fflag;
                          suffix = findsuff(objname);
-                         if (suffix == 'c')
+                         if (suffix == 'c' || suffix == 'r')
                               error("Suffix '.%c' not allowed for output", suffix);
                          goto saver;
                          /*page*/
@@ -151,8 +152,13 @@ emcommon:
 
                     case 'r' :                /* stop at .r (no link) */
                          rflag = TRUE;
-                         break;
-
+                         if (*++p != '=')
+                             goto saver;
+                         strcpy(rlib, (p + 1));
+                         if (rlib[0] == '\0')
+                             goto saver;
+                         strcat(rlib, "/");
+                         goto saver;
                          /*page*/
                     case 's' :               /* no stack checking (C) */
                          sflag = TRUE;
@@ -285,6 +291,27 @@ saver:
                newopath = 0;
                /*page*/
                /* now compile it */
+               if (TWOPASS)
+               {
+                    strcpy(srcfile, destfile);
+                    frkprmp = parmbuf;
+                    thisfilp = srcfile;
+                    splcat(srcfile);
+                    if (sflag)
+                        splcat("-s"); /* no stack checking */
+                    strcpy(destfile, tmpname);
+                    chgsuff(destfile, 'a');
+                    strcpy(ofn, "-o=");
+                    strcat(ofn, destfile);
+                    splcat(ofn);
+                    if (pflag)
+                        splcat("-p"); /* profiler code */
+                    trmcat();
+                    lasfilp = destfile;
+                    runit("c.pass1", 0);
+                    unlink(srcfile);
+               }
+
                strcpy(srcfile, destfile);
                frkprmp = parmbuf;
                thisfilp = srcfile;
@@ -293,7 +320,8 @@ saver:
                     splcat("-s");                    /* no stack checking */
                if (nullflag)
                {
-                    splcat("-n");                    /* waste the output */
+                    if (!TWOPASS)
+                        splcat("-n");                 /* waste the output */
                     strcpy(destfile, "/nil");
                     deltmpflg = 0;
                }
@@ -320,7 +348,10 @@ saver:
                     splcat("-p");                  /* wants profiler code */
                trmcat();
                lasfilp = destfile;
-               runit("c.comp", 0);
+               if (TWOPASS)
+                   runit("c.pass2", 0);
+               else
+                   runit("c.comp", 0);
                unlink(srcfile);
           }
           else
@@ -382,11 +413,15 @@ saver:
                     else
                     {
                          if (fflag && rflag)
-                             strcpy(destfile, objname);
+                         {
+                             strcpy(destfile, rlib);
+                             strcat(destfile, objname);
+                         }
                          else
                          {
                              chgsuff(namarray[j], 'r');
-                             strcpy(destfile, namarray[j]);
+                             strcpy(destfile, rlib);
+                             strcat(destfile, namarray[j]);
                          }
                     }
                     strcpy(ofn, "-o=");
@@ -394,7 +429,7 @@ saver:
                     splcat(ofn);
                     trmcat();
                     lasfilp = destfile;
-                    runit("c.asm", 0);
+                    runit(ASSEMBLER, 0);
                     if (deltmpflg)
                          unlink(srcfile);
                }
@@ -452,7 +487,7 @@ saver:
           splcat("-s");
      trmcat();
      lasfilp = 0;
-     runit("c.link", 0);
+     runit(LINKER, 0);
      cleanup();
 }
 
