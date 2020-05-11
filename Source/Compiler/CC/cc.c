@@ -10,6 +10,7 @@
 **  07-30-86  P option for special debug and z for debug
 **  03-24-87  don't optimize ".o" files, but accept as ".a"
 **  03-12-88  Added two pass (CoCo) compiler support.  Bill Dickhaus
+**  09-23-90  Increased command-line buffer (parmbuf) to 4k, Eddie Kuns
 */
 
 #include "cc.h"

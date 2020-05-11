@@ -2,7 +2,7 @@
 
 #define  VERSION     2
 #define  MAJREV      2
-#define  MINREV      1
+#define  MINREV      2
 
 #define  TWOPASS     TRUE    /* change to FALSE for one pass compiler */
 #define  ASSEMBLER   "rma"   /* change to "c.asm" if not dev pak */
@@ -62,5 +62,5 @@ char        *libarray[4],
             destfile[60],
             srcfile[60],
             objname[60],
-            parmbuf[256],
+            parmbuf[4096],
             devnam1[20];
