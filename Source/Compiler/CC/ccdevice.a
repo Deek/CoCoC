@@ -1,0 +1,34 @@
+*
+* cc1, cc2 and c.prep call defdrive() to determine the "system" device
+* for pathlists to the DEFS and LIB directories.  The technique used is
+* to link to the "Init" module and determine the name of the booted device.
+* Unfortunately, this is not always the correct device.  Systems that have
+* a hard disk usually boot from the floppy drive (/D0) and change execution
+* and data directories to the hard disk (/H0).  This leaves defdrive()
+* referring to /D0 instead of /H0 unless the "Init" module has been changed.
+*
+* Edition 3 and later of cc1, cc2 and c.prep will attempt to link to
+* a data module called "ccdevice" and extract the default system drive
+* string from there.  If no "ccdevice" module is in memory, they will
+* use defdrive() as before to obtain the string.  The following assembly
+* code, when assembled and linked, can be loaded into memory (Level II
+* systems) or merged to the end of cc1, cc2 and c.prep each (Level I
+* systems) to override the call to defdrive().
+*
+* To assemble and link:
+*
+* c.asm ccdevice.a -o=ccdevice.r
+* c.link ccdevice.r -f=ccdevice
+*
+* To merge with cc1 (others similar):
+*
+* merge /h0/cmds/cc1 ccdevice >xxx
+* attr xxx pe e
+* del -x cc1
+* copy xxx /h0/cmds/cc1
+* del xxx
+*
+ psect ccdevice_a,$40,$81,1,0,ccdev
+ccdev fcc "/D0" Device name here
+ fcb 0 Must have this zero byte
+ endsect
