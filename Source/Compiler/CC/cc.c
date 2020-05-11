@@ -11,6 +11,8 @@
 **  03-24-87  don't optimize ".o" files, but accept as ".a"
 **  03-12-88  Added two pass (CoCo) compiler support.  Bill Dickhaus
 **  09-23-90  Increased command-line buffer (parmbuf) to 4k, Eddie Kuns
+**  10-29-91  Added -g to use /dd/lib/getopt.r instead of library version
+**            Added -V to show version number.  Bob Billson
 */
 
 #include "cc.h"
@@ -96,6 +98,9 @@ char  **argv;
                               error("Suffix '.%c' not allowed for output", suffix);
                          goto saver;
                          /*page*/
+                    case 'g':                 /* use /dd/lib/getopt.r */
+                         gtflg++;
+                         break;
                     case 'l' :               /* specify a library (L) */
                          if (*(p + 1) == 'l')
                          {
@@ -185,6 +190,10 @@ emcommon:
                               strcat(tmpname,"/");
                          }
                          goto saver;
+
+                    case 'V':
+                         logo();
+                         exit (0);
 
                     case 'w' :    /* waste the compile for error check */
                          nullflag = TRUE;
@@ -458,6 +467,13 @@ saver:
           chgsuff(objname, 0);
      strcat(ofn, objname);
      splcat(ofn);
+
+     if (gtflg)
+     {
+          strcpy (ofn, "/dd/lib/getopt.r");
+          splcat (ofn);
+     }
+
      for (j = 0; j < libcnt; j++)
           splcat(libarray[j]);
      if (llflg)

@@ -2,7 +2,7 @@
 
 #define  VERSION     2
 #define  MAJREV      2
-#define  MINREV      2
+#define  MINREV      3
 
 #define  TWOPASS     TRUE    /* change to FALSE for one pass compiler */
 #define  ASSEMBLER   "rma"   /* change to "c.asm" if not dev pak */
@@ -12,6 +12,7 @@ direct int  aflag = FALSE,
             bflag = FALSE,
             cflag = FALSE,
             fflag = FALSE,
+            gtflg = FALSE,
             llflg = FALSE,
             mflag = FALSE,
             oflag = TRUE,
