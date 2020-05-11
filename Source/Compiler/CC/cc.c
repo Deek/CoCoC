@@ -13,6 +13,8 @@
 **  09-23-90  Increased command-line buffer (parmbuf) to 4k, Eddie Kuns
 **  10-29-91  Added -g to use /dd/lib/getopt.r instead of library version
 **            Added -V to show version number.  Bob Billson
+**  02-19-92  Added lg and ls options for cgfx and sys libraries,
+**              respectively.  Boisy G. Pitre
 */
 
 #include "cc.h"
@@ -105,6 +107,16 @@ char  **argv;
                          if (*(p + 1) == 'l')
                          {
                               llflg++;
+                              goto saver;
+                         }
+                         else if (*(p + 1) == 's')
+                         {
+                              lsflg++;
+                              goto saver;
+                         }
+                         else if (*(p+1) == 'g')
+                         {
+                              lgflg++;
                               goto saver;
                          }
                          else
@@ -205,6 +217,10 @@ emcommon:
 
                     case 'z' :
                          zflag = TRUE;
+                         break;
+
+                    case '?':     /* print list of options */
+                         usage();
                          break;
 
                     default  :
@@ -476,10 +492,23 @@ saver:
 
      for (j = 0; j < libcnt; j++)
           splcat(libarray[j]);
+
+     if (lgflg)
+     {
+          strcat (strcat (strcpy (ofn, "-l="), p), "/lib/cgfx.l");
+          splcat (ofn);
+     }
+
      if (llflg)
      {
           strcat(strcat(strcpy(ofn, "-l="), p), "/lib/lexlib.l");
           splcat(ofn);
+     }
+
+     if (lsflg)
+     {
+          strcat (strcat (strcpy (ofn, "-l="), p), "/lib/sys.l");
+          splcat (ofn);
      }
 
      if (p2flg)
@@ -632,4 +661,49 @@ logo()
 {
      if (hello == 0)
           fprintf(stderr, "\n cc version %d.%d.%d\n", VERSION, MAJREV, MINREV);
+}
+
+
+usage()
+{
+     register char **p;
+     static char *help[] =  {
+          "cc: C compiler executive",
+          "Usage: cc <opts> <files> <opts>",
+          "OPTIONS",
+          "   -a        = stop at the assembly",
+          "   -b=<path> = use a different \"cstart\"",
+          "   -c        = include comments",
+          "   -d        = create an identifier",
+          "   -e#       = set edition number of module",
+          "   -f=<path> = set outfile path",
+          "   -g        = use /dd/lib/getopt.r",
+          "   -l=<path> = specify a library",
+          "   -lg       = cgfx.l      (graphics library)",
+          "   -ls       = sys.l       (system library)",
+          "   -ll       = lexlib.l    (lexical library)",
+          "   -P        = dbg.l       (special debugger library)",
+          "   -m<memK>  = set memory size",
+          "   -M        = ask linker for link map",
+          "   -n=<name> = give module a name",
+          "   -o        = no optimizer",
+          "   -O        = stop after optimization",
+          "   -p        = add profiler",
+          "   -q        = quiet mode (don't echo lines)",
+          "   -r        = stop at .r (no link)",
+          "   -s        = no stack checking",
+          "   -S        = ask linker for symbol table",
+          "   -t        = use transendental library (clibt.l)",
+          "   -T=<path> = use alternate (or NO) temp. dir.",
+          "   -V        = show version number",
+          "   -w        = waste the compile for error checking only",
+          "   -x        = use the work dir. for the main library",
+          "   -z        = debug mode",
+          NULL
+     };
+
+     for (p = help; *p != NULL; ++p)
+          fprintf (stderr, "%s\n", *p);
+
+     exit (0);
 }

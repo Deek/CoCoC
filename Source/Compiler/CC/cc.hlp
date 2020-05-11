@@ -1,0 +1,54 @@
+NAME
+    "cc" is the C compiler executive.  It replaces cc1 and/or cc2, which
+come with the C compiler.  cc is compatible with cc1 and cc2, but offers
+more features as well as running faster if you have a RAM drive.
+
+DESCRIPTION
+    "cc" invokes the appropriate phases of the C compiler in order to compile
+C source programs.  This version is configured to use the two-pass Level 1
+version of the compiler, and to use RMA and RLINK as the last two passes.  It
+also puts temporary files in the first of /R, /R0, /DD/TMP, whichever it finds
+first.  If you need to reconfigure cc, instructions are contained in the
+file "read.me".
+
+OPTIONS
+    -a        Suppress assembly.  Leave output in ".a" file.
+    -b=<path> Use <path> as the mainline module.  /dd/lib/cstart.r is the
+              default if <path> is left off or this option isn't used.
+    -c        Include C source & comments as comments in assembly code.
+    -d<NAME>  Equivalent to #define <NAME> 1 in the preprocessor.
+    -d<NAME>=<STRING> is equivalent to #define <NAME> <STRING>
+    -e=n      Set edition number to n.
+    -f=<path> Use <path> as the output filename.  Filename part of <path>
+              is used as the module name unless overridden with -n.
+    -g        Use /dd/lib/getopt.r instead of CLIB function.
+    -l=<path> Use <path> as a library during link phase.
+    -lg       Same as "-l=/dd/lib/cgfx.l      (graphics library)
+    -ll       Same as "-l=/dd/lib/lexlib.l"   (lexical library)
+    -ls       Same as "-l=/dd/lib/sys.l"      (systems library)
+    -m=n      Instruct linker to add n pages to program's data size.
+    -m=nk     Instruct linker to add n kilobytes to program's data size.
+    -M        Request Linker to generate a linkage map.
+    -n=<name> Use <name> as the module name.
+    -o        Skip optimization pass.
+    -O        Stop after optimization.
+    -P        Same as " -p -l=/dd/lib/dbg.l ".
+    -p        Invoke the execution profiler.
+    -q        Quiet mode (put all output in the file c.errors).
+    -r        Suppress linking.  Stop at .r file.
+    -r=<dir>  Suppress linking.  Stop at .r file, putting .r's in <dir>
+    -s        Don't include stack checking code in the program.
+    -S        Ask linker to generate a symbol table.
+    -t        Use transcendental library clibt.l INSTEAD of normal clib.l.
+    -T        Put temporary files in the current directory.
+    -T=<dir>  Put temporary files in <dir>.  Without this option, cc puts
+              temporary files in the first of /R, /R0, or /DD/TMP which
+              exists.  (They are looked for in that order.)
+    -V        Show version number.
+    -w        Waste this compile as an error check.  Don't generate any
+              object.
+    -x        Use current data directory for main library.
+    -z        Print, but do not execute, the compilation commands.
+
+AUTHORS
+    Carl Kreider, Pete Lyall, Bill Dickhaus, Eddie Kuns, Boisy Pitre
