@@ -2,7 +2,7 @@
 
 #define  VERSION     2
 #define  MAJREV      5
-#define  MINREV      0
+#define  MINREV      1
 
 #ifndef TRUE
 #define TRUE 1
@@ -33,6 +33,7 @@ direct int  aflag = FALSE,
             rflag = FALSE,
             sflag = FALSE,
             s2flg = FALSE,
+            tgfex = FALSE,
             tflag = FALSE,
             xflag = FALSE,
             zflag = FALSE,

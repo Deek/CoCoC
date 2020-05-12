@@ -16,6 +16,7 @@
 **  02-19-92  Added lg and ls options for cgfx and sys libraries,
 **              respectively.  Boisy G. Pitre
 **  07-10-93  Added -A option to use ansifront.  Vaughn Cato.
+**  11-22-93  Added -E opt, triggers c_prep18's trigraph expands. G. Heskett
 */
 
 #include "cc.h"
@@ -100,6 +101,10 @@ char  **argv;
                     case 'e' :                  /* set edition number */
                          emp = &edition;
                          goto emcommon;
+
+                    case 'E' :
+                         tgfex = 1;
+                         break;
 
                     case 'f' :                /* set outfile path (L) */
                          if (*++p != '=')
@@ -323,7 +328,10 @@ saver:
                trmcat();
                thisfilp = 0;
                lasfilp = destfile;
-               runit("c.prep", 1);
+               if(tgfex)
+                    runit("c_prep -T ", 1);
+               else
+                    runit("c_prep", 1);
                close(1);
                dup(newopath);
                close(newopath);
