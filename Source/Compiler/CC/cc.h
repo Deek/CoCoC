@@ -1,14 +1,22 @@
 #include <stdio.h>
 
 #define  VERSION     2
-#define  MAJREV      2
-#define  MINREV      4
+#define  MAJREV      5
+#define  MINREV      0
 
-#define  TWOPASS     TRUE    /* change to FALSE for one pass compiler */
-#define  ASSEMBLER   "rma"   /* change to "c.asm" if not dev pak */
-#define  LINKER      "rlink" /* change to "c.link" if not dev pak */
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#define  TWOPASS     TRUE    /* undefine for one pass compiler */
+#define  ASSEMBLER   "rma"   /* change to "c.asm" if NOT Developer's Pak */
+#define  LINKER      "rlink" /* change to "c.link" if NOT Developer's pak */
 
 direct int  aflag = FALSE,
+            Aflag = FALSE,
             bflag = FALSE,
             cflag = FALSE,
             fflag = FALSE,
@@ -47,7 +55,7 @@ direct char *thisfilp = 0,
 direct int  frkprmsiz = 0;
 direct char *frkprmp = 0;
 
-char        *tmproot[] = { "/R", "/R0", "/DD/TMP"} ;
+char        *tmproot[] = {"/R", "/R0", "/DD/TEMP", "/DD/TMP"} ;
 char        tmptail[] = "ctmp.XXXXXX";
 char        tmpname[64] = "";
 char        rlib[60] = "";

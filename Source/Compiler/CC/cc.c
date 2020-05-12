@@ -15,10 +15,13 @@
 **            Added -V to show version number.  Bob Billson
 **  02-19-92  Added lg and ls options for cgfx and sys libraries,
 **              respectively.  Boisy G. Pitre
+**  07-10-93  Added -A option to use ansifront.  Vaughn Cato.
 */
 
 #include "cc.h"
 #include <module.h>
+
+static int newipath = -1;
 
 cleanup()
 {
@@ -28,6 +31,12 @@ cleanup()
      {
           close(1);
           dup(newopath);
+          close(newopath);
+     }
+     if (newipath > -1) {
+       close(0);
+       dup(newipath);
+       close(newipath);
      }
      if (thisfilp)
           unlink(thisfilp);
@@ -63,6 +72,10 @@ char  **argv;
                     {
                     case 'a' :             /* stop at asm (no .r) (D) */
                          aflag = TRUE;
+                         break;
+
+                    case 'A' :                       /* Use ansifront */
+                         Aflag = TRUE;
                          break;
 
                     case 'b' :              /* use different "cstart" */
@@ -316,28 +329,58 @@ saver:
                close(newopath);
                newopath = 0;
                /*page*/
-               /* now compile it */
-               if (TWOPASS)
-               {
+
+               if (Aflag) {
+/* Run ansifront */
                     strcpy(srcfile, destfile);
+                    strcpy(destfile, tmpname);
+                    chgsuff(destfile, 'n');
                     frkprmp = parmbuf;
                     thisfilp = srcfile;
-                    splcat(srcfile);
-                    if (sflag)
-                        splcat("-s"); /* no stack checking */
-                    strcpy(destfile, tmpname);
-                    chgsuff(destfile, 'a');
-                    strcpy(ofn, "-o=");
-                    strcat(ofn, destfile);
-                    splcat(ofn);
-                    if (pflag)
-                        splcat("-p"); /* profiler code */
-                    trmcat();
+                    trmcat(); /* Add \n\0 to frkprmp */
                     lasfilp = destfile;
-                    runit("c.pass1", 0);
+                    newipath = dup(0);
+                    close(0);
+                    if ((open(srcfile, 3)) != 0)
+                         error("can't open temporary file for '%s'", namarray[j]);
+                    newopath = dup(1);
+                    close(1);
+                    if ((creat(destfile, 3)) != 1)
+                         error("can't create temporary file for '%s'", namarray[j]);
+                    runit("ansifront", 0);
+                    close(1);
+                    dup(newopath);
+                    close(newopath);
+                    newopath = 0;
+                    close(0);
+                    dup(newipath);
+                    close(newipath);
+                    newipath = -1;
                     unlink(srcfile);
                }
 
+               /* now compile it */
+#ifdef TWOPASS
+               strcpy(srcfile, destfile);
+               frkprmp = parmbuf;
+               thisfilp = srcfile;
+               splcat(srcfile); /* append a space and srcfile to frkprmp */
+               if (sflag)
+                   splcat("-s"); /* no stack checking */
+               strcpy(destfile, tmpname);
+               chgsuff(destfile, 'a');
+               strcpy(ofn, "-o=");
+               strcat(ofn, destfile);
+               splcat(ofn);
+
+               if (pflag)
+                   splcat("-p"); /* profiler code */
+
+               trmcat();
+               lasfilp = destfile;
+               runit("c.pass1", 0);
+               unlink(srcfile);
+#endif
                strcpy(srcfile, destfile);
                frkprmp = parmbuf;
                thisfilp = srcfile;
@@ -346,8 +389,9 @@ saver:
                     splcat("-s");                    /* no stack checking */
                if (nullflag)
                {
-                    if (!TWOPASS)
-                        splcat("-n");                 /* waste the output */
+#ifndef TWOPASS
+                    splcat("-n");                     /* waste the output */
+#endif
                     strcpy(destfile, "/nil");
                     deltmpflg = 0;
                }
@@ -374,10 +418,11 @@ saver:
                     splcat("-p");                  /* wants profiler code */
                trmcat();
                lasfilp = destfile;
-               if (TWOPASS)
-                   runit("c.pass2", 0);
-               else
-                   runit("c.comp", 0);
+#ifdef TWOPASS
+               runit("c.pass2", 0);
+#else
+               runit("c.comp", 0);
+#endif
                unlink(srcfile);
           }
           else
@@ -543,7 +588,7 @@ char  *cmd;
 int   code;
 {
      /*   fprintf(stderr, "   %-6s:\n", cmd); */
-     fprintf(stderr, "   %-6s:  %s", cmd, parmbuf);
+     fprintf(stderr, "   %-7s:  %s", cmd, parmbuf);
      if (zflag)
           return;
      if ((childid = os9fork(cmd, frkprmsiz, parmbuf, 1, 1, 0)) < 0)
@@ -672,6 +717,7 @@ usage()
           "Usage: cc <opts> <files> <opts>",
           "OPTIONS",
           "   -a        = stop at the assembly",
+          "   -A        = run ansifront for ANSI-C processing",
           "   -b=<path> = use a different \"cstart\"",
           "   -c        = include comments",
           "   -d        = create an identifier",

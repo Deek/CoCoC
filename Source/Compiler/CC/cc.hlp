@@ -13,6 +13,7 @@ file "read.me".
 
 OPTIONS
     -a        Suppress assembly.  Leave output in ".a" file.
+    -A        Run ansifront for ANSI-C processing.
     -b=<path> Use <path> as the mainline module.  /dd/lib/cstart.r is the
               default if <path> is left off or this option isn't used.
     -c        Include C source & comments as comments in assembly code.
