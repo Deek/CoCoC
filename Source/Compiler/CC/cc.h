@@ -2,7 +2,7 @@
 
 #define  VERSION     2
 #define  MAJREV      5
-#define  MINREV      1
+#define  MINREV      2
 
 #ifndef TRUE
 #define TRUE 1

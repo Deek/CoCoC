@@ -23,6 +23,12 @@
 #include "cc.h"
 #include <module.h>
 
+/* screw ansifront's 8 char hashing */
+#define intercept intercep
+
+/* some proto info for ansifront or c.pass1 */
+char *chkccdev();
+
 static int newipath = -1;
 
 cleanup()
@@ -307,7 +313,7 @@ saver:
      mktemp(tmpname);
      strcat(tmpname, ".m"); /* add a suffix for chgsuff */
 
-     intercept(trap);
+     intercept(trap); /* I'm gonna bet this is the barfed name */
      dummy();
 
      for (j = 0; j < filcnt; ++j)         /* for each file on cmd line */
@@ -528,7 +534,7 @@ saver:
      /*page*/
      /* now link all together */
      frkprmp = parmbuf;
-     if ((p = chkccdev()) == 0)
+     if ((p = chkccdev()) == NULL)
           error("Cannot find default system drive");
      if (bflag)
           strcpy(ofn, mainline);      /* use cstart.r or whatever */
@@ -617,14 +623,15 @@ int   code;
 }
 
 
+char *
 chkccdev()
 {
      char *s, c;
      register char  *p;
-     struct mod_exec *q;
+     struct mod_data *q; /* was mod_exec, m_data not member if it! */
      struct mod_config  *r;
 
-     if ((q = modlink("ccdevice", 4, 0)) != -1)
+     if ((q = (struct mod_data *)modlink("ccdevice", 4, 0)) != (struct mod_data *)-1)
      {
           strcpy(devnam1, (char *)q + q->m_data);
           munlink(q);
@@ -632,9 +639,9 @@ chkccdev()
      }
      else
      {
-          if ((r = modlink("Init", 0x0c, 0)) != -1)
+          if ((r = (struct mod_config *)modlink("Init", 0x0c, 0)) != (struct mod_config *)-1)
           {
-               s = (char *)r + r->m_sysdrive;
+               s = (char *)(r + r->m_sysdrive);
                p = devnam1;
                while ((c = *s++) > 0)
                     *p++ = c;
@@ -644,7 +651,7 @@ chkccdev()
                return (devnam1);
           }
      }
-     return (0);
+     return (NULL);
 }
 
 
