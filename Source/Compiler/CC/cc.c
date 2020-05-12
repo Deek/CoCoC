@@ -17,6 +17,7 @@
 **              respectively.  Boisy G. Pitre
 **  07-10-93  Added -A option to use ansifront.  Vaughn Cato.
 **  11-22-93  Added -E opt, triggers c_prep18's trigraph expands. G. Heskett
+**  03-21-94  Added -N opt, use r63 as assembler instead of rma.  G. Heskett
 */
 
 #include "cc.h"
@@ -159,6 +160,10 @@ emcommon:
 
                     case 'M' :         /* ask linker for link map (L) */
                          mflag = TRUE;
+                         break;
+
+                    case 'N' :               /* use r63 for assembler */
+                         Nflag = TRUE;
                          break;
 
                     case 'n' :              /* give module a name (L) */
@@ -508,7 +513,11 @@ saver:
                     splcat(ofn);
                     trmcat();
                     lasfilp = destfile;
-                    runit(ASSEMBLER, 0);
+                    if (Nflag)
+                         runit(NASSEMBLER, 0);
+                    else
+                         runit(ASSEMBLER, 0);
+
                     if (deltmpflg)
                          unlink(srcfile);
                }
@@ -740,6 +749,7 @@ usage()
           "   -m<memK>  = set memory size",
           "   -M        = ask linker for link map",
           "   -n=<name> = give module a name",
+          "   -N        = use r63 assembler for native source .a code",
           "   -o        = no optimizer",
           "   -O        = stop after optimization",
           "   -p        = add profiler",

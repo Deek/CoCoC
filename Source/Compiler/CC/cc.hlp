@@ -31,6 +31,7 @@ OPTIONS
     -m=nk     Instruct linker to add n kilobytes to program's data size.
     -M        Request Linker to generate a linkage map.
     -n=<name> Use <name> as the module name.
+    -N        Use native mode assembler r63 in place of rma
     -o        Skip optimization pass.
     -O        Stop after optimization.
     -P        Same as " -p -l=/dd/lib/dbg.l ".

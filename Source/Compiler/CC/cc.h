@@ -13,6 +13,7 @@
 
 #define  TWOPASS     TRUE    /* undefine for one pass compiler */
 #define  ASSEMBLER   "rma"   /* change to "c.asm" if NOT Developer's Pak */
+#define  NASSEMBLER  "r63"   /* alternate assembler for native .a source */
 #define  LINKER      "rlink" /* change to "c.link" if NOT Developer's pak */
 
 direct int  aflag = FALSE,
@@ -25,6 +26,7 @@ direct int  aflag = FALSE,
             llflg = FALSE,
             lsflg = FALSE,
             mflag = FALSE,
+            Nflag = FALSE,
             oflag = TRUE,
             o2flg = FALSE,
             pflag = FALSE,
