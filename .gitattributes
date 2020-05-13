@@ -1,7 +1,7 @@
 Cmds/* binary
-Defs/* filter=crtext
+Defs/** filter=crtext
 Lib/* binary
-Sys/* filter=crtext
+Sys/** filter=crtext
 
 *.ipc binary
 
@@ -15,7 +15,7 @@ Sys/* filter=crtext
 *.txt filter=crtext
 *.README filter=crtext
 comp.* filter=crtext
-[Mm]ake* filter=crtext
+Source/**/[Mm]ake* filter=crtext
 
 README filter=crtext
 MANUAL filter=crtext
