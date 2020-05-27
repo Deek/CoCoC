@@ -17,5 +17,6 @@ Sys/** filter=crtext
 comp.* filter=crtext
 Source/**/[Mm]ake* filter=crtext
 
+COPYING	filter=crtext
 README filter=crtext
 MANUAL filter=crtext
