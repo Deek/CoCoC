@@ -428,10 +428,22 @@ register int *p;
         for (i = 1; i++ < n; ) os("0,");
         ob('0');
     } else
+#if defined(_LIL_END) || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__))
+        /*
+         * We're only swapping the order in which we output the words, the
+         * individual words will format correctly since they're native.
+         */
+        p += (n - 1);
+        for (i = n; i > 0; --i){
+            od(*p--);
+            if (i > 1) ob(',');
+        }
+#else	/* assume bigendian */
         for (i = 0; i < n; ++i){
             od(*p++);
             if (i != n - 1) ob(',');
         }
+#endif
     nl();
 }
 
