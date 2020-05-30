@@ -70,7 +70,14 @@ char **argv;
 
 	/* resident system define name */
 	addmac("OS9","1");			/* target operating system */
-	addmac("mc6809","1");		/* target machine name */
+	addmac("_OS9","1");			/* more standard version */
+
+	addmac("mc6809","1");			/* target cpu */
+	addmac("__mc6809__","1");		/* target cpu */
+	addmac("__MC6809__","1");
+
+	addmac("_BIG_END","1");					/* OS9 endian marker */
+/*	addmac("_LIL_END","1");					/* OS9 endian marker */
 
 	/* the current line macro */
 	(macline = addmac("__LINE__",""))->macdef->md_elem = curlinebuf;
