@@ -292,7 +292,7 @@ doliner()
 		}
 		skipsp(1);
 		gch(1);
-		getword(name, NAMESIZE);
+		getfile(name, NAMESIZE);
 		if (*name)
 		{
 			strcpy(setfile(filename), name);

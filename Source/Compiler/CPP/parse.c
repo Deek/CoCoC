@@ -125,6 +125,24 @@ register int count;
 		gch(KEEPSP);
 }
 
+getfile(word,count)
+register char *word;
+register int count;
+{
+	/* eat an initial quote character */
+	if (cch == '"') gch(KEEPSP);
+
+	while (--count > 0 && (isalnum(cch) || cch == '_' || cch == '-' || cch == '.' || cch == '$')) {
+		*word++ = cch;
+		gch(KEEPSP);
+	}
+	*word = '\0';
+
+	/* eat any extra chars */
+	while (isalnum(cch) || cch == '_' || cch == '-' || cch == '.' || cch == '$' || cch == '"')
+		gch(KEEPSP);
+}
+
 newline()
 {
 	for(;;) {
