@@ -427,7 +427,7 @@ register int *p;
     else if (p == NULL) {
         for (i = 1; i++ < n; ) os("0,");
         ob('0');
-    } else
+    } else {
 #if defined(_LIL_END) || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__))
         /*
          * We're only swapping the order in which we output the words, the
@@ -444,6 +444,7 @@ register int *p;
             if (i != n - 1) ob(',');
         }
 #endif
+    }
     nl();
 }
 
