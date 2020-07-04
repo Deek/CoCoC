@@ -64,7 +64,7 @@ char *s;
        return(temp);
       };
     };
-   if (temp=strchr(temp,13))
+   if (temp=strchr(temp,'\n'))
     temp++;
   };
  return(0);
@@ -78,7 +78,7 @@ char *s;
  int len;
 
  temp=findenv(s);
- len=((char *)strchr(temp,13)-temp); /* We need to use this more than once */
+ len=((char *)strchr(temp,'\n')-temp); /* We need to use this more than once */
 
  strncpy(envstr,temp,len);
  envstr[len] = 0;                      /* Add a terminating NUL */
@@ -97,7 +97,7 @@ char *v,*s;
 
  if (temp=findenv(v))
   {
-   len=(char *)strchr(temp,13)-temp;
+   len=(char *)strchr(temp,'\n')-temp;
    movemem(temp+slen,temp+len,strlen(temp+len)+1);
    movemem(temp,s,slen);
   }
