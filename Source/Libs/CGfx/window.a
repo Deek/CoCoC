@@ -32,7 +32,7 @@ d0 ldb 19,s
  std 8,s
  lda 15,s
  leax ,s
- os9 I$WRITE
+ os9 I$Write
  leas 10,s
  bra os9err0
 
@@ -44,7 +44,7 @@ DWEnd:
  leax ,s
  ldy #2
  lda 7,s
- os9 I$WRITE
+ os9 I$Write
  leas 2,s
  bra os9err0
 
@@ -58,7 +58,7 @@ DWProtSw:
  lda 8,s
  ldy #3
  leax ,s
- os9 I$WRITE
+ os9 I$Write
  leas 3,s
 
 os9err0 puls y
@@ -91,7 +91,7 @@ OWSet:
  ldy #9
  leax ,s
  lda 14,s
- os9 I$WRITE
+ os9 I$Write
  leas 9,s
  bra os9err0
 
@@ -102,7 +102,7 @@ MVOWEnd:
  lda 5,s
  ldb #$86 first _ss_wset the overlay to no box...
  ldy #0
- os9 I$SETSTT
+ os9 I$SetStt
  bra o0 then do OWEnd....
 
 UnShadow:
@@ -114,7 +114,7 @@ o0 ldd #$1b23
  lda 7,s
  ldy #2
  leax ,s
- os9 I$WRITE
+ os9 I$Write
  leas 2,s
  bra os9err0
 
@@ -126,7 +126,7 @@ Select:
  leax ,s
  lda 7,s
  ldy #2
- os9 I$WRITE
+ os9 I$Write
  leas 2,s
  lbra os9err0
 
@@ -145,7 +145,7 @@ CWArea:
  lda 11,s
  ldy #6
  leax ,s
- os9 I$WRITE
+ os9 I$Write
  leas 6,s
  lbra os9err0
 

@@ -7,8 +7,9 @@
 
 
  psect keysense,0,0,0,0,0
+ ifp1
  use /dd/defs/os9defs.a
- 
+ endc
 
 ***********************************
 * int _ss_ksns(path,keybits)
@@ -23,7 +24,7 @@ _ss_ksns:
  ldx 4,s get 'keybits'
  lda 3,s get 'path'
  ldb #$27 SS.KYSNS call
- os9 I$SETSTT
+ os9 I$SetStt
  bcs os9err error, return -1 and leave error code in 'errno'
  clra
  clrb
@@ -47,7 +48,7 @@ os9err
 _gs_ksns:
  lda 3,s get 'path'
  ldb #$27 SS.KYSNS call
- os9 I$GETSTT
+ os9 I$GetStt
  bcs os9err
  tfr a,b
  clra

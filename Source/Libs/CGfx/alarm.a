@@ -23,7 +23,7 @@ ClrAlarm:
  clra
  clrb
 
-return os9 F$ALARM
+return os9 F$Alarm
  bcs error
  clra
  clrb

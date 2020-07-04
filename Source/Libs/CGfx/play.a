@@ -349,7 +349,7 @@ playnorm lsrb
  beq playit
  clra
  tfr d,x
- os9 F$SLEEP
+ os9 F$Sleep
  bra playit
 
 playstac lsrb
@@ -358,7 +358,7 @@ playstac lsrb
  beq playit
  clra
  tfr d,x
- os9 F$SLEEP
+ os9 F$Sleep
  bra playit
 
 playleg clr ,-s
@@ -370,7 +370,7 @@ playit puls b
  lda path,y
  puls x,y
  ldb #$98
- os9 I$SETSTT
+ os9 I$SetStt
 
 playret puls x,y,pc
 
@@ -379,7 +379,7 @@ playrest pshs x
  lbsr calctime
  cmpx #0
  beq playret2
- os9 F$SLEEP
+ os9 F$Sleep
 playret2 puls x,pc
 
  endsect

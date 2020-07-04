@@ -26,7 +26,7 @@ cread:
  lda 5,s
  ldy 8,s
  ldx 6,s
- os9 I$READLN
+ os9 I$ReadLn
  bcs os9err
  leay -1,y
  ldx 6,s
@@ -58,7 +58,7 @@ creadln:
  lda 5,s
  ldy 8,s
  ldx 6,s
- os9 I$READLN
+ os9 I$ReadLn
  bcs os9err
  ldx 6,s
  tfr y,d
@@ -134,7 +134,7 @@ cwriteln:
 c1 tfr d,y
  ldx 6,s
  lda 5,s
- os9 I$WRITLN
+ os9 I$WritLn
  bcs os9err
  tfr y,d
  puls y,pc
@@ -156,7 +156,7 @@ read:
  lda 5,s
  ldy 8,s
  ldx 6,s
- os9 I$READ
+ os9 I$Read
  bcs os9err
  tfr y,d
  puls y,pc
@@ -178,7 +178,7 @@ readln:
  lda 5,s
  ldy 8,s
  ldx 6,s
- os9 I$READLN
+ os9 I$ReadLn
  lbcs os9err
  tfr y,d
  puls y,pc
@@ -221,7 +221,7 @@ writeln:
  ldx 6,s
  ldy 8,s
  lda 5,s
- os9 I$WRITLN
+ os9 I$WritLn
  lbcs os9err
  tfr y,d
  puls y,pc

@@ -16,14 +16,14 @@ _ss_wset:
  ldb #$86
  ldx 8,s
  ldy 6,s
- os9 I$SETSTT
+ os9 I$SetStt
  puls y
  bra os9err0
 
 _gs_msel:
  lda 3,s
  ldb #$87
- os9 I$GETSTT
+ os9 I$GetStt
  bcs os9err0
  pshs a
  clra
@@ -34,7 +34,7 @@ _ss_umbar:
 _ss_umba:
  lda 3,s
  ldb #$95
- os9 I$SETSTT
+ os9 I$SetStt
 
 os9err0 bcc noerr0
  clra
@@ -51,7 +51,7 @@ _ss_sbar:
  ldx 6,s
  ldy 8,s
  ldb #$88
- os9 I$SETSTT
+ os9 I$SetStt
  puls y
  bra os9err0
 

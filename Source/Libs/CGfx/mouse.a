@@ -17,7 +17,7 @@ _ss_mous:
  ldy 10,s
  lda 5,s
  ldb #$89
- os9 I$SETSTT
+ os9 I$SetStt
  puls y
 
 os9err0 bcc noerr0
@@ -33,7 +33,7 @@ _ss_msig:
  ldx 4,s
  lda 3,s
  ldb #$8a
- os9 I$SETSTT
+ os9 I$SetStt
  bra os9err0
 
 _gs_mous:
@@ -42,7 +42,7 @@ _gs_mous:
  lda 5,s
  ldy #0
  ldb #$89
- os9 I$GETSTT
+ os9 I$GetStt
  puls y
  bra os9err0
 

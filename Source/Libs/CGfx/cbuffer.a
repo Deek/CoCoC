@@ -55,7 +55,7 @@ _Flush:
  leax _CBuffer,y
  ldy _CUsed,y
  beq noerror1
- os9 I$WRITE
+ os9 I$Write
  bcc noerror1 thanks Bob!
  clra
  std errno,u
@@ -83,7 +83,7 @@ _CGFXBuf:
 **************************************
 * write function- used for all other
 * functions to write to a path-
-* unbuffered version just calls I$WRITE.
+* unbuffered version just calls I$Write.
 *
 * A=path
 * X=address
@@ -114,7 +114,7 @@ noflush2 cmpu #256 writing more than 256 bytes?
  pshs y otherwise, write it directly
  lda _CPath,y get the path
  tfr u,y y=byte count
- os9 I$WRITE write it
+ os9 I$Write write it
  puls y
  bcc noerror2 no error...
  clra

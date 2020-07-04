@@ -1,4 +1,4 @@
- psect mouse,0,0,0,0,0
+ psect shadow,0,0,0,0,0
 
 
  ifp1
@@ -20,8 +20,8 @@ Shadow:
  lbsr _Flush
  leas -9,s
  lda 14,s
- ldb #SS.SCSIZ
- os9 I$GETSTT
+ ldb #SS.ScSiz
+ os9 I$GetStt
  tfr x,d
  subd 15,s
  lsrb

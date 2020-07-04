@@ -15,7 +15,7 @@
 _write:
  pshs y save y
  tfr u,y byte count to y
- os9 I$WRITE write it
+ os9 I$Write write it
  bcs error
  puls y
 _Flush:

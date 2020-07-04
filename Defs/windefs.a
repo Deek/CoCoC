@@ -1,0 +1,249 @@
+*
+* Pointer Device Packet Definition
+*
+ csect 0
+Pt.Valid rmb 1 Is returned info valid (0=no/1=yes)
+Pt.Actv rmb 1 Active Side 0=off/1=Right/2=left
+Pt.ToTm rmb 1 Time out Initial value
+ rmb 2 reserved
+Pt.TTTo rmb 1 Time Till Timeout
+Pt.TSSt rmb 2 Time Since Start Counter
+Pt.CBSA rmb 1 Current Button State    Button A
+Pt.CBSB rmb 1 Current Button State    Button B
+Pt.CCtA rmb 1 Click Count             Button A
+Pt.CCtB rmb 1 Click Count             Button B
+Pt.TTSA rmb 1 Time This State Counter Button A
+Pt.TTSB rmb 1 Time This State Counter Button B
+Pt.TLSA rmb 1 Time Last State Counter Button A
+Pt.TLSB rmb 1 Time Last State Counter Button B
+ rmb 2 Reserved
+Pt.BDX rmb 2 Button down X value EXPERIMENTAL
+Pt.BDY rmb 2 Button down Y value
+Pt.Stat rmb 1 Window Pointer type location
+Pt.Res rmb 1 Resolution (0..640 by: 0=ten/1=one)
+Pt.AcX rmb 2 Actual X Value
+Pt.AcY rmb 2 Actual Y Value
+Pt.WRX rmb 2 Window Relative X
+Pt.WRY rmb 2 Window Relative Y
+Pt.Siz equ 32 Packet Size 32 bytes
+ ends
+*
+* buffer group numbers
+*
+ csect 200
+Grp.Fnt
+GRP_FONT rmb 1	Font group
+Grp.Clip
+GRP_CLIP rmb 1	Clipboard group
+Grp.Ptr
+GRP_PTR rmb 1	Pointer group
+Grp.Pat2
+GRP_PAT2 rmb 1	Two color patterns
+Grp.Pat4
+GRP_PAT4 rmb 1	Four color patterns
+Grp.Pat6
+GRP_PAT6 rmb 1	Sixteen color patterns
+ ends
+*
+* font buffer numbers
+*
+ csect 1
+Fnt.S8x8
+FNT_S8X8 rmb 1	Standard 8x8 font (default)
+Fnt.S6x8
+FNT_S6X8 rmb 1	Standard 6x8 font
+Fnt.G8x8
+FNT_G8X8 rmb 1	Standard graphics character font
+ ends
+*
+* pattern buffer numbers
+*
+ csect 0
+Pat.Sld
+PAT_SLD rmb 1	Solid (default)
+Pat.Dot
+PAT_DOT rmb 1	Dots
+Pat.Vrt
+PAT_VRT rmb 1	Vertical lines
+Pat.Hrz
+PAT_HRZ rmb 1	Horizontal lines
+Pat.XHtc
+PAT_XHTC rmb 1	Crosshatch
+Pat.LSnt
+PAT_LSNT rmb 1	Left slanted lines
+Pat.RSnt
+PAT_RSNT rmb 1	Right slanted lines
+Pat.SDot
+PAT_SDOT rmb 1	Small dots
+Pat.BDot
+PAT_BDOT rmb 1	BIG dots
+ ends
+*
+* mouse pointer buffers
+*
+ csect 1
+Ptr.Arr
+PTR_ARR rmb 1	Arrow pointer
+Ptr.Pen
+PTR_PEN rmb 1	Pencil pointer
+Ptr.LCH
+PTR_LCH rmb 1	Large cross hair pointer
+Ptr.Slp
+PTR_SLP rmb 1	Hourglass (wait timer) pointer
+Ptr.Ill
+PTR_ILL rmb 1	Illegal action (circle with a slash) pointer
+Ptr.Txt
+PTR_TXT rmb 1	Text pointer
+Ptr.SCH
+PTR_SCH rmb 1	Small cross hair pointer
+ ends
+*
+* Window/Menu Bar Data Structure
+*
+NUMMENS equ	10	maximum number of menus on menu bar
+MXTTLEN equ	15	max chars for menu and item names
+NUMITMS equ	20	maximum number of items in a menu
+WINSYNC equ	$C0C0	sync bytes for window validation
+*
+* Menu item descriptor format
+*
+ csect 0
+MI.TTL	rmb MXTTLEN	item name
+MI.ENBL rmb 1	enable flag
+MI.RES	rmb 5	reserved bytes
+MI.SIZ	equ .	size of menu item descriptor
+ ends
+*
+* Menu descriptor format
+*
+ csect 0
+MN.TTL	rmb MXTTLEN	menu title
+MN.ID	rmb 1	menu id number (1..255)
+MN.XSIZ rmb 1	h.size of desired pulldown menu
+MN.NITS rmb 1	number of items in menu
+MN.ENBL rmb 1	enable flag
+MN.RES	rmb 2	reserved bytes
+MN.ITEMS rmb 2	pointer to array of menu items
+MN.SIZ	equ .	size of menu descriptor
+ ends
+*
+* Window descriptor format
+*
+ csect 0
+WN.TTL	rmb 20	window title bar
+WN.NMNS rmb 1	number of menus in menu bar
+WN.XMIN rmb 1	minimum h.size for app to run
+WN.YMIN rmb 1	minimum v.size for app to run
+WN.SYNC rmb 2	sync bytes ($C0C0)
+WN.RES	rmb 7	reserved bytes
+WN.BAR	rmb 2	pointer to array of menu descriptors
+WN.SIZ	equ .	size of window descriptor
+ ends
+*
+* window type defs
+*
+ csect 0
+WT.NBox
+WT_NBOX rmb 1	No box
+WT.FWin
+WT_FWIN rmb 1	Framed window
+WT.FSWin
+WT_FSWIN rmb 1	Framed window, with scroll bars
+WT.SBox
+WT_SBOX rmb 1	Shadowed box
+WT.DBox
+WT_DBOX rmb 1	Double box
+WT.PBox
+WT_PBOX rmb 1	Plain box
+ ends
+*
+* predefined menu ids
+*
+ csect 1
+MId.Mov
+MN_MOVE rmb 1	move box
+MId.Cls
+MN_CLOS rmb 1	close box
+MId.Grw
+MN_GROW rmb 1	grow box
+MId.SUp
+MN_USCRL rmb 1	scroll up
+MId.SDn
+MN_DSCRL rmb 1	scroll down
+MId.SRt
+MN_RSCRL rmb 1	scroll right
+MId.SLt
+MN_LSCRL rmb 1	scroll left
+MId.Chr rmb 1	character was depressed (no C version?)
+ ends
+ csect 20
+MId.Tdy
+MN_TNDY rmb 1	Tandy menu
+MId.Fil
+MN_FILE rmb 1	Files menu
+MId.Edt
+MN_EDIT rmb 1	Edit menu
+MId.Sty
+MN_STYL rmb 1	Styles menu
+MId.Fnt
+MN_FONT rmb 1	Font menu
+ ends
+*
+* logic modes
+*
+ csect 0
+LOG_NONE rmb 1	no logic - just put it there (default)
+LOG_AND rmb 1	AND the contents of the screen with the data
+LOG_OR	rmb 1	OR the contents of the screen with the data
+LOG_XOR rmb 1	XOR the contents of the screen with the data
+ ends
+*
+* special characters for font FNT_G8X8
+*
+ csect $C1
+CHR_RGT rmb 1	right arrow
+CHR_LFT rmb 1	left arrow
+CHR_DN	rmb 1	down arrow
+CHR_UP	rmb 1	up arrow
+CHR_TRI rmb 1	triple bar (for title bar)
+CHR_RSZ rmb 1	resize box (not used)
+CHR_CLZ rmb 1	close box
+CHR_MOV rmb 1	move box
+CHR_VBX rmb 1	vertical box (for scroll markers)
+CHR_HBX rmb 1	horizontal box (for scroll markers)
+CHR_HRG rmb 1	hourglass (Tandy menu)
+CHR_TRR rmb 1	triple bar with open right side
+CHR_TRL rmb 1	triple bar with open left side
+ ends
+*
+* now for some define constants for the 'd_type' field...
+*
+ csect -1
+D_END	rmb 1	End marker of array
+D_TEXT	rmb 1	ASCII text
+D_KEY	rmb 1	key-binding
+D_STRING rmb 1	ASCII string box (accepts text)
+D_BUTTON rmb 1	3-D text button
+D_RADIO rmb 1	Radio button (where d_string should be NULL)
+ ends
+*
+*
+*
+ csect 0
+MN_DSBL rmb 1
+MN_ENBL
+MN_FUNC rmb 1	call a function
+MN_SUBMN rmb 1	sub-menu
+ ends
+*
+*
+*
+ csect 0
+WR_CNTNT rmb 1	content region
+WR_CNTRL rmb 1	control region
+WR_OFWIN rmb 1	off window
+ ends
+ csect 0
+MNDSBL rmb 1
+MNENBL rmb 1
+ ends

@@ -31,7 +31,7 @@ _ss_tone:
  ldy 10,s get frequency
  lda 5,s get path
  ldb #$98 SS.Tone call
- os9 I$SETSTT
+ os9 I$SetStt
  clra
  clrb
  puls y,pc return 0

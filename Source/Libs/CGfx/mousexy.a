@@ -5,13 +5,13 @@
 * by Mike Sweet 10/4/89
 *
 
- psect mouse,0,0,0,40,0
+ psect mousexy,0,0,0,40,0
  
  ifp1
  use /dd/defs/os9defs.a
- use /dd/defs/mousedefs.a
+ use /dd/defs/windefs.a
  endc
- 
+
 **********************************
 * int MouseXY(path,column,row);
 * int path;
@@ -30,14 +30,14 @@ MouseXY:
  leas -32,s reserve space for the mouse info packet
  leax ,s
  lda 37,s get 'path'
- ldb #SS.MOUSE
+ ldb #SS.Mouse
  ldy #0 automatically select from right or left mouse
- os9 I$GETSTT
+ os9 I$GetStt
  bcs nogood return -1 if this call was unsuccessful
  
- lda PT.VALID,s are we the current interactive device?
+ lda Pt.Valid,s are we the current interactive device?
  beq nogood no, return -1
- lda PT.STAT,s on the current window?
+ lda Pt.Stat,s on the current window?
  cmpa #WR_OFWIN off window?
  beq nogood no, return -1
 
@@ -59,9 +59,9 @@ MouseXY:
  rorb
  std [40,s] and save it in 'row'
 
- ldb PT.CBSB,s
+ ldb Pt.CBSB,s
  lslb
- orb PT.CBSA,s return button status
+ orb Pt.CBSA,s return button status
 
 
 return leas 32,s restore stack pointer
