@@ -39,7 +39,7 @@ static char *findenv(s)
 char *s;
 {
  char *temp;
- register int len;
+ register int len, slen=strlen(s);
 
  if (!_ENVFILE)
   readenv();
@@ -53,7 +53,7 @@ char *s;
      len=0;
      while ((temp[len]!=' ') && (temp[len]!='='))
       len++;
-     if (strnucmp(temp,s,len)==0)
+     if (strnucmp(temp,s,slen)==0)
       {
        temp+=len;
        while (*temp && *temp!='=')
@@ -75,9 +75,13 @@ char *getenv(s)
 char *s;
 {
  register char *temp;
+ int len;
 
  temp=findenv(s);
- strncpy(envstr,temp,(char *)strchr(temp,13)-temp);
+ len=((char *)strchr(temp,13)-temp); /* We need to use this more than once */
+
+ strncpy(envstr,temp,len);
+ envstr[len] = 0;                      /* Add a terminating NUL */
  return(envstr);
 } 
 
