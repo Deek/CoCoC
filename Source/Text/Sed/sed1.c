@@ -586,7 +586,7 @@ char	*addr;
 	p2 = cbp;
 	for (;;) {
 		if (p2 >= ebp) {
-			if ((c = read(f, ibuf, 512)) <= 0) {
+			if ((c = read(f, ibuf, BLOCKSIZE)) <= 0) {
 				return(badp);
 			}
 			p2 = ibuf;
@@ -594,7 +594,7 @@ char	*addr;
 		}
 		if ((c = *p2++) == '\n') {
 			if(p2 >=  ebp) {
-				if((c = read(f, ibuf, 512)) <= 0) {
+				if((c = read(f, ibuf, BLOCKSIZE)) <= 0) {
 					close(f);
 					if(eargc == 0)
 							dolflag = 1;

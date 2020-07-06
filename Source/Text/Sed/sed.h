@@ -28,6 +28,11 @@
 
 #define STAR	01
 
+#if defined(_OS9) || defined(_OSK)
+# define BLOCKSIZE	256
+#else
+# define BLOCKSIZE	512
+#endif
 #define NLINES	256
 #define DEPTH	20
 #define PTRSIZE	100
@@ -48,7 +53,7 @@ GLOBAL FILE	*fin;
 GLOBAL struct reptr	*abuf[ABUFSIZE];
 GLOBAL struct reptr	**aptr;
 GLOBAL char	*lastre;
-GLOBAL char	ibuf[512];
+GLOBAL char	ibuf[BLOCKSIZE];
 GLOBAL char	*cbp;
 GLOBAL char	*ebp;
 GLOBAL char	genbuf[LBSIZE];
