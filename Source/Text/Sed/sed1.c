@@ -10,7 +10,7 @@ char	*file;
 	char    *execp;
 
 	if (file) {
-		if ((f = open(file, 0)) < 0) {
+		if ((f = open(file, O_RDONLY)) < 0) {
 			fprintf(stderr, "Can't open %s\n", file);
 		}
 	} else

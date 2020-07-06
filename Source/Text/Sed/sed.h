@@ -29,8 +29,13 @@
 #define STAR	01
 
 #if defined(_OS9) || defined(_OSK)
+# include <lowio.h>
+# ifndef O_RDONLY	/* We want to use the standard name */
+#  define O_RDONLY	READ
+# endif
 # define BLOCKSIZE	256
 #else
+# include <fcntl.h>	/* for open(), O_RDONLY */
 # define BLOCKSIZE	512
 #endif
 #define NLINES	256
