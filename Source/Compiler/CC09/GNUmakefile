@@ -1,4 +1,4 @@
-CFLAGS	= -g -m32 -DUNIX -DPTREE -DDEBUG -DPROF -DREGCONTS \
+CFLAGS	= -g -m32 -DUNIX -DPTREE -DPROF -DREGCONTS \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type \
@@ -10,7 +10,8 @@ BINARY	= cc09
 CKEYS	= ckeys
 OBJS	= bool.o build.o cmain.o codgen.o declare.o floats.o get.o inits.o \
 	lex.o local.o longs.o misc.o optim.o prtree.o regscont.o stats.o tb.o \
-	tranexp.o
+	tranexp.o \
+	fadjust.o
 
 $(BINARY):	$(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@

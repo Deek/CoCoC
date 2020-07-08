@@ -418,7 +418,8 @@ int *p;
 
 
 defcon(p,n)
-register int *p;
+//register int *p;
+register INTTYPE *p;
 {
     register int i;
 

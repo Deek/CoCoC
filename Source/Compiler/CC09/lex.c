@@ -16,9 +16,13 @@
 
 #include "cj.h"
 
+#if defined(OS9) || defined(_OSK)
 static double normaliz(n);
+#else
+double fadjust(double);
+#endif
 
-#define     isdigit(c)  (chartab[c]==DIGIT)
+#define     isdigit(c)  (chartab[(int)c]==DIGIT)
 
 typedef union {
     INTTYPE *ip;
@@ -37,7 +41,9 @@ direct int stringlen;
 extern symnode *lookup();
 extern char *grab();
 
-
+#ifndef COCO
+void
+#endif
 getsym()
 {
     register symnode *ptr;
@@ -57,12 +63,12 @@ getsym()
 
     symptr=lptr-1;
     symline=lineno;
-    while(!(sym=chartab[cc])) {
+    while(!(sym=chartab[(int)cc])) {
         error("bad character");
         getch();
         symptr=lptr;
     }
-    symval=valtab[cc];
+    symval=valtab[(int)cc];
 
     switch(sym) {
         case LETTER:
@@ -372,7 +378,7 @@ char name[];
     /* return a pointer to a symbol table entry for 'name'  */
     /* if one is not found create one                       */
     register symnode *nptr,**tptr,**tab;
-    char *cp;
+//    char *cp;
 
     /* which symbol table is it in? */
     tab = mosflg ? mostab : hashtab;
@@ -459,19 +465,27 @@ number(type,np)
 register numptrs np;
 {
     long i;
-    double n, scale(), normaliz();
+    double n, scale();
+#if defined(OS9) || defined(_OSK)
+    double  normaliz();
     int exp, esign, digcount = 0;
     register char *cp;
+#else
+    char num[128], *nump = num;
+#endif
 
     i = 0;
     n = 0;
-    cp = (char *) &n;
+//    cp = (char *) &n;
 
     if (type == DOUBLE) goto fraction;
 
     if (cc == '0') {
         getch();
         if (cc == '.') {
+#ifndef COCO
+            *(nump++) = cc;
+#endif
             getch();
             goto fraction;
         }
@@ -505,10 +519,14 @@ retlong:
 
     /* here all types still possible; collect in 8 byte integer */
     while (isdigit(cc)) {
+#ifdef COCO
         if (addin(&n,cc)) { /* overflow */
             getch();
             return 0;
         }
+#else
+        *(nump++) = cc;
+#endif
         getch();
     }
 
@@ -518,8 +536,12 @@ retlong:
      */
     if (cc=='.' || cc=='e' || cc=='E') { /* double */
         if (cc == '.') {
+#ifndef COCO
+            *(nump++) = cc;
+#endif
             getch();
-fraction:
+fraction:;
+#if defined OS9 || defined OSK
             while (isdigit(cc)) {
                 if (addin(&n,cc)) { /* overflow */
                     getch();
@@ -528,8 +550,10 @@ fraction:
                 getch();
                 ++digcount;
             }
+#endif  /* Do this because the brace was defined outside the ifdef */
         }
 
+#if defined OS9 || defined OSK
         n = normaliz(&n);
 
         if (cc=='E' || cc=='e') {
@@ -555,12 +579,57 @@ fraction:
             esign=1;
         } else esign=0;
         *np.dp = scale(n,digcount,esign);
+#else
+        while (isdigit(cc))
+        {
+            *(nump++) = cc;
+            getch();
+        }
+
+        if (cc == '.')
+        {
+            *(nump++) = cc;
+            getch();
+        }
+
+        if ((cc == 'E') || (cc == 'e'))
+        {
+            *(nump++) = cc;
+            getch();
+
+            if ((cc == '+') || (cc == '-'))
+            {
+                *(nump++) = cc;
+                getch();
+            }
+        }
+
+        while (isdigit(cc))
+        {
+            *(nump++) = cc;
+            getch();
+        }
+
+        *nump = '\0';
+        *np.dp = fadjust(atof(num));
+#endif
         return DOUBLE;
     }
 
+#ifndef COCO
+    *np.lp = 0;
+    nump = num;
+    if(isdigit(*nump))
+        *np.lp = *(nump++) - '0';
+    while (isdigit(*nump))
+    {
+        *np.lp = (*np.lp * 10) + (*(nump++) - '0');
+    }
+
+#endif
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
     if (*(int64_t *)&n > __INT32_MAX__) return 0;
-    *np.lp = *((long*)&n);
+    //*np.lp = *((long*)&n);
     if (cc=='l' || cc=='L') {       /* explicitly long */
         getch();
 longint:
@@ -910,6 +979,7 @@ char c;
 }
 
 
+#if defined(OS9) || defined(_OSK)
 static double
 normaliz(n)
 long n[];
@@ -918,7 +988,6 @@ long n[];
 }
 
 
-#if defined(OS9) || defined(_OSK)
 static numshf(n);
 
 addin(n,c)
