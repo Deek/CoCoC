@@ -182,7 +182,7 @@ summary(){ /* output the summary on the tty */
 		  fprintf( stdout, "\n" );
 		  }
 
-	fclose( ftemp );
+	if (ftemp) fclose( ftemp );
 	if( fdefine != NULL ) fclose( fdefine );
 	}
 
