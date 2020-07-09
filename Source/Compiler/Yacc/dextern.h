@@ -40,6 +40,19 @@
 # define WSETSIZE 250
 # endif
 
+# ifdef SMALL
+# define ACTSIZE 2000
+# define MEMSIZE 2000
+# define NSTATES 300
+# define NTERMS 127
+# define NPROD 200
+# define NNONTERM 200
+# define TEMPSIZE 400
+# define CNAMSZ 2000
+# define LSETSIZE 450
+# define WSETSIZE 250
+# endif
+
 # define NAMESIZE 50
 # define NTYPES 63
 
