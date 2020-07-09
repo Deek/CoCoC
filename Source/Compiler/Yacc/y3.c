@@ -1,4 +1,4 @@
-# include "dextern"
+# include "dextern.h"
 
 	/* important local variables */
 int lastred;  /* the number of the last reduction of a state */

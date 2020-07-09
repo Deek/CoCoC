@@ -1,4 +1,4 @@
-# include "dextern"
+# include "dextern.h"
 
 # define a amem
 # define mem mem0

@@ -1,4 +1,4 @@
-# include "dextern"
+# include "dextern.h"
 # define IDENTIFIER 257
 # define MARK 258
 # define TERM 259

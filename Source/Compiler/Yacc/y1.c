@@ -1,4 +1,4 @@
-# include "dextern"
+# include "dextern.h"
 
 	/* variables used locally */
 

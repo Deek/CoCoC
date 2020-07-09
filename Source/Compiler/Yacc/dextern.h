@@ -1,6 +1,6 @@
 # include <stdio.h>
 # include <ctype.h>
-# include "files"
+# include "files.h"
 
 	/*  MANIFEST CONSTANT DEFINITIONS */
 
