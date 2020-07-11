@@ -756,7 +756,11 @@ qstr()
                 case 0:
                 case 2:
                         if(strfile == NULL) {
-                                if((strfile = fopen(strname,"w+")) == NULL)
+#if defined(OS9) || defined(_OSK)
+                                if(!(strfile = fopen(mktemp(strname),"w+")))
+#else
+                                if(!(strfile = fdopen(mkstemp(strname),"w+")))
+#endif
                                         fatal("can't open strings file");
                         }
                         sfile = strfile;

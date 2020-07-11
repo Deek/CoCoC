@@ -10,11 +10,7 @@
 
 char *dumname = sdummy.sname;
 
-#if defined (OS9) || defined (OSK)
-char strname[] = "cstr.XXXXX";
-#else
 char strname[] = "cstr.XXXXXX";
-#endif
 
 #ifdef  SPLIT
 direct char *infile;
@@ -39,7 +35,6 @@ char **argv;
 #else
         intercept(tidy);
 #endif
-        mktemp(strname);
 
         sdummy.type = INT;
         sdummy.size = 2;
