@@ -133,6 +133,7 @@ callopt(){
 	aoutput();
 
 	osummary();
+	fclose(finput);
 	ZAPFILE(TEMPNAME);
 	}
 
