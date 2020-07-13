@@ -253,18 +253,6 @@ extern char *writem();
 # define OFILE "y.tab.c"
 # endif
 
-	/* user output file name */
-
-# ifndef FILEU
-# define FILEU "y.output"
-# endif
-
-	/* output file for # defines */
-
-# ifndef FILED
-# define FILED "y.tab.h"
-# endif
-
 	/* command to clobber tempfiles after use */
 
 # ifndef ZAPFILE

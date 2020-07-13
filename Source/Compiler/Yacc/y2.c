@@ -61,53 +61,93 @@ int nprod= 1;	/* number of productions */
 int *prdptr[NPROD];	/* pointers to descriptions of productions */
 int levprd[NPROD] ;	/* precedence levels for the productions */
 
+char *
+newext(file,ext) char *file, *ext; {
+	int len = strlen (file);
+	char *out = malloc (len + strlen(ext));
+	char *tmp;
 
-setup(argc,argv) int argc; char *argv[];
-{	int i,j,lev,t, ty;
+	strcpy (out, file);
+	if (!(tmp = rindex (out, '.')))	/* file has no extension */
+		tmp = out + len;
+	strcpy (tmp, ext);
+/*	printf("%s -> %s\n", ofile, dfile);*/
+	return out;
+}
+
+setup(argc,argv) int argc; char *argv[]; {
+	register int t;
+	int i = 1,j,lev, ty;
 	int c;
 	int *p;
 	char actname[8];
+	char *ofile = OFILE;
+	int dflag = 0, vflag = 0;
 
 	foutput = NULL;
 	fdefine = NULL;
-	i = 1;
-	while( argc >= 2  && argv[1][0] == '-' ) {
-		while( *++(argv[1]) ){
-			switch( *argv[1] ){
+	ftable = NULL;
+
+escape:
+	while( argc-- > 2 && **(++argv) == '-' ) {
+		while (*++(*argv)) switch( *(*argv) ){
 			case 'v':
 			case 'V':
-				foutput = fopen(FILEU, "w" );
-				if( foutput == NULL ) error( "cannot open y.output" );
+				vflag = 1;
 				continue;
 			case 'D':
 			case 'd':
-				fdefine = fopen( FILED, "w" );
+				dflag = 1;
 				continue;
 			case 'o':
 			case 'O':
-				fprintf( stderr, "`o' flag now default in yacc\n" );
-				continue;
-
-			case 'r':
-			case 'R':
-				error( "Ratfor Yacc is dead: sorry...\n" );
-
+				if (!(*argv)[1]) {	// whitespace, next arg
+					ofile = argv[1];
+					argv++;
+					argc--;
+				} else {	// the filename is the rest of this argument
+					ofile = (argv[0])+1;
+					(*argv) += strlen(ofile);
+				}
+				goto escape;
+				break;
 			default:
 				error( "illegal option: %c", *argv[1]);
-				}
-			}
-		argv++;
-		argc--;
 		}
+	}
 
-	ftable = fopen( OFILE, "w" );
+#if 0
+	while ((c = getopt(argc, argv, "dvo:")) != EOF) {
+		switch (c) {
+			case 'd':
+				dflag = 1;
+				break;
+			case 'v':
+				vflag = 1;
+				break;
+			case 'o':
+				ofile = optarg;
+				break;
+		}
+	}
+#endif
+
+	ftable = fopen( ofile, "w" );
 	if( ftable == NULL ) error( "cannot open table file" );
+
+	if (dflag && !(fdefine = fopen(newext(ofile, ".h"), "w"))) {
+		error("cannot open defines file");
+	}
+
+	if (vflag && !(foutput = fopen(newext(ofile, ".output"), "w"))) {
+		error("cannot open output file");
+	}
 
 	ftemp = fopen( TEMPNAME, "w" );
 	faction = fopen( ACTNAME, "w" );
 	if( ftemp==NULL || faction==NULL ) error( "cannot open temp file" );
 
-	if( argc < 2 || ((finput=fopen( infile=argv[1], "r" )) == NULL ) ){
+	if((finput=fopen( infile=argv[1], "r" )) == NULL ){
 		error( "cannot open input file" );
 		}
 
