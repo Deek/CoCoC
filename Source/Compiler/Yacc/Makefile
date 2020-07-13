@@ -6,7 +6,7 @@ LDIR=/DD/Lib
 yacc: y1.r y2.r y3.r y4.r
     :$(CC) -f=$(ODIR/)yacc -n=Yacc y?.r
 
-y1.r y2.r y3.r y4.r: dextern.h files.h
+y1.r y2.r y3.r y4.r: dextern.h files.h Makefile
 
 install:
     :attr $(ODIR/)yacc e pe
