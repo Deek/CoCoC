@@ -9,7 +9,7 @@
 #include <string.h>
 
 fatal(errstr)
-char *errstr;
+char	*errstr;
 {
 	extern int errno;
 
@@ -19,24 +19,24 @@ char *errstr;
 
 
 error(s)
-char *s;
+char	*s;
 {
 	doerr(symptr-lbase,s,lineno,ERROR);
 }
 
 
 lerror(s)
-char s[];
+char	s[];
 {
 	doerr(lptr-lbase,s,lineno,ERROR);
 }
 
 
 doerr(n, errstr, lno, ertype)
-int n, lno, ertype;
-char errstr[];
+int		n, lno, ertype;
+char	errstr[];
 {
-	register char *tmp;
+	register char	*tmp;
 
 	if (lno == lineno)
 		tmp = lbase;
@@ -56,10 +56,8 @@ char errstr[];
 
 putesc(type, arg, arg1)
 {
-	if (!aflag)
-	{
-		switch (type)
-		{
+	if (!aflag) {
+		switch (type) {
 		case NEWFNAME:
 		case OLDFNAME:
 		case PSECT:
@@ -78,51 +76,48 @@ putesc(type, arg, arg1)
 
 int
 hash(word)
-char *word;
+char	*word;
 {
-	register int n = 0, c;
+	register int	n = 0, c;
 
-	while (c = *word++)
-		n += c;
+	while (c = *word++) n += c;
 	return (n & 127);
 }
 
 
 char *
 grab(size)
-unsigned size;
+unsigned	size;
 {
-    register char *p;
+	register char	*p;
 
-	if (size & 1)
-		++size;			/* a certain OS pukes on odd requests */
-#ifndef OSK
-    if ((p = (char*) malloc(size)) == NULL)
+	if (size & 1) ++size;			/* a certain OS pukes on odd requests */
+#ifdef OSK
+	if ((p = (char*) ebrk(size)) == -1)
+#elif defined(OS9)
+	if ((p = (char*) sbrk(size)) == -1)
 #else
-    if ((p = (char*) ebrk(size)) == -1)
+	if ((p = (char*) malloc(size)) == NULL)
 #endif
-        fatal("out of memory");
-    return p;
+		fatal("out of memory");
+	return p;
 }
 
 
 char *
 copystr(p, s, n)
-char *p, *s;
-int n;
+char	*p, *s;
+int		n;
 {
-    while (n-- > 0)
-	{
-    	*p++ = *s++;
-	}
-	
-    return p;
+	while (n-- > 0) *p++ = *s++;
+
+	return p;
 }
 
 
 char *
 savestr(s)
-char *s;
+char	*s;
 {
     return (char *)strcpy(grab(strlen(s) + 1), s);
 }

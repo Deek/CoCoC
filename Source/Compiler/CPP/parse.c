@@ -3,11 +3,11 @@
 */
 #include "prep.h"
 
-int		supergch();		/* to snarf macro args at top level--leaps tall
+int supergch();			/* to snarf macro args at top level--leaps tall
 							newlines at a single bound! */
 
 extern int	nxtlno;
-							
+
 preinit()
 {
 	lbase = lptr = line;
@@ -20,11 +20,11 @@ preinit()
 
 getline1()
 {
-	register char *name = holdbuf;
-	char pline[LINESIZE];               /* finished output line */
-		
+	register char	*name = holdbuf;
+	char			pline[LINESIZE];    /* finished output line */
+
 	strcpy(lastline,line);              /* save last input line */
-	
+
 restart:
 	if(newline()) {
 		gch(0);
@@ -35,31 +35,31 @@ restart:
 			if(isalpha(cch)) {
 				getword(name,NAMESIZE);
 				switch(findcmd(name)) {
-					case DEFINE:    dodefine(DEFINE); break;
-					case INCLUDE:   doinclude(); break;
-					case IFDEF:     doifdef(1); break;
-					case IFNDEF:    doifdef(0); break;
-					case ENDIF:     unstack(); break;
+					case DEFINE:	dodefine(DEFINE); break;
+					case INCLUDE:	doinclude(); break;
+					case IFDEF:		doifdef(1); break;
+					case IFNDEF:	doifdef(0); break;
+					case ENDIF:		unstack(); break;
 					case IF:		docond(); break;
 					case ELIF:		doelif(); break;
-					case ELSE:      doelse(); break;
-					case UNDEF:     dodefine(UNDEF); break;
-					case ASM:       if(process)
+					case ELSE:		doelse(); break;
+					case UNDEF:		dodefine(UNDEF); break;
+					case ASM:		if(process)
 										asmflag = 1;
 									break;
-					case ENDASM:    if(process)
+					case ENDASM:	if(process)
 										asmflag = 0;
 									break;
-					case LINE:      doliner(); break;
-					default:        goto badhash;
+					case LINE:		doliner(); break;
+					default:		goto badhash;
 				}
 			} else {
-badhash:        error("illegal '#'");
+badhash:		error("illegal '#'");
 			}
 			if(newline() == 0) return EOF;
 			else gch(0);
 		}
-		
+
 		if(cch == '@') {		/* special asmline indicator for OS9 */
 			if(process) {
 				putesc(ASSLINE,line+1);
@@ -83,7 +83,7 @@ badhash:        error("illegal '#'");
 }
 
 quoexp(s,t)
-register char *s,*t;
+register char	*s,*t;
 {
 	while(*s++ = *t++)
 		if(s[-1] == HIDER)      /* if the last char was a hidden quote */
@@ -91,11 +91,11 @@ register char *s,*t;
 }
 
 char *makename(s)
-register char *s;
+register char	*s;
 {
-	static char buf[15];
-	register char *p=s;
-	register int c,i=sizeof buf;
+	static char		buf[15];
+	register char	*p=s;
+	register int	c, i = sizeof buf;
 	
 	while(c= *s++)
 		if(c == '/')
@@ -111,8 +111,8 @@ register char *s;
 }
 
 getword(word,count)
-register char *word;
-register int count;
+register char	*word;
+register int	count;
 {
 	while(--count > 0 && (isalnum(cch) || cch == '_')) {
 		*word++ = cch;
@@ -126,8 +126,8 @@ register int count;
 }
 
 getfile(word,count)
-register char *word;
-register int count;
+register char	*word;
+register int	count;
 {
 	/* eat an initial quote character */
 	if (cch == '"') gch(KEEPSP);
@@ -152,6 +152,7 @@ newline()
 			return 1;
 		}
 		fclose(in);
+
 		/* The nxtlno/lineno check can get faked out, so... */
 		nxtlno = -1;
 		if(inclptr) {
@@ -167,7 +168,7 @@ newline()
 }
 
 gch(skflag)
-register int skflag;
+register int	skflag;
 {
 	if((cch = *lptr) == 0)
 		return;
@@ -194,18 +195,15 @@ register int	skflag;
 
 skipsp(skflag)
 {
-	register char c;
-	register int flag = 0;
-	
-	for (;;)
-	{
-		switch (c = *lptr)
-		{
+	register char	c;
+	register int	flag = 0;
+
+	for (;;) {
+		switch (c = *lptr) {
 			case '\f':
 			case '\t':
 			case ' ':
-				if (skflag)
-				{
+				if (skflag) {
 					++lptr;
 					flag = 1;
 					continue;
@@ -213,37 +211,21 @@ skipsp(skflag)
 				return flag;
 
 			case '/':
-				if (lptr[1] == '*')
-				{
+				if (lptr[1] == '*') {
 					/* is this what this is? (sic) */
 					flag = 1;
 					lptr += 2;
-					while (((c = *lptr) != '*') || lptr[1] != '/')
-					{
-						if (c == 0)
-						{
-							if (_inline() == 0)
-							{
-								return flag;
-							}
-						}
-						else
-						{
-							++lptr;
-						}
+					while (((c = *lptr) != '*') || lptr[1] != '/') {
+						if (c == 0) {
+							if (_inline() == 0) return flag;
+						} else ++lptr;
 					}
 					lptr += 2;
 					continue;
-				}
-				else
-				if (lptr[1] == '/')
-				{
+				} else if (lptr[1] == '/') {
 					/* C++ style comment (like this // ) */
 					flag = 1;
-					while (*lptr != 0)
-					{
-						lptr++;
-					}
+					while (*lptr != 0) lptr++;
 				}
 
 			default:
@@ -255,36 +237,29 @@ skipsp(skflag)
 
 _inline()
 {
-	register char *p;
-	register int c,count = LINESIZE;
+	register char	*p;
+	register int	c, count = LINESIZE;
 
 	p = lptr = line;
-	if ((c = getc(in)) == EOF)
-	{
+	if ((c = getc(in)) == EOF) {
 		if (ferror(in))
 			fatal("source file read error");
 		else return *p=0;
 	}
-	
-	while (c != '\n' && c != EOF && count-- > 0)
-	{
-		if (c == '\\')
-		{
-			if((c = getc(in)) == '\n')
-			{
+
+	while (c != '\n' && c != EOF && count-- > 0) {
+		if (c == '\\') {
+			if((c = getc(in)) == '\n') {
 				count++;            /* ..skipped a character */
 				setline(++lineno);  /* ..to a new line */
-			}
-			else
-			{
+			} else {
 				ungetc(c,in);       /* some other escape sequence */
 				*p++ = '\\';
 			}
-		}
-		else *p++ = c;
+		} else *p++ = c;
 		c = getc(in);
 	}
-	
+
 	if (count < 0)
 		fatal("source line too long");
 

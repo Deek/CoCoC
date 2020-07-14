@@ -48,7 +48,7 @@ int		(*arggch)();
 	register macro	*nptr;
 	register char	*cptr, *savep, *saveb;
 	char			savem[LINESIZE];
-	
+
 	/*
 	 * make gch() give chars from the portion of the line yet to be scanned
 	 * for macro names.
@@ -57,7 +57,7 @@ int		(*arggch)();
 	saveb = lbase;
 	lbase = lptr = lp;
 	gch(1);
-	
+
 	while (cch) {
 		if (cch == '"' || cch == '\'') {
 			char delim = cch;
@@ -75,26 +75,26 @@ int		(*arggch)();
 			getword(savem, LINESIZE);
 			if (dodef && strcmp(savem, "defined") == 0) {
 				register int	paren;
-				
+
 				nxtch();
 				if (cch == '(') {
 					paren = TRUE;
 					gch(1);
-				} else
-					paren = FALSE;
+				} else paren = FALSE;
+
 				if (isalpha(cch) || cch == '_') {
 					getword(savem, LINESIZE);
 					*pptr++ = findmac(savem) ? '1' : '0';
-				} else
-					error("expected identifier after defined");
+				} else error("expected identifier after defined");
+
 				if (paren) {
 					if (cch != ')')
 						gch(1);
 					gch(1);
 				}
-			} else if ((nptr = findmac(savem)) == NULL || nptr->expanding)
+			} else if ((nptr = findmac(savem)) == NULL || nptr->expanding) {
 				pptr = copystr(pptr, savem, strlen(savem));
-			else {
+			} else {
 				/* it's a macro and it's not already expanding -- expand it */
 				register char	*mptr, savec;
 				register int	count, n, flag;
@@ -113,7 +113,7 @@ int		(*arggch)();
 						register char	*sscan;
 						char			*nargv[MAXARGS];  /* -> actual args */
 						int				narglen[MAXARGS]; /* and their lengths */
-					  
+
 						/* 
 						 * Now buzz thru the actual arguments
 						 * to determine the number and length of each.
@@ -163,7 +163,7 @@ int		(*arggch)();
 								(*arggch)(1);
 								*sscan++ = cch;
 							}
-				loopend:    narglen[nargc++] = count;
+loopend:					narglen[nargc++] = count;
 						}
 						/* 
 						 * Now copy out the macro definition
@@ -181,8 +181,7 @@ int		(*arggch)();
 								else
 									lerror("too few macro arguments");
 							} else
-								mptr = copystr(mptr, mac->md_elem, 
-										strlen(mac->md_elem));
+								mptr = copystr(mptr, mac->md_elem, strlen(mac->md_elem));
 						}
 						*mptr = '\0';
 						cptr = templine;
@@ -232,4 +231,4 @@ int		(*arggch)();
 	*pptr = '\0';
 	lptr = savep;
 	lbase = saveb;
-} 
+}

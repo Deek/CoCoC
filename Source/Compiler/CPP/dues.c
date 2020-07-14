@@ -17,28 +17,23 @@ extern char *defdev;
 static short nextncnt;
 
 
-char *nextname(fname, delimiter)
+char *
+nextname(fname, delimiter)
 char *fname;
 char delimiter;
 {
 	static char nambuf[100];
 
-	if (delimiter == '"' && nextncnt == -1)
-	{
+	if (delimiter == '"' && nextncnt == -1) {
 		nextncnt = 0;
 		return strcpy(nambuf, fname);
 	}
 
-	if (nextncnt++ < inclcount)
-	{
+	if (nextncnt++ < inclcount) {
 		strcpy(nambuf, incl[nextncnt-1]);
 		strcat(nambuf, "/");
 		return strcat(nambuf, fname);
-	}
-	else
-	{
-		return NULL;
-	}
+	} else return NULL;
 }
 
 
@@ -49,38 +44,29 @@ doinclude()
 	register FILE *fp;
 	int lasterr;
 
-	if (process)
-	{										/* ok to do this? */
+	if (process) {							/* ok to do this? */
 		skipsp(1);							/* skip spaces */
 		symptr = lptr;
 		gch(KEEPSP);
 		c = cch;
 		nameptr = fname;
-		if (c == '"' || c == '<')
-		{
+		if (c == '"' || c == '<') {
 			gch(SKIPSP);
-			if (c == '"')
-			{
-				nextncnt = -1;
-			}
-			else
-			{
+			if (c == '"') nextncnt = -1;
+			else {
 				c = '>';
 				nextncnt = 0;
 			}
-			while (cch && cch != c)
-			{
+			while (cch && cch != c) {
 				*nameptr++ = cch;
 				gch(SKIPSP);
 			}
 			*nameptr = '\0';
 			skipsp(1);	/* get rid of (possible) comment */
-			for (last = fname; nameptr = nextname(fname, c); last = nameptr)
-			{
-				if (fp = fopen(nameptr, "r"))
-				{
+			for (last = fname; nameptr = nextname(fname, c); last = nameptr) {
+				if (fp = fopen(nameptr, "r")) {
 					register include *nptr;
-				
+
 					nptr = (include*)grab(sizeof(include));
 					nptr->next = inclptr;
 					nptr->lno = lineno;
@@ -91,26 +77,18 @@ doinclude()
 					strcpy(modname, makename(nameptr));
 					putesc(NEWFNAME, filename, modname);
 					inclptr = nptr;
-				
+
 					putesc(NEWLINO, 0);
 					setline(lineno = 0);
 					in = fp;
 					return;
-				}
-				else
-				{
-					lasterr = errno;
-				}
+				} else lasterr = errno;
 			}
 			strcpy(fname, "can't open ");
 			strcat(fname, last);
 			sprintf(fname+strlen(fname), " (err=%d)", lasterr);
 			fatal(fname);
-		}
-		else
-		{
-			fatal("incorrect include file syntax");
-		}
+		} else fatal("incorrect include file syntax");
 	}
 }
 
@@ -119,41 +97,29 @@ dodefine(func)
 int func;
 {
 	char name[NAMESIZE];
-	
-	if (process)
-	{
+
+	if (process) {
 		skipsp(1);
 		gch(KEEPSP);
-		if (isalpha(cch) || cch == '_')
-		{
+		if (isalpha(cch) || cch == '_') {
 			getword(name, NAMESIZE);
-			if (func == DEFINE)
-			{
+			if (func == DEFINE) {
 				/*
 				 * ANSI allows "redefinition" if it's not really different,
 				 * which will take some hacking...for now, we'll leave it
 				 * alone.
 				 */
-				if (findmac(name))
-				{
+				if (findmac(name)) {
 					lerror("redefined macro");
-				}
-				else if (strcmp(name, "defined") == 0)
-				{
+				} else if (strcmp(name, "defined") == 0) {
 					lerror("can't #define defined");
-				}
-				else
-				{
+				} else {
 					addmac(name, 0);
 				}
-			}
-			else
-			{
+			} else {
 				delmac(name);
 			}
-		}
-		else
-		{
+		} else {
 			lerror("illegal macro name");
 		}
 	}
@@ -169,27 +135,21 @@ static struct
 
 docond()
 {
-	if (iftop < MAXIFS)
-	{
+	if (iftop < MAXIFS) {
 		/*
 		 * skipsp(1);
 		 * gch(SKIPSP);
 		 */
 		symptr = lptr;
 		ifstack[iftop].oldelse = elseflag;
-		if (ifstack[iftop].oldproc = process)
-		{
+		if (ifstack[iftop].oldproc = process) {
 			ifstack[iftop].hitaltern = process = eval();
-		}
-		else
-		{
+		} else {
 			ifstack[iftop].hitaltern = FALSE;
 		}
 		iftop++;
 		elseflag = TRUE;
-	}
-	else
-	{
+	} else {
 		lerror("#if nesting too deep");
 	}
 }
@@ -199,13 +159,11 @@ doifdef(_bool)
 {
 	char name[NAMESIZE];
 	
-	if (iftop < MAXIFS)
-	{
+	if (iftop < MAXIFS) {
 		skipsp(1);
 		gch(SKIPSP);
 		symptr = lptr;
-		if (isalpha(cch) || cch == '_')
-		{
+		if (isalpha(cch) || cch == '_') {
 			getword(name, NAMESIZE);
 			ifstack[iftop].oldelse = elseflag;
 			if (ifstack[iftop].oldproc = process)
@@ -214,14 +172,10 @@ doifdef(_bool)
 				ifstack[iftop].hitaltern = FALSE;
 			iftop++;
 			elseflag = TRUE;
-		}
-		else
-		{
+		} else {
 			lerror("illegal #if macro name");
 		}
-	}
-	else
-	{
+	} else {
 		lerror("#if nesting too deep");
 	}
 }
@@ -229,8 +183,7 @@ doifdef(_bool)
 
 doelif()
 {
-	if (elseflag)
-	{
+	if (elseflag) {
 		/*
 		 * skipsp(1);
 		 * gch(SKIPSP);
@@ -240,9 +193,7 @@ doelif()
 			ifstack[iftop - 1].hitaltern = process = eval();
 		else
 			process = FALSE;
-	}
-	else
-	{
+	} else {
 		lerror("no #if for #elif");
 	}
 }
@@ -250,13 +201,10 @@ doelif()
 
 doelse()
 {
-	if (elseflag)
-	{
+	if (elseflag) {
 		process = ifstack[iftop - 1].oldproc && !ifstack[iftop - 1].hitaltern;
 		elseflag = FALSE;
-	}
-	else
-	{
+	} else {
 		lerror("no #if for #else");
 	}
 }
@@ -264,13 +212,10 @@ doelse()
 
 unstack()
 {
-	if (iftop)
-	{
+	if (iftop) {
 		process = ifstack[--iftop].oldproc;
 		elseflag = ifstack[iftop].oldelse;
-	}
-	else
-	{
+	} else {
 		lerror("too many #endifs");
 	}
 }
@@ -281,13 +226,11 @@ doliner()
 	register int i;
 	char name[NAMESIZE];
 
-	if (process)
-	{
+	if (process) {
 		skipsp(1);
 		gch(1);
 		getword(name, NAMESIZE);
-		if (i = atoi(name))
-		{
+		if (i = atoi(name)) {
 			setline(lineno = i);
 		}
 		skipsp(1);

@@ -38,7 +38,9 @@ static long	doit();		/* evaluate constant expressions */
 
 int			gch();		/* snarfs text -- explicitly passed to scan() now */
 
-int eval(void)
+
+int
+eval(void)
 {
 	int		ok, uresult;
 	long	result;
@@ -56,13 +58,10 @@ int eval(void)
 	gch(0);
 	getsym();
 	ok = FALSE;
-	if (sym == 0)
-	{
+	if (sym == 0) {
 		symptr = pline;	/* gotta make symptr plausible for error()! */
 		error("constant expression expected");
-	}
-	else if (parsexp(&result, &uresult, 0))
-	{
+	} else if (parsexp(&result, &uresult, 0)) {
 		if (sym != 0)
 			error("trailing text after constant expression");
 		else
@@ -74,7 +73,8 @@ int eval(void)
 }
 
 
-long parsexp(resultp, uresultp, priority)
+long
+parsexp(resultp, uresultp, priority)
 long	*resultp;		/* -> the result */
 int		*uresultp;		/* -> unsignedness of result */
 int		priority;
@@ -83,22 +83,18 @@ int		priority;
 	int				urhs, ulhs, utert;
 	register short	op, priop, rprec;
 
-	if (!primary(&lhs, &ulhs))
-	{
+	if (!primary(&lhs, &ulhs)) {
 		return FALSE;
 	}
 
-	while (isop() && priority <= symval)
-	{
+	while (isop() && priority <= symval) {
 		op = sym;
 		rprec = priop = (short) symval;
 		getsym();
 
-		switch (op)
-		{
+		switch (op) {
 		default:
-			if (op < ASSPLUS || op > ASSXOR)
-			{
+			if (op < ASSPLUS || op > ASSXOR) {
 				rprec = priop + 1;
 				break;
 			}
@@ -109,37 +105,26 @@ int		priority;
 			;
 		}
 
-		if (parsexp(&rhs, &urhs, rprec))
-		{
-			if (op == QUERY)
-			{
-				if (need(COLON))
-				{
+		if (parsexp(&rhs, &urhs, rprec)) {
+			if (op == QUERY) {
+				if (need(COLON)) {
 					return FALSE;
 				}
-				if (!parsexp(&tertius, &utert, LEV_3))
-				{
+				if (!parsexp(&tertius, &utert, LEV_3)) {
 					error("missing third operand for ?:");
 					return FALSE;
 				}
-				if (lhs)
-				{
+				if (lhs) {
 					lhs = rhs;
 					ulhs = urhs;
-				}
-				else
-				{
+				} else {
 					lhs = tertius;
 					ulhs = utert;
 				}
-			}
-			else
-			{
+			} else {
 				lhs = doit(op, ulhs = ulhs || urhs, lhs, rhs);
 			}
-		}
-		else
-		{
+		} else {
 			error("missing operand");
 			return FALSE;
 		}
@@ -152,10 +137,10 @@ int		priority;
 }
 
 
-int chkpost(void)
+int
+chkpost()
 {
-	switch (sym)
-	{
+	switch (sym) {
 		case INCBEF:
 		case DECBEF:
 			error(badop);
@@ -166,7 +151,8 @@ int chkpost(void)
 }
 
 
-long primary(resultp, uresultp)
+long
+primary(resultp, uresultp)
 long	*resultp;
 int		*uresultp;
 {
@@ -177,8 +163,7 @@ int		*uresultp;
 
 	ok = FALSE;
 
-	switch (sym)
-	{
+	switch (sym) {
 #ifdef FLOAT
 	case DCONST:
 #endif
@@ -206,8 +191,7 @@ int		*uresultp;
 		break;
 	case LPAREN:
 		getsym();
-		if (!parsexp(&nodep, &unodep, LEV_0))
-		{
+		if (!parsexp(&nodep, &unodep, LEV_0)) {
 noexp:
 			error(needexpr);
 			nodep = 0;
@@ -220,8 +204,7 @@ noexp:
 	case COMPL:
 		op = sym;
 		getsym();
-		if (primary(&prim, &uprim))
-		{
+		if (primary(&prim, &uprim)) {
 			nodep = doit(op, uprim, prim, 0);
 			unodep = uprim;
 			ok = TRUE;
@@ -243,8 +226,7 @@ noexp:
 	*/
 	ok = chkpost();
 
-	switch (sym)
-	{
+	switch (sym) {
 	case LPAREN:
 	case LBRACK:
 	case DOT:
@@ -253,8 +235,7 @@ noexp:
 		error("invalid operation in preprocessor constant expression");
 	}
 	
-	if (ok && chkpost())
-	{
+	if (ok && chkpost()) {
 		*resultp = nodep;
 		*uresultp = unodep;
 		return TRUE;
@@ -263,10 +244,10 @@ noexp:
 }
 
 
-int isop(void)
+int
+isop()
 {
-	switch (sym)
-	{
+	switch (sym) {
 	case AMPER:
 		sym = AND;
 		symval = LEV_8;				/* "and" operator level */
@@ -284,7 +265,7 @@ int isop(void)
 		return TRUE;
 	case COLON:
 		return FALSE;
-	default: 
+	default:
 		return (sym >= DBLAND && sym <= GT) ||
 			   (sym >= ASSPLUS && sym <= ASSXOR);
 	}
@@ -295,8 +276,7 @@ doit(op, isunsigned, lhs, rhs)
 int		op, isunsigned;
 long	lhs, rhs;
 {
-	switch (op)
-	{
+	switch (op) {
 	/* unary operators--ignore rhs */
 	case NOT:
 		return !lhs;
@@ -315,8 +295,7 @@ long	lhs, rhs;
 		else
 			return lhs * rhs;
 	case DIV:
-		if (rhs == 0)
-		{
+		if (rhs == 0) {
 			error("division by zero");
 			return 0;
 		}
@@ -325,8 +304,7 @@ long	lhs, rhs;
 		else
 			return lhs / rhs;
 	case MOD:
-		if (rhs == 0)
-		{
+		if (rhs == 0) {
 			error("division by zero");
 			return 0;
 		}

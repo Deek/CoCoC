@@ -32,42 +32,42 @@ extern char kanjtbl[];
 
 
 char chartab[] = {
-	0, 	0, 	0, 	0, 	0, 	0, 	0, 	0, 	/* 00-07 */
-	0, 	0, 	0, 	0, 	0, 	0, 	0, 	0, 	/* 08-0f */
-	0, 	0, 	0, 	0, 	0, 	0, 	0, 	0, 	/* 10-17 */
-	0, 	0, 	0, 	0, 	0, 	0, 	0, 	0, 	/* 18-1f */
-	SPACE, 	NOT, 	QUOTE, 	0, 	0, 	MOD, 	AMPER, 	PRIME, 	/* 20-27 */
-	LPAREN,	RPAREN,	STAR, 	PLUS, 	COMMA, 	NEG, 	DOT, 	DIV, 	/* 28-2f */
-	DIGIT, 	DIGIT, 	DIGIT, 	DIGIT, 	DIGIT, 	DIGIT, 	DIGIT, 	DIGIT, 	/* 30-37 */
-	DIGIT, 	DIGIT, 	COLON, 	SEMICOL, LT, 	ASSIGN, GT, 	QUERY, 	/* 38-3f */
-	0, 	LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 40-47 */
-	LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 48-4f */
-	LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 50-57 */
-	LETTER, LETTER, LETTER, LBRACK, BSLASH, RBRACK, XOR, 	LETTER, /* 58-5f */
-	0, 	LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 60-67 */
-	LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 68-6f */
-	LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 70-77 */
-	LETTER, LETTER, LETTER, LBRACE, OR,		RBRACE, COMPL, 	0, 	/* 78-7f */
+	0,	0,	0,	0,	0,	0,	0,	0,	/* 00-07 */
+	0,	0,	0,	0,	0,	0,	0,	0,	/* 08-0f */
+	0,	0,	0,	0,	0,	0,	0,	0,	/* 10-17 */
+	0,	0,	0,	0,	0,	0,	0,	0,	/* 18-1f */
+	SPACE,	NOT,	QUOTE,	0,	0,	MOD,	AMPER,	PRIME,			/* 20-27 */
+	LPAREN,	RPAREN,	STAR,	PLUS,	COMMA,	NEG,	DOT,	DIV,	/* 28-2f */
+	DIGIT,	DIGIT,	DIGIT,	DIGIT,	DIGIT,	DIGIT,	DIGIT,	DIGIT,	/* 30-37 */
+	DIGIT,	DIGIT,	COLON,	SEMICOL,	LT,	ASSIGN,	GT,	QUERY,		/* 38-3f */
+	0,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,		/* 40-47 */
+	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	/* 48-4f */
+	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	/* 50-57 */
+	LETTER,	LETTER,	LETTER,	LBRACK,	BSLASH,	RBRACK,	XOR, 	LETTER,	/* 58-5f */
+	0,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,		/* 60-67 */
+	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	/* 68-6f */
+	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	/* 70-77 */
+	LETTER,	LETTER,	LETTER,	LBRACE,	OR,		RBRACE,	COMPL,	0,		/* 78-7f */
 };
 
 char valtab[] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, LEV_9, 0, 0, 0, LEV_13, LEV_14, 0, 		/* 9=NOT, 13=MOD, 14=AMPER */
-	0, 0, LEV_14, LEV_12, LEV_1, 			/* 14=STAR, 12=PLUS, 1=COMMA */
-	LEV_14, LEV_15, LEV_13, 				/* 14=NEG, 15=DOT, 13=DIV */
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, LEV_3, 0, LEV_10, LEV_2, LEV_10, LEV_3, /* 3=COLON, 10=LT, 2=ASSIGN, 10=GT, 3=QUERY */
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, LEV_7, 0, 				/* 7=XOR */
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, LEV_6, 0, LEV_14, 0			/* 6=OR, 14=COMPL */
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	LEV_9, 0,	0,	0,	LEV_13,	LEV_14,	0,	/* 9=NOT, 13=MOD, 14=AMPER */
+	0,	0,	LEV_14,	LEV_12,	LEV_1,				/* 14=STAR, 12=PLUS, 1=COMMA */
+	LEV_14,	LEV_15,	LEV_13,						/* 14=NEG, 15=DOT, 13=DIV */
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	LEV_3,	0,	LEV_10,	LEV_2,	LEV_10,	LEV_3,	/* 3=COLON, 10=LT, 2=ASSIGN, 10=GT, 3=QUERY */
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	0,	0,	LEV_7,	0,			/* 7=XOR */
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	0,	0,	0,	0,
+	0,	0,	0,	0,	LEV_6,	0,	LEV_14,	0		/* 6=OR, 14=COMPL */
 };
 
 #ifdef KANJI
@@ -98,30 +98,25 @@ static dobslash();
 
 getsym()
 {
-	register int		numtype;
-	auto long			n;
+	register int	numtype;
+	auto long		n;
 
-	while (isspace(cch))
-	{
+	while (isspace(cch)) {
 		gch(1);
 	}
-	if (cch == 0)
-	{
-		sym = 0; 
-		return; 
+	if (cch == 0) {
+		sym = 0; return;
 	}
 
 	symptr = lptr - 1;
-	while (!(sym = chartab[cch]))
-	{
+	while (!(sym = chartab[cch])) {
 		error("invalid character in constant expression");
 		gch(1);
 		symptr = lptr;
 	}
 	symval = (long) valtab[cch];		/* operator character's priority */
 
-	switch(sym)
-	{
+	switch(sym) {
 	case LETTER:
 		getword(namebuf, NAMESIZE);
 		sym = NAME;
@@ -129,9 +124,7 @@ getsym()
 		break;
 	case DIGIT:
 		numtype = number(&n);
-donum:   
-		switch(numtype)
-		{
+donum:	switch(numtype) {
 		case INT:
 			symval = n;
 			sym = CONST;
@@ -140,7 +133,7 @@ donum:
 			symval = n;
 			sym = UCONST;
 			break;
-		default:        
+		default:
 			error("illegal number");
 			symval = 1;
 			sym = CONST;
@@ -148,150 +141,131 @@ donum:
 		}
 		break;
 
-	case PRIME: 
-		pstr(); 
-		sym = CONST; 
-		break;
-	case QUOTE: 
-		qstr(); 
-		sym = STRING; 
-		break;
+	case PRIME: pstr(); sym = CONST; break;
+	case QUOTE: qstr(); sym = STRING; break;
 	default :
 		gch(1);
-		switch(sym)
-		{
+		switch(sym) {
 		case AMPER :
-			switch(cch)
-			{
-			case '&': 
-				sym = DBLAND; 
-				gch(1); 
+			switch(cch) {
+			case '&':
+				sym = DBLAND;
+				gch(1);
 				symval = LEV_5; 			/* boolean "and" level */
 				break;
-			case '=': 
-				sym = ASSAND; 
+			case '=':
+				sym = ASSAND;
 				symval = LEV_2; 			/* assignment operator level */
 				gch(1);
-			} 
+			}
 			break;
-		case ASSIGN : 
-			if (cch == '=')
-			{
+		case ASSIGN:
+			if (cch == '=') {
 				sym = EQ;
 				symval = LEV_9;			/* boolean "equality" level */
 				gch(1);
-			} 
+			}
 			break;
 		case OR :
-			switch (cch)
-			{
-			case '|': 
-				sym = DBLOR; 
-				gch(1); 
+			switch (cch) {
+			case '|':
+				sym = DBLOR;
+				gch(1);
 				symval = LEV_4; 			/* boolean "or" level */
 				break;
-			case '=': 
+			case '=':
 				sym = ASSOR;
-				gch(1); 
+				gch(1);
 				symval = LEV_2;			/* assignment operator level */
-			} 
+			}
 			break;
-		case NOT : 
-			if (cch == '=')
-			{
+		case NOT:
+			if (cch == '=') {
 				sym = NEQ;
 				gch(1);
 				symval = LEV_9;			/* boolean "equality" level */
-			} 
+			}
 			break;
-		case STAR: 
-			if (cch == '=')
-			{
+		case STAR:
+			if (cch == '=') {
 				sym = ASSMUL;
 				gch(1);
 				symval = LEV_2;			/* assignment operator level */
-			} 
+			}
 			break;
-		case DIV: 
+		case DIV:
 		case MOD:
-		case XOR:  
-			if (cch == '=')
-			{
+		case XOR:
+			if (cch == '=') {
 				sym = sym + (ASSPLUS - PLUS);
 				gch(1);
 				symval = LEV_2;			/* assignment operator level */
-			} 
+			}
 			break;
-		case LT : 
-			switch (cch)
-			{
-			case '<' : 
+		case LT:
+			switch (cch) {
+			case '<':
 				sym = SHL;
 				symval = LEV_11;			/* shift operator level */
 				gch(1);
-				if (cch == '=')
-				{
-					sym = ASSSHL; 
-					symval = LEV_2; 
+				if (cch == '=') {
+					sym = ASSSHL;
+					symval = LEV_2;
 					gch(1);
 				}
 				break;
-			case '=' : 
+			case '=':
 				sym = LEQ;
 				symval = LEV_10;			/* boolean "relational" level */
 				gch(1);
-			} 
+			}
 			break;
-		case GT : 
-			switch (cch)
-			{
-			case '>' : 
+		case GT:
+			switch (cch) {
+			case '>':
 				sym = SHR;
 				symval = LEV_11;			/* shift operator level */
 				gch(1);
-				if (cch == '=')
-				{
+				if (cch == '=') {
 					sym = ASSSHR;
-					symval = LEV_2; 		/* assignment operator level */
+					symval = LEV_2;			/* assignment operator level */
 					gch(1);
 				}
 				break;
-			case '=' : 
+			case '=':
 				sym = GEQ;
 				symval = LEV_10;			/* boolean "relational" level */
 				gch(1);
-			} 
+			}
 			break;
 		case PLUS :
-			switch (cch)
-			{
-			case '+': 
-				sym = INCBEF; 
-				symval = LEV_14; 		/* high level unary operator */
-				gch(1); 
+			switch (cch) {
+			case '+':
+				sym = INCBEF;
+				symval = LEV_14; 			/* high level unary operator */
+				gch(1);
 				break;
-			case '=': 
+			case '=':
 				sym = ASSPLUS;
 				symval = LEV_2; 			/* assignment operator level */
 				gch(1);
 			}
 			break;
 		case NEG :
-			switch (cch)
-			{
-			case '-': 
-				sym = DECBEF; 
-				symval = LEV_14; 		/* high level unary operator */
-				gch(1); 
+			switch (cch) {
+			case '-':
+				sym = DECBEF;
+				symval = LEV_14; 			/* high level unary operator */
+				gch(1);
 				break;
-			case '=': 
-				sym = ASSMIN; 
+			case '=':
+				sym = ASSMIN;
 				symval = LEV_2; 			/* assignment operator level */
-				gch(1);  
+				gch(1);
 				break;
-			case '>': 
-				sym = ARROW; 
-				symval = LEV_15; 		/* top level binding */
+			case '>':
+				sym = ARROW;
+				symval = LEV_15; 			/* top level binding */
 				gch(1);
 			}
 			break;
@@ -308,23 +282,20 @@ long *np;
 	auto long		n;
 	register char	*cp;
 	register short	nunsigned = FALSE, nlong = FALSE;
-	
+
 	n = 0;
 	cp = (char*) &n;
 
-	if (cch == '0')
-	{
+	if (cch == '0') {
 		gch(1);
-		if (cch == 'x' || cch == 'X'){
+		if (cch == 'x' || cch == 'X') {
 			int c;
 			gch(1);
 			while (c = ishex(cch)) {
 				n = (n << 4) + (c - (c >= 'A' ? 'A' - 10 : '0'));
 				gch(1);
 			}
-		}
-		else
-		{
+		} else {
 			while (isoct(cch)) {
 				n = (n << 3) + (cch - '0');
 				gch(1);
@@ -334,17 +305,14 @@ long *np;
 	}
 
 	/* here all types still possible; collect in 4 byte integer */
-	while (ISDIGIT(cch))
-	{
+	while (ISDIGIT(cch)) {
 		n = (n * 10) + (cch - '0');
 		gch(1);
 	}
 
 intsuffix:
-	for (; ; gch(1))
-	{
-		switch (cch)
-		{
+	for (; ; gch(1)) {
+		switch (cch) {
 		case 'l':
 		case 'L':
 			if (nlong)
@@ -376,24 +344,16 @@ direct int			stringlen;           /* for inits */
 pstr()
 {
 	gch(0);
-	if (cch != '\\')
-	{
+	if (cch != '\\') {
 		symval = cch;
 		gch(0);
-	}
-	else
-	{
+	} else
 		symval = dobslash();
-	}
 
 	if (cch == '\'')
-	{
 		gch(1);
-	}
 	else
-	{
 		error("bad character constant");
-	}
 }
 
 
@@ -406,28 +366,22 @@ qstr()
 	stringlen = 0;
 	gch(0);
 
-	while (cch != '"')
-	{
-		if ((lptr - lbase) == 0)
-		{
+	while (cch != '"') {
+		if ((lptr - lbase) == 0) {
 			error("bad string constant");
 			break;
 		}
 
 #ifdef KANJI
-		if (kanji_flg)
-		{
+		if (kanji_flg) {
 			kanji_flg = 0;
 			gch(0);
-		}
-		else if (cch != '\\')
-		{
+		} else if (cch != '\\') {
 			kanji_flg = iskanji(cch & 0xff);
 			gch(0);
 		}
 #else
-		if (cch != '\\')
-		{
+		if (cch != '\\') {
 			gch(0);
 		}
 #endif
@@ -445,8 +399,7 @@ dobslash()
 	c = cch;
 	gch(1);
 
-	switch(c)
-	{
+	switch (c) {
 	case 'n':   return NEWLINE;
 	case 'l':   return LINEFEED;
 	case 't':   return TAB_CHAR;
@@ -456,32 +409,24 @@ dobslash()
 	case 'f':   return FORMFEED;
 	case '\n':  return ' ';
 	}
-	if (c == 'x')
-	{
+	if (c == 'x') {
 		int c1;
 
 		c = n = 0;
-		while ((c1 = ishex(cch)) && n++ < 2)
-		{
+		while ((c1 = ishex(cch)) && n++ < 2) {
 			c = (c << 4) + (c1 < 'A' ? c1 - '0' : c1 - 'A' + 10);
 			gch(1);
 		}
-	}
-	else if (c == 'd')
-	{
+	} else if (c == 'd') {
 		c = n = 0;
-		while (ISDIGIT(cch) && n++ < 3)
-		{
+		while (ISDIGIT(cch) && n++ < 3) {
 			c= c * 10 + cch - '0';
 			gch(1);
 		}
-	}
-	else if (isoct(c))
-	{
+	} else if (isoct(c)) {
 		c -= '0';
 		n = 0;
-		while (isoct(cch) && n++ < 2)
-		{
+		while (isoct(cch) && n++ < 2) {
 			c = (c << 3) + (cch - '0');
 			gch(1);
 		}
@@ -521,15 +466,12 @@ char key;
 	register int i;
 	static char	exptmsg[] = "expected X";
 
-	if (sym == key)
-	{
+	if (sym == key) {
 		getsym();
 		return 0;
 	}
-	for (i = 0; i < 128; ++i)
-	{
-		if (chartab[i] == key)
-		{
+	for (i = 0; i < 128; ++i) {
+		if (chartab[i] == key) {
 			break;
 		}
 	}

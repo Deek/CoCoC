@@ -18,23 +18,23 @@ direct char
 
 static direct char
 	*devptr,			/* ptr to dev tbl form sysdevice */
-	*pedit = "0",       /* default psect edition */
-	*fname;             /* name of file to pre-process */
+	*pedit = "0",		/* default psect edition */
+	*fname;				/* name of file to pre-process */
 
 cmdstruct cmds[] =
 {
-	"define",   DEFINE,
+	"define",	DEFINE,
 	"elif",		ELIF,
-	"include",  INCLUDE,
-	"ifdef",    IFDEF,
-	"ifndef",   IFNDEF,
-	"endif",    ENDIF,
+	"include",	INCLUDE,
+	"ifdef",	IFDEF,
+	"ifndef",	IFNDEF,
+	"endif",	ENDIF,
 	"if",		IF,
-	"else",     ELSE,
-	"undef",    UNDEF,
-	"asm",      ASM,
-	"endasm",   ENDASM,
-	"line",     LINE,
+	"else",		ELSE,
+	"undef",	UNDEF,
+	"asm",		ASM,
+	"endasm",	ENDASM,
+	"line",		LINE,
 };
 
 cmdstruct *endcmds = cmds + (sizeof cmds) / (sizeof(cmdstruct));
@@ -86,43 +86,27 @@ char **argv;
 	(macfile = addmac("__FILE__",""))->macdef->md_elem = mfilename;
 
 	/* process the arguments */
-	while (--argc > 0)
-	{
-		if (*(p = *++argv) == '-')
-		{
+	while (--argc > 0) {
+		if (*(p = *++argv) == '-') {
 			while (*++p) {
-				switch(*p)
-				{
+				switch(*p) {
 				case 'L':
 				case 'l':
 					lflag = 1;
 					break;
 				case 'E':
 				case 'e':
-					if (*++p == '=')
-					{
-						pedit = p + 1;
-					}
+					if (*++p == '=') pedit = p + 1;
 					goto done;
 				case 'D':
 				case 'd':
-					if (isalpha(*++p) || *p == '_')
-					{
+					if (isalpha(*++p) || *p == '_') {
 						q = p;
-						while (isalnum(*q) || *q == '_')
-						{
-							++q;
-						}
+						while (isalnum(*q) || *q == '_') ++q;
 						c = *q;
 						*q = '\0';
-						if (c == '=')
-						{
-							q++;
-						}
-						else
-						{
-							q = "1";
-						}
+						if (c == '=') q++;
+						else q = "1";
 						strncpy(mtemp, p, NAMESIZE);
 						addmac(p, q);
 						goto done;
@@ -137,18 +121,14 @@ char **argv;
 					delmac(p + 1);
 					goto done;
 #ifdef DEBUG
-				case 'x': 
-					dflag=1; 
+				case 'x':
+					dflag=1;
 					break;
 #endif
 				case 'V':
 				case 'v':
-					if (*++p == '=')
-					{
-						++p;
-					}
-					if (inclcount >= MAXLIBS)
-					{
+					if (*++p == '=') ++p;
+					if (inclcount >= MAXLIBS) {
 						fprintf(stderr, "too many include libraries (%d)\n",
 							MAXLIBS);
 						exit(FAILURE);
@@ -161,11 +141,8 @@ char **argv;
 				case 'g':
 					gflag++;
 					break;
-				case 'o': 
-					if (*++p == '=')
-					{
-						outfname = p + 1;
-					}
+				case 'o':
+					if (*++p == '=') outfname = p + 1;
 					goto done;
 				default:
 					fprintf(stderr, "cpp: unknown option -%c\n", *p);
@@ -174,57 +151,42 @@ char **argv;
 			}
 done: ;
 		}
-		else if (fname != NULL)
-		{
+		else if (fname != NULL) {
 			fprintf(stderr, "cpp: only one file allowed\n");
 			errexit(FAILURE);
-		}
-		else
-		{
-			fname = *argv;
-		}
+		} else fname = *argv;
 	}
 
 /* get the default library name from environment if no -v given*/
-	if (inclcount == 0)
-	{
+	if (inclcount == 0) {
 #ifdef OSK
-		if (p = getenv("CDEF"))
-		{
+		if (p = getenv("CDEF")) {
 			incl[inclcount++] = p;
-		}
-		else
+		} else
 #endif
 		{
 			incl[inclcount++] = DEFDIR;
 		}
 	}
 
-	if (outfname == NULL)
-	{
+	if (!outfname) {
 		out = stdout;	/* make sure output is good */
-	}
-	else if ((out = fopen(outfname,"w")) == NULL)
-	{
+	} else if ((out = fopen(outfname,"w")) == NULL) {
 		fprintf(stderr, "can't open output file %s (err=%d)\n", outfname,
 			errno);
 		exit(errno);		/* all hope lost now... */
 	}
 
-	if (fname == NULL)
-	{
+	if (!fname) {
 		fname = "stdin";
 		in = stdin;
-	}
-	else if ((in = fopen(fname,"r")) == NULL)
-	{
+	} else if ((in = fopen(fname,"r")) == NULL) {
 		putesc(FATERR, fname);               /* couldn't open file */
 		fprintf(out, "0\n0\ncan't open file %s (err=%d)\n", fname, errno);
 		errexit(SUCCESS);	/* let c68 report the error */	
 	}
 
-	if (badflag)
-	{
+	if (badflag) {
 		putesc(FATERR, badflag);
 		fprintf(out, "0\n0\nbad argument define\n");
 		errexit(FAILURE);
@@ -239,37 +201,30 @@ done: ;
 	preinit();
 
 	/* read (and expand) a line */
-	while (getline1() != EOF)
-	{
-		if (nxtlno != lineno - 1)
-		{
-		     /*   if line number changed */
+	while (getline1() != EOF) {
+		if (nxtlno != lineno - 1) {     /*   if line number changed */
 			nxtlno = lineno - 1;        /*   tell the compiler */
 			putesc(NEWLINO, nxtlno);
 		}
 		fprintf(out, "%s\n", line);     /*   write out expanded line */
-		if (ferror(stdout))
-		{
+		if (ferror(stdout)) {
 			fatal("error writing output file");
 		}
 		++nxtlno;
 	}
 
-	if (iftop)
-	{
+	if (iftop) {
 		fatal("missing #endif");
 	}
 
 #if defined(OSK)
-	if (devptr)
-	{
+	if (devptr) {
 		detach(devptr);
 	}
 #endif
 
 #ifdef DEBUG
-	if (dflag)
-	{
+	if (dflag) {
 		dumpmac();
 	}
 #endif
@@ -297,20 +252,16 @@ char *str;
 #ifdef DEBUG
 dumpmac()
 {
-	int n;
-	macro *p;
-	macdef *m;
+	int		n;
+	macro	*p;
+	macdef	*m;
 
-	for (n = 0; n < 127; ++n)
-	{
-		if ((p = mactab[n]) != NULL)
-		{
+	for (n = 0; n < 127; ++n) {
+		if ((p = mactab[n]) != NULL) {
 			printf("slot %5d ", n);
-			for (; p != NULL; p = p->next)
-			{
+			for (; p != NULL; p = p->next) {
 				printf("  %9s %d ->", p->macname, p->macargs);
-				for (m = p->macdef; m; m = m->next)
-				{
+				for (m = p->macdef; m; m = m->next) {
 					if (m->md_type)
 						printf("<#%d>",m->md_type);
 					else
@@ -328,10 +279,9 @@ int
 findcmd(s)
 char *s;
 {
-	register cmdstruct *p;
+	register cmdstruct	*p;
 
-	for (p = cmds; p < endcmds; ++p)
-	{
+	for (p = cmds; p < endcmds; ++p) {
 		if (strcmp(s, p->cmdname) == 0)
 			return p->cmdtok;
 	}
@@ -343,7 +293,7 @@ char *s;
 char *
 sysdrive()
 {
-	register char *p;
+	register char	*p;
 
 	if (defdev)
 		return defdev;
