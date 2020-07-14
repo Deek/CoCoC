@@ -9,6 +9,11 @@ LFLAGS =
 * Assembler name and flags.
 RMA = rma
 RFLAGS =
+* Yacc name and flags
+YACC = yacc
+YFLAGS =
+* Library directory
+LIB = /DD/Lib
 * Directories to use for executables and .r files.
 * Note: ODIR is relative to current exec dir; RDIR is  relative to data dir
 ODIR =                              
@@ -17,7 +22,7 @@ RDIR =
 * When trying to find implicit source files, Make will append each suffix
 *   in turn until it finds a source file that exists, and for which
 *   there is a rule defined below.
-.SUFFIXES: .r .a .c
+.SUFFIXES: .r .a .c .y
 
 * .c specifies how to build a no-extension file from a .c file
 * .c.r specifies how to compile .c files into .r files.
@@ -25,6 +30,7 @@ RDIR =
 .r:;$(LINK) $(LFLAGS) $< -o=$(ODIR/)$@
 .c.r:;$(CC) $(CFLAGS) -r=$(RDIR) $<
 .a.r:;$(RMA) $(RFLAGS) $< -o=$(RDIR/)$@
+.y.c:;$(YACC) $(YFLAGS) -o $@ $<
 
 * Notes: RDIR support here is a bit of a hack.  A macro such as
 *   $(RDIR/) will expand the same as $(RDIR), except that a trailing
