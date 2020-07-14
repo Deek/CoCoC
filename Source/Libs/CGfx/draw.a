@@ -68,11 +68,18 @@ send2 pshs u,d
  leas 2,s
  bra os9err0
 
+FCircle:
+ pshs u
+ ldd 6,s
+ pshs d
+ ldd #$1b53
+ bra _docirc
 Circle:
  pshs u
  ldd 6,s
  pshs d
  ldd #$1b50
+_docirc
  pshs d
  lda 9,s
  leax ,s
@@ -83,6 +90,10 @@ Circle:
 
 Ellipse:
  ldd #$1b51
+ bra send6
+
+FEllipse:
+ ldd #$1b54
  bra send6
 
 PutGC:
