@@ -22,8 +22,12 @@
 
 #define bool           uchar
 #define time_t         long
-#define TRUE           (1)
-#define FALSE          (0)
+#ifndef TRUE
+# define TRUE           (1)
+#endif
+#ifndef FALSE
+# define FALSE          (0)
+#endif
 #define max(a,b)       ((a)>(b)?(a):(b))
 
 /* System-specific constants */
