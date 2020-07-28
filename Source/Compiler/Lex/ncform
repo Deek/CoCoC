@@ -18,6 +18,10 @@ yylook(){
 	int debug;
 # endif
 	char *yylastch;
+
+	if (!yyin) yyin=stdin;
+	if (!yyout) yyout=stdout;
+
 	/* start off machines */
 # ifdef LEXDEBUG
 	debug = 0;

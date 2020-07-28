@@ -1,3 +1,4 @@
+#include <stdio.h>
 	/* because of external definitions, this code should occur only once */
 # ifdef ASCII
 int ctable[2*NCH] = {
@@ -45,7 +46,11 @@ int ctable[2*NCH] = {
 250,251,252,253,254,255};
 # endif
 int ZCH = NCH;
+#ifdef STATIC_STDOUT
 FILE *fout = NULL, *errorf = {stdout};
+#else
+FILE *fout = NULL, *errorf = NULL;
+#endif
 int sect = DEFSECTION;
 int prev = '\n';	/* previous input character */
 int pres = '\n';	/* present input character */

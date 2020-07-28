@@ -10,6 +10,10 @@ main(argc,argv)
   int argc;
   char **argv; {
 	register int i;
+
+#ifndef STATIC_STDOUT
+	if (!errorf) errorf = stdout;
+#endif
 # ifdef DEBUG
 #include <signal.h>
 	signal(SIGBUS,buserr);
