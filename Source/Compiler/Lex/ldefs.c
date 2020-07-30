@@ -89,6 +89,10 @@ extern int charc;
 # define freturn(s) s
 # endif
 
+#ifndef HAVE_CFREE
+# define cfree(p, n, s) free((p))
+#endif
+
 extern int sargc;
 extern char **sargv;
 extern char buf[520];
