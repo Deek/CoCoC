@@ -20,8 +20,8 @@ header.o: header.c ldefs.c
 	cc -c $(CFLAGS) header.c
 
 install: all
-	install -s lex $(DESTDIR)/usr/bin
-	install -c ncform $(DESTDIR)/usr/lib/lex
+	install -s lex $(DESTDIR)/usr/local/bin
+	install -c ncform $(DESTDIR)/usr/local/share/lex
 
 clean:
 	rm -f *.o lex y.tab.c

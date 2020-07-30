@@ -101,7 +101,7 @@ main(argc,argv)
 # ifdef DEBUG
 	free3core();
 # endif
-	if (ZCH>NCH) cname="/usr/lib/lex/ebcform";
+	if (ZCH>NCH) cname="/usr/local/share/lex/ebcform";
 	fother = fopen(ratfor?ratname:cname,"r");
 	if(fother == NULL)
 		error("Lex driver missing, file %s",ratfor?ratname:cname);
