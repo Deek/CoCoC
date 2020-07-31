@@ -6,7 +6,7 @@ yacc: y1.o y2.o y3.o y4.o
 y1.o y2.o y3.o y4.o: dextern.h files.h GNUmakefile
 
 install:
-	install -s yacc $(DESTDIR)/usr/bin
-	install -c yaccpar $(DESTDIR)/usr/lib
+	install -s yacc $(DESTDIR)/usr/local/bin
+	install -c yaccpar $(DESTDIR)/usr/local/share/yacc
 clean :
 	rm -f *.o
