@@ -302,6 +302,10 @@ escape:
 		fprintf( ftable,  "extern int yychar;\nextern short yyerrflag;\n" );
 		fprintf( ftable,  "#ifndef YYMAXDEPTH\n#define YYMAXDEPTH 150\n#endif\n" );
 		if( !ntypes ) fprintf( ftable,  "#ifndef YYSTYPE\n#define YYSTYPE int\n#endif\n" );
+		if( !ntypes && fdefine ) {
+			fprintf( fdefine,  "#ifndef YYSTYPE\n#define YYSTYPE int\n#endif\n" );
+			fprintf( fdefine,  "extern YYSTYPE yylval;\n" );
+		}
 		fprintf( ftable,  "YYSTYPE yylval, yyval;\n" );
 
 	prdptr[0]=mem;
