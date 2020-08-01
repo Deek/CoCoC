@@ -46,5 +46,3 @@ extern FILE _iob[_NFILE];
 
 long ftell();
 
-#define FALSE  0
-#define TRUE   1
