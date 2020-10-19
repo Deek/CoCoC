@@ -575,5 +575,5 @@ dummy ()
 logo ()
 {
 	if (hello)
-		fprintf (stderr, "DCC %d.%d.%d\n", VERSION, REVISION, PATCHLVL);
+		fprintf (stderr, "%s %d.%d.%d\n", PROGNAME, VERSION, REVISION, PATCHLVL);
 }
