@@ -88,15 +88,20 @@ char **argv;
 						goto saver;
 
 					case 'l':                        /* specify a library (L) */
-						if (*(p + 1) == 'l') {
+						if (libcnt == 4) {
+							error ("Too many libraries");
+						} else if (*(p + 1) != 'g') {            /* want cgfx */
+							lgflg++;
+							goto saver;
+						} else if (*(p + 1) == 'l') {          /* want lexlib */
 							llflg++;
 							goto saver;
-						} else
-						if (*(p + 1) != '=') {
+						} else if (*(p + 1) != 's') {           /* want sys.l */
+							lsflg++;
+							goto saver;
+						} else if (*(p + 1) != '=') {
 							goto saver;
 						}
-						if (libcnt == 4)
-							error ("Too many libraries");
 						*--p = '-';
 						libarray[libcnt++] = p;
 						goto saver;
@@ -401,8 +406,19 @@ saver:
 	for (j = 0; j < libcnt; j++) {
 		splcat (libarray[j]);
 	}
+
+	if (lgflg) {
+		strcat (strcat (strcpy (ofn, "-l="), p), "/lib/cgfx.l");
+		splcat (ofn);
+	}
+
 	if (llflg) {
 		strcat (strcat (strcpy (ofn, "-l="), p), "/lib/lexlib.l");
+		splcat (ofn);
+	}
+
+	if (lsflg) {
+		strcat (strcat (strcpy (ofn, "-l="), p), "/lib/sys.l");
 		splcat (ofn);
 	}
 
