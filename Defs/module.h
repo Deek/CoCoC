@@ -1,7 +1,7 @@
 /* OS-9 module header definitions */
 
 /* Executable memory module */
-typedef struct {
+typedef struct mod_exec {
         unsigned        m_sync,         /* sync bytes ($87cd) */
                         m_size,         /* module size */
                         m_name;         /* offset to module name */
@@ -14,7 +14,7 @@ typedef struct {
 } mod_exec;
 
 /* Device descriptor module */
-typedef struct {
+typedef struct mod_dev {
         unsigned        m_sync,         /* sync bytes ($87cd) */
                         m_size,         /* module size */
                         m_name;         /* offset to module name */
@@ -30,7 +30,7 @@ typedef struct {
 } mod_dev;
 
 /* Configuration module */
-typedef struct {
+typedef struct mod_config {
         unsigned        m_sync,         /* sync bytes ($87cd) */
                         m_size,         /* module size */
                         m_name;         /* offset to module name */
@@ -47,7 +47,7 @@ typedef struct {
 } mod_config;
 
 /* C data module */
-typedef struct {
+typedef struct mod_data {
         unsigned        m_sync,         /* sync bytes ($87cd) */
                         m_size,         /* module size */
                         m_name;         /* offset to module name */
