@@ -1,12 +1,12 @@
-CFLAGS	= -g -m32 -DUNIX -DPTREE -DDEBUG -DPROF -DREGCONTS \
+CFLAGS	= -g -mx32 -fsigned-char -DUNIX -DPTREE -DPROF -DREGCONTS \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type \
 	-DCKEYSFILE=\"$(HOME)/.ckeys\"
 
-LDFLAGS = -m32
+LDFLAGS = -mx32
 
-BINARY	= cc09
+BINARY	= dcc68
 CKEYS	= ckeys
 OBJS	= bool.o build.o cmain.o codgen.o declare.o floats.o get.o inits.o \
 	lex.o local.o longs.o misc.o optim.o prtree.o regscont.o stats.o tb.o \

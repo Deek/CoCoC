@@ -9,12 +9,12 @@
 #define REVISION  0
 #define PATCHLVL  0
 
-#define PROGNAME  "DCC"
-#define PREPROC   "cpp"
-#define COMPILER  "cc09"
-#define OPTIMIZER "c.opt"
-#define ASSEMBLER "rma"
-#define LINKER    "rlink"
+#define PROGNAME	"dcc"
+#define PREPROC		"dcpp"
+#define COMPILER	"dcc68"
+#define OPTIMIZER	"dco68"
+#define ASSEMBLER	"rma"
+#define LINKER		"rlink"
 
 direct int  aflag = FALSE,
             bflag = FALSE,

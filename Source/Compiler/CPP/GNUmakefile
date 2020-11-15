@@ -1,11 +1,11 @@
-CFLAGS	= -m32 -Dunix -DUNIX \
+CFLAGS	= -g -mx32 -fsigned-char -Dunix -DUNIX \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type
 
-LDFLAGS = -m32
+LDFLAGS = -mx32
 
-BINARY	= c.prep
+BINARY	= dcpp
 OBJS	= scan.o dues.o eval.o history.o lex.o macros.o main.o misc.o parse.o
 
 $(BINARY): $(OBJS)
