@@ -106,11 +106,36 @@ unsigned	size;
 
 
 char *
-copystr(p, s, n)
+copystr(p, s, n, e)
 char	*p, *s;
-int		n;
+int		n, e;
 {
-	while (n-- > 0) *p++ = *s++;
+	/*
+		if e is nonzero, we have been told to stringify s. Add quotes, and
+		escape any backslashes or embedded quotes.
+
+		Don't look too closely at this, you may go blind.
+	*/
+	if (e) {
+		int	instr = 0;
+		*p++ = '"';
+		while (n-- > 0) switch (*s) {
+			case '\\':	/* only escape backslash inside strings */
+				if (instr) *p++ = '\\';
+				*p++ = *s++;
+				if (instr && *s == '"') *p++ = '\\';
+				*p++ = *s++; n--;	/* eat the next char too */
+				break;
+			case '"':	/* just entered or exited a string */
+				instr = ~instr;
+				*p++ = '\\';
+			default:
+				*p++ = *s++;
+		}
+		*p++ = '"';
+	} else while (n-- > 0) {
+		*p++ = *s++;
+	}
 
 	return p;
 }

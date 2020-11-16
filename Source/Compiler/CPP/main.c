@@ -65,6 +65,9 @@ char **argv;
 	register char	*badflag = 0;
 	register char	*outfname = NULL;
 
+	/* set default flag values */
+	aflag = lflag = kflag = 0;
+
 	/* resident system define name */
 	addmac("OS9","1");			/* target operating system */
 	addmac("_OS9","1");			/* more standard version */
@@ -113,6 +116,10 @@ char **argv;
 						badflag = *argv;
 						goto done;
 					}
+				case 'K':
+				case 'k':
+					kflag = 1;	/* K&R mode */
+					break;
 				case 'U':
 				case 'u':
 					delmac(p + 1);

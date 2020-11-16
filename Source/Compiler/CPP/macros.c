@@ -93,8 +93,86 @@ register char	*name,*string;
 	if(cch) {
 		cptr = holdbuf;
 
-		while(cch) {
-			if(isalpha(cch) || cch == '_') {
+		while (cch) {
+			if ((!kflag) && (cch == '"' || cch == '\'')) {
+				char delim = cch;
+				*cptr++ = cch; gch(KEEPSP);
+				while (cch && cch != delim) {
+					*cptr++ = cch; gch(KEEPSP);
+					if (cch == '\\') {
+						*cptr++ = cch; gch(KEEPSP);
+						*cptr++ = cch; gch(KEEPSP);
+					}
+				}
+				if (!cch)
+					lerror("missing end of string or character literal");
+				*cptr++ = cch; gch(KEEPSP);
+				continue;
+			} else
+tryagain:	if (cch == '#') { /* stringify or concatenation */
+				gch(KEEPSP);
+				if (cch == '#') { /* concatenation */
+					gch(KEEPSP);
+					nxtch();	/* eat trailing spaces */
+					*cptr = '\0';
+					while (isspace(*(cptr-1))) { /* eat leading spaces too */
+						*--cptr = '\0';
+					}
+					continue;
+				} else if (argc > 0) {
+					if (isspace(cch)) {
+						nxtch();
+						if (!(isalpha(cch) || cch == '_')) {
+							goto badhash;
+						} else {
+							goto tryagain;
+						}
+					} else if (isalpha(cch) || cch == '_') { /* stringify */
+						register char *s = hold1buf;
+
+						getword(s, LINESIZE);
+						for (n = 0; n < argc; ++n) {
+							if (strcmp (s, argv[n]) == 0) {
+								register macdef *m;
+
+								*cptr = '\0';
+								mlist->md_elem = savestr(holdbuf);
+								mlist->md_type = 0;
+								cptr = holdbuf;
+
+								/*
+									new argument node
+
+									the md_type is negative to tell macro
+									expansion to safely quote the new string
+								*/
+								m = (macdef *) grab(sizeof(macdef));
+								m->md_type = -(n+1); /* right here */
+								m->md_elem = NULL;
+								m->next = mlist;
+								mlist = m;
+
+								/* new text node */
+								m = (macdef *) grab(sizeof(macdef));
+								m->md_type = 0;
+								m->next = mlist;
+								mlist = m;
+								break;
+							}
+						}
+						if (n >= argc) { /* we didn't match */
+badhash:					*cptr = '\0';
+							lerror("# not followed by macro argument");
+							continue;
+						}
+					}
+				} else {
+					*cptr++ = '#';
+					*cptr++ = cch;
+					gch(KEEPSP);
+					continue;
+				}
+			} else if (isalpha(cch) || cch == '_') {
 				register char *s = hold1buf;
 
 				getword(s,LINESIZE);

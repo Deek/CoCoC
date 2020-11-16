@@ -27,10 +27,14 @@ getline1()
 
 restart:
 	if(newline()) {
+		int	nkr = kflag ? 0 : 1;
+
 		gch(0);
 		while(cch == '#') {
-			gch(0);
-			while(isspace(cch)) gch(0);
+			/* if in K&R mode, don't skip comments */
+			gch(nkr);
+			while(isspace(cch)) gch(nkr);
+
 			symptr = lptr;
 			if(isalpha(cch)) {
 				getword(name,NAMESIZE);
@@ -55,6 +59,8 @@ restart:
 					case ERRTOK:	doerror(); break;
 					default:		goto badhash;
 				}
+			} else if (cch == '\0') {
+				/* null directive, do nothing */
 			} else {
 badhash:		error("illegal '#'");
 			}

@@ -93,7 +93,7 @@ int		(*arggch)();
 					gch(1);
 				}
 			} else if ((nptr = findmac(savem)) == NULL || nptr->expanding) {
-				pptr = copystr(pptr, savem, strlen(savem));
+				pptr = copystr(pptr, savem, strlen(savem), 0);
 			} else {
 				/* it's a macro and it's not already expanding -- expand it */
 				register char	*mptr, savec;
@@ -175,13 +175,15 @@ loopend:					narglen[nargc++] = count;
 						gch(1);
 						mptr = templine;
 						for (mac = nptr->macdef; mac; mac = mac->next) {
-							if (n = mac->md_type) {
+							if (n = mac->md_type) {	/* do we need to stringify? */
+								int stringify = (n < 0) ? 1 : 0;
+								if (stringify) n = -n;
 								if (--n < nargc)
-									mptr = copystr(mptr, nargv[n], narglen[n]);
+									mptr = copystr(mptr, nargv[n], narglen[n], stringify);
 								else
 									lerror("too few macro arguments");
 							} else
-								mptr = copystr(mptr, mac->md_elem, strlen(mac->md_elem));
+								mptr = copystr(mptr, mac->md_elem, strlen(mac->md_elem), 0);
 						}
 						*mptr = '\0';
 						cptr = templine;

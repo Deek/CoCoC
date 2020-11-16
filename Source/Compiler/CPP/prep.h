@@ -2,6 +2,7 @@
 	@(#)prep.h 2.2.2 10/5/87
 */
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #include "defdir.h"
 
@@ -130,6 +131,7 @@ global direct int
 #ifdef DEBUG
 	dflag,					/* want debug output */
 #endif
+	kflag,                  /* using "K&R" mode */
 	inclcount,				/* number of include libraries */
     lineno;                 /* current line number */
 
