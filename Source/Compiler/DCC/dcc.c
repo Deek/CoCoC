@@ -97,6 +97,10 @@ char **argv;
 							error ("Suffix '.%c' not allowed for output", suffix);
 						goto saver;
 
+					case 'k':                      /* preprocess in K&R mode */
+						kflag = TRUE;
+						break;
+
 					case 'l':                       /* specify a library (L) */
 						if (libcnt == 4) {
 							error ("Too many libraries");
@@ -287,6 +291,9 @@ saver:
 
 			if (edition)	/* explicit edition number */
 				splcat (edition);
+
+			if (kflag)	/* we want maximum K&R compatibility */
+				splcat ("-k");
 
 			for (m = 0; m < maccnt;) {
 				splcat (macarray[m++]);                 /* tack on "defines" */

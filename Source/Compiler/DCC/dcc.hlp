@@ -37,6 +37,7 @@ General options:
     -c           Include C source and comments in assembly
     -dSYM[=val]  Define a preprocessor symbol
     -f=<path>    Output to path
+    -k           Run preprocessor in maximum K&R compatibility mode
     -o           Skip running the optimizer
     -O           Stop after optimizing assembly code
     -p           Add profiling code
