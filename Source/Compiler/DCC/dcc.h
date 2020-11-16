@@ -1,5 +1,13 @@
 #include <stdio.h>
 
+#if defined(_OS9) || defined(_OSK) || defined(_OS9000)
+# define MWOS	1	/* running on a Microware OS */
+#endif
+
+#ifndef MWOS
+# define direct
+#endif
+
 #ifndef TRUE
 # define TRUE     1
 # define FALSE    0
@@ -74,3 +82,5 @@ char        *libarray[4],
             objname[60],
             parmbuf[4096],
             devnam1[20];
+
+char *chkccdev();

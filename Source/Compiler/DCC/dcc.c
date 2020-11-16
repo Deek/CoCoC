@@ -6,7 +6,17 @@
 	See 'git log' for changes.
 */
 #include "dcc.h"
-#include <module.h>
+
+#ifdef MWOS
+# include <module.h>
+#else
+# include <signal.h>
+#endif
+#include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <string.h>
 
 cleanup ()
 {
@@ -243,7 +253,13 @@ saver:
 	mktemp (tmpname);
 	strcat (tmpname, ".m");	/* add a suffix for chgsuff */
 
+#ifdef MWOS
 	intercept (trap);
+#else
+	signal (SIGINT, trap);
+	signal (SIGQUIT, trap);
+	signal (SIGTERM, trap);
+#endif
 	dummy ();
 
 	for (j = 0; j < filcnt; ++j) {               /* for each file on cmd line */
@@ -267,7 +283,7 @@ saver:
 			splcat (namarray[j]);                    /* and now the file name */
 			newopath = dup (1);
 			close (1);
-			if ((creat (destfile, 3)) != 1)
+			if ((creat (destfile, O_RDWR|S_IRUSR|S_IWUSR)) != 1)
 				error ("can't create temporary file for '%s'", namarray[j]);
 
 			trmcat ();
@@ -457,8 +473,19 @@ int code;
 	fprintf (stderr, "   %-6s:  %s", cmd, parmbuf);
 	if (zflag)
 		return;
+#ifdef MWOS
 	if ((childid = os9fork (cmd, frkprmsiz, parmbuf, 1, 1, 0)) < 0)
 		error ("cannot execute %s", cmd);
+#else
+	if ((childid = fork()) == 0) { /* we're the child */
+		char foo[4096];
+		sprintf(foo, "%s%s", cmd, parmbuf);
+		exit(system (foo)); /* don't clean up */
+	} else if (childid < 0) { /* fork failed */
+		error ("cannot execute '%s' -- fork() failed, reason: %s", cmd, strerror(errno));
+		return;
+	}
+#endif
 	wait (&childstat);
 	childid = 0;
 	if (childstat > code)
@@ -466,8 +493,10 @@ int code;
 }
 
 
+char *
 chkccdev ()
 {
+#ifdef MWOS
 	char          *s, c;
 	register char *p;
 	mod_data      *q;
@@ -477,20 +506,23 @@ chkccdev ()
 		strcpy (devnam1, (char *) q + q->m_data);
 		munlink (q);
 		return (devnam1);
-	} else {
-		if ((r = modlink ("Init", 0x0c, 0)) != -1) {
-			s = (char *) r + r->m_sysdrive;
-			p = devnam1;
-			while ((c = *s++) > 0) {
-				*p++ = c;
-			}
-			*p++ = (c & 0x7f);
-			*p = 0;
-			munlink (r);
-			return (devnam1);
+	} else if ((r = modlink ("Init", 0x0c, 0)) != -1) {
+		s = (char *) r + r->m_sysdrive;
+		p = devnam1;
+		while ((c = *s++) > 0) {
+			*p++ = c;
 		}
+		*p++ = (c & 0x7f);
+		*p = 0;
+		munlink (r);
+		return (devnam1);
 	}
-	return (0);
+	return NULL;
+#else
+	static char *retval = "/dd";
+
+	return retval;
+#endif
 }
 
 
