@@ -73,7 +73,7 @@ doinclude()
 					nptr->fp = in;
 					strcpy(nptr->fname, filename);
 					strcpy(nptr->modname, modname);
-					strcpy(setfile(filename), nameptr);
+					setfile(strcpy(filename, nameptr));
 					strcpy(modname, makename(nameptr));
 					putesc(NEWFNAME, filename, modname);
 					inclptr = nptr;
@@ -238,7 +238,7 @@ doliner()
 		getfile(name, NAMESIZE);
 		if (*name)
 		{
-			strcpy(setfile(filename), name);
+			setfile(strcpy(filename, name));
 			strcpy(modname, makename(filename));
 		}
 		putesc(NEWFNAME, filename, modname);

@@ -158,7 +158,7 @@ newline()
 		if(inclptr) {
 			in = inclptr->fp;
 			setline(lineno = inclptr->lno);
-			strcpy(setfile(filename),inclptr->fname);
+			setfile(strcpy(filename,inclptr->fname));
 			strcpy(modname,inclptr->modname);
 			inclptr = inclptr->next;
 			putesc(NEWFNAME,filename,modname);
