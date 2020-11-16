@@ -135,9 +135,6 @@ char **argv;
 				case 'a':
 					aflag++;
 					break;
-				case 'g':
-					gflag++;
-					break;
 				case 'o':
 					if (*++p == '=') outfname = p + 1;
 					goto done;

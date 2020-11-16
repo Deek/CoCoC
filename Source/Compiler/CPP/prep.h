@@ -130,7 +130,6 @@ global direct int
 #ifdef DEBUG
 	dflag,					/* want debug output */
 #endif
-	gflag,					/* global symbolic debugging flag */
 	inclcount,				/* number of include libraries */
     lineno;                 /* current line number */
 
