@@ -57,22 +57,22 @@ char **argv;
 		if (*(p = *++argv) == '-') {
 			while (*++p) {
 				switch (*p) {
-					case 'a':                      /* stop at asm (no .r) (D) */
+					case 'a':                     /* stop at asm (no .r) (D) */
 						aflag = TRUE;
 						break;
 
-					case 'b':                       /* use different "cstart" */
+					case 'b':                      /* use different "cstart" */
 						bflag = TRUE;
 						if (*(p + 1) != '=')
 							break;
 						strcpy (mainline, (p + 2));
 						goto saver;
 
-					case 'c':                         /* include comments (C) */
+					case 'c':                        /* include comments (C) */
 						cflag = TRUE;
 						break;
 
-					case 'd':                 /* make identifier (define) (C) */
+					case 'd':                /* make identifier (define) (C) */
 					case 'D':
 						if (*(p + 1) == '\0')
 							goto saver;
@@ -81,11 +81,11 @@ char **argv;
 						macarray[maccnt++] = p;
 						goto saver;
 
-					case 'e':                           /* set edition number */
+					case 'e':                          /* set edition number */
 						emp = &edition;
 						goto emcommon;
 
-					case 'f':                         /* set outfile path (L) */
+					case 'f':                        /* set outfile path (L) */
 						if (*++p != '=')
 							goto saver;
 						strcpy (objname, (p + 1));
@@ -97,16 +97,16 @@ char **argv;
 							error ("Suffix '.%c' not allowed for output", suffix);
 						goto saver;
 
-					case 'l':                        /* specify a library (L) */
+					case 'l':                       /* specify a library (L) */
 						if (libcnt == 4) {
 							error ("Too many libraries");
-						} else if (*(p + 1) != 'g') {            /* want cgfx */
+						} else if (*(p + 1) == 'g') {           /* want cgfx */
 							lgflg++;
 							goto saver;
-						} else if (*(p + 1) == 'l') {          /* want lexlib */
+						} else if (*(p + 1) == 'l') {         /* want lexlib */
 							llflg++;
 							goto saver;
-						} else if (*(p + 1) != 's') {           /* want sys.l */
+						} else if (*(p + 1) == 's') {          /* want sys.l */
 							lsflg++;
 							goto saver;
 						} else if (*(p + 1) != '=') {
@@ -116,7 +116,7 @@ char **argv;
 						libarray[libcnt++] = p;
 						goto saver;
 
-					case 'm':                              /* set memory size */
+					case 'm':                             /* set memory size */
 						emp = &xtramem;
 						*p &= 0x5f;
 					emcommon:
@@ -126,51 +126,51 @@ char **argv;
 						}
 						goto saver;
 
-					case 'M':                  /* ask linker for link map (L) */
+					case 'M':                 /* ask linker for link map (L) */
 						mflag = TRUE;
 						break;
 
-					case 'n':                       /* give module a name (L) */
+					case 'n':                      /* give module a name (L) */
 						*--p = '-';
 						modname = p;
 						goto saver;
 
-					case 'o':                             /* no optimizer (O) */
+					case 'o':                            /* no optimizer (O) */
 						oflag = FALSE;
 						break;
 
-					case 'O':                      /* stop after optimization */
+					case 'O':                     /* stop after optimization */
 						o2flg = TRUE;
 						break;
 
-					case 'P':
-						p2flg = TRUE;                /* fall to set pflag too */
-					case 'p':                             /* add profiler (C) */
+					case 'P':           /* use debug profiler (fall through) */
+						p2flg = TRUE;
+					case 'p':                            /* add profiler (C) */
 						pflag = TRUE;
 						break;
 
-					case 'q':                               /* use quiet mode */
+					case 'q':                              /* use quiet mode */
 						qflag = TRUE;
 						freopen ("c.errors", "w", stderr);
 						break;
 
-					case 'r':                         /* stop at .r (no link) */
+					case 'r':                        /* stop at .r (no link) */
 						rflag = TRUE;
 						break;
 
-					case 's':                        /* no stack checking (C) */
+					case 's':                       /* no stack checking (C) */
 						sflag = TRUE;
 						break;
 
-					case 'S':              /* ask linker for symbol table (L) */
+					case 'S':             /* ask linker for symbol table (L) */
 						s2flg = TRUE;
 						break;
 
-					case 't':                    /* use transendental library */
+					case 't':                   /* use transendental library */
 						tflag = TRUE;
 						break;
 
-					case 'T':                  /* use alternate (or NO) tmpdir*/
+					case 'T':                /* use alternate (or NO) tmpdir */
 						if (*(p + 1) != '=') {
 							tmpdir = FALSE;
 							break;
@@ -180,15 +180,15 @@ char **argv;
 						}
 						goto saver;
 
-					case 'V':                          /* give version number */
+					case 'V':                         /* give version number */
 						hello = TRUE;
 						break;
 
-					case 'w':            /* waste the compile for error check */
+					case 'w':           /* waste the compile for error check */
 						nullflag = TRUE;
 						break;
 
-					case 'x':            /* use the work dir for main library */
+					case 'x':           /* use the work dir for main library */
 						xflag = TRUE;
 						break;
 
@@ -262,11 +262,11 @@ saver:
 #endif
 	dummy ();
 
-	for (j = 0; j < filcnt; ++j) {               /* for each file on cmd line */
+	for (j = 0; j < filcnt; ++j) {              /* for each file on cmd line */
 		fprintf (stderr, "'%s'\n", namarray[j]);
 
 		if (suffarray[j] == 'c') {
-			deltmpflg = 1;                /* is C prog so prep and compile it */
+			deltmpflg = 1;               /* is C prog so prep and compile it */
 			strcpy (destfile, tmpname);
 			chgsuff (destfile, 'm');
 			frkprmp = parmbuf;
@@ -278,9 +278,9 @@ saver:
 				splcat (edition);
 
 			for (m = 0; m < maccnt;) {
-				splcat (macarray[m++]);                  /* tack on "defines" */
+				splcat (macarray[m++]);                 /* tack on "defines" */
 			}
-			splcat (namarray[j]);                    /* and now the file name */
+			splcat (namarray[j]);                   /* and now the file name */
 			newopath = dup (1);
 			close (1);
 			if ((creat (destfile, O_RDWR|S_IRUSR|S_IWUSR)) != 1)
@@ -345,7 +345,7 @@ saver:
 				strcpy (srcfile, destfile);
 				thisfilp = srcfile;
 				if (oflag) {
-					frkprmp = parmbuf;  /* yes,  optimize it */
+					frkprmp = parmbuf;  /* yes, optimize it */
 					splcat (srcfile);
 					if ((filcnt == 1) && !o2flg) {
 						strcpy (destfile, tmpname);
@@ -368,6 +368,7 @@ saver:
 					thisfilp = srcfile;
 				}
 			}
+
 			if (!o2flg) {
 				frkprmp = parmbuf;
 				splcat (srcfile);
@@ -392,7 +393,7 @@ saver:
 					unlink (srcfile);
 			}
 		}
-	}   /* end of for each file */
+	}	/* end of for each file */
 
 	if (nullflag || aflag || rflag || o2flg)
 		exit (0);
