@@ -70,6 +70,8 @@ extern int errno;
 #define LINE        10
 #define IF			11
 #define ELIF		12
+#define ERRTOK		13
+#define WARNING		14
 
 typedef struct filstr {
     struct filstr	*next;				/* next file in include list */

@@ -21,20 +21,21 @@ static direct char
 	*pedit = "0",		/* default psect edition */
 	*fname;				/* name of file to pre-process */
 
-cmdstruct cmds[] =
-{
-	"define",	DEFINE,
-	"elif",		ELIF,
-	"include",	INCLUDE,
-	"ifdef",	IFDEF,
-	"ifndef",	IFNDEF,
-	"endif",	ENDIF,
-	"if",		IF,
-	"else",		ELSE,
-	"undef",	UNDEF,
-	"asm",		ASM,
-	"endasm",	ENDASM,
-	"line",		LINE,
+cmdstruct cmds[] = {
+	{"define",	DEFINE},
+	{"elif",	ELIF},
+	{"include",	INCLUDE},
+	{"ifdef",	IFDEF},
+	{"ifndef",	IFNDEF},
+	{"endif",	ENDIF},
+	{"if",		IF},
+	{"else",	ELSE},
+	{"undef",	UNDEF},
+	{"asm",		ASM},
+	{"endasm",	ENDASM},
+	{"line",	LINE},
+	{"error",	ERRTOK},
+	{"warning",	WARNING},
 };
 
 cmdstruct *endcmds = cmds + (sizeof cmds) / (sizeof(cmdstruct));

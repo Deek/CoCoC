@@ -244,3 +244,40 @@ doliner()
 		putesc(NEWFNAME, filename, modname);
 	}
 }
+
+
+dowarn()
+{
+	char lin[LINESIZE];
+	char *sptr;
+
+	if (process) {
+		skipsp(1);
+		gch(1);
+		strcpy (lin, "warning: ");
+		sptr = lin + strlen(lin);
+		while (cch && cch != '\n') {
+			*sptr++ = cch;
+			gch(1);
+		}
+		*sptr = '\0';
+		error(lin);
+	}
+}
+
+
+doerror()
+{
+	char lin[LINESIZE], *sptr;
+	if (process) {
+		skipsp(1);
+		gch(1);
+		sptr = lin;
+		while (cch && cch != '\n') {
+			*sptr++ = cch;
+			gch(1);
+		}
+		*sptr = '\0';
+		fatal(lin);
+	}
+}
