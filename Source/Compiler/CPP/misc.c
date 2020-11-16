@@ -55,6 +55,7 @@ char	errstr[];
 
 
 putesc(type, arg, arg1)
+char	*arg, *arg1;
 {
 	if (!aflag) {
 		switch (type) {
@@ -64,10 +65,10 @@ putesc(type, arg, arg1)
 			fprintf(out, "%c%c\n%s\n%s\n", ESCHAR, type, arg, arg1);
 			break;
 		case NEWLINO:
-			fprintf(out,"%c%c\n%d\n",ESCHAR,type,arg);
+			fprintf(out,"%c%c\n%d\n",ESCHAR, type, (int)arg);
 			break;
 		default:
-			fprintf(out,"%c%c\n%s\n",ESCHAR,type,arg);
+			fprintf(out,"%c%c\n%s\n",ESCHAR, type, arg);
 			break;
 		}
 	}
