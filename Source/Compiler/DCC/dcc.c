@@ -189,6 +189,8 @@ char **argv;
 
 					case 'V':                         /* give version number */
 						hello = TRUE;
+						logo();
+						exit(0);
 						break;
 
 					case 'w':           /* waste the compile for error check */
@@ -201,6 +203,10 @@ char **argv;
 
 					case 'z':
 						zflag = TRUE;
+						break;
+
+					case '?':
+						usage();
 						break;
 
 					default:
@@ -229,11 +235,9 @@ saver:
 	}	/* end of outer while */
 
 	/* command line now parsed, start real work */
-	logo ();                                            /* identify ourselves */
-	if (filcnt == 0) {
-		fprintf (stderr, "no files!\n");
-		exit (0);
-	}
+	logo ();                                           /* identify ourselves */
+	if (filcnt == 0)
+		error ("%s: no input files", PROGNAME);
 
 	if ((aflag && rflag))
 		error ("incompatible flags");
@@ -479,8 +483,7 @@ runit (cmd, code)
 char  *cmd;
 int code;
 {
-/*	fprintf (stderr, "   %-6s:\n", cmd); */
-	fprintf (stderr, "   %-6s:  %s", cmd, parmbuf);
+	fprintf (stderr, "%6s:%s", cmd, parmbuf);
 	if (zflag)
 		return;
 #ifdef MWOS
@@ -593,7 +596,7 @@ char  *s;
 {
 	register char *p = s;
 
-	*frkprmp++ = 0x20;
+	*frkprmp++ = ' ';
 	while (*frkprmp++ = *p++) {
 		;
 	}
@@ -616,6 +619,55 @@ dummy ()
 
 logo ()
 {
-	if (hello)
-		fprintf (stderr, "%s %d.%d.%d\n", PROGNAME, VERSION, REVISION, PATCHLVL);
+	static int done = FALSE;
+	if (hello && !done) {
+		done++;
+		fprintf (stderr, "%s version %d.%d.%d\n", PROGNAME, VERSION, REVISION, PATCHLVL);
+	}
+}
+
+
+usage()
+{
+	register char	**p;
+	static char	*help[] = {
+		"dcc - a compiler for the C programming language",
+		"Usage: dcc [options] FILE...",
+		"General options:",
+		"   -a           Stop after generating assembly",
+		"   -c           Include C comments in assembly",
+		"   -dSYM[=val]  Define a preprocessor symbol",
+		"   -f=<path>    Output to path",
+		"   -k           Use maximum K&R compatibility mode",
+		"   -o           Do not run optimizer",
+		"   -O           Stop after optimizing assembly code",
+		"   -p           Add profiling code",
+		"   -P           Use special debugging profiler and library",
+		"   -r           Stop after assembly (do not link)",
+		"   -s           Disable stack checks",
+		"   -T[=path]    Use alternate temporary directory",
+		"   -q           Quiet mode (write to 'c.errors' instead of screen)",
+		"   -V           Show version info",
+		"   -w           Waste the compile (do error checking only)",
+		"   -z           Debug mode (do not run commands)",
+		"Linker options:",
+		"   -b=<path>    Use an alternate \"cstart\"",
+		"   -e<#>        Set edition of output module",
+		"   -l=<path>    Link with a library file",
+		"   -lg          Link with cgfx.l             (Graphics library)",
+		"   -ll          Link with lexlib.l         (Lex helper library)",
+		"   -ls          Link with sys.l                (System library)",
+		"   -M           Ask linker for linkage map",
+		"   -m<##[K]>    Set memory size for output module",
+		"   -n=<name>    Set name of output module",
+		"   -S           Ask linker for symbol table",
+		"   -t           Link with clibt.l (Transcendental math library)",
+		"   -x           Use the work directory for the main library",
+		NULL
+	};
+
+	for (p = help; *p; ++p)
+		puts(*p);
+
+	exit (0);
 }
