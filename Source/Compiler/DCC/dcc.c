@@ -156,6 +156,13 @@ char **argv;
 
 					case 'r':                        /* stop at .r (no link) */
 						rflag = TRUE;
+						if (*++p != '=')    /* support putting ROFs in a dir */
+							goto saver;
+						strcpy (rlib, (p + 1));
+						if (*rlib == '\0')
+							goto saver;
+						strcat (rlib, "/");
+						goto saver;
 						break;
 
 					case 's':                       /* no stack checking (C) */
@@ -377,10 +384,12 @@ saver:
 					chgsuff (destfile, 'r');
 				} else {
 					if (fflag && rflag) {
-						strcpy (destfile, objname);
+						strcpy (destfile, rlib);
+						strcat (destfile, objname);
 					} else {
 						chgsuff (namarray[j], 'r');
-						strcpy (destfile, namarray[j]);
+						strcpy (destfile, rlib);
+						strcat (destfile, namarray[j]);
 					}
 				}
 				strcpy (ofn, "-o=");
