@@ -127,6 +127,9 @@ global direct int
     asmflag,                /* copying assembly source lines */
     lflag,                  /* output source lines as comments */
 	aflag,					/* output intended for assembler */
+#ifdef DEBUG
+	dflag,					/* want debug output */
+#endif
 	gflag,					/* global symbolic debugging flag */
 	inclcount,				/* number of include libraries */
     lineno;                 /* current line number */

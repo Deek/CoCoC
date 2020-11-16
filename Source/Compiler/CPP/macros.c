@@ -47,6 +47,9 @@ register char	*name,*string;
 
 	/* save pre-defined string (no args possible) */
 	if (string) {
+#ifdef DEBUG
+		if (dflag) fprintf(stderr, "new macro: %s=%s\n", name, string);
+#endif
 		(nptr->macdef = (macdef *)grab(sizeof(macdef)))->md_elem = savestr(string);
 		nptr->macargs = -1;
 		return nptr;
@@ -164,6 +167,23 @@ register char	*name,*string;
 		nptr->macdef = mlist;
 /*		nptr->next = NULL; */
 	}
+
+#ifdef DEBUG
+	if (dflag) {
+		macdef	*temp = nptr->macdef;
+
+		fprintf(stderr, "new macro: %s=", name);
+		while (temp) {
+			if (temp->md_type)
+				fprintf(stderr, "<arg%d>", temp->md_type);
+			else
+				fprintf(stderr, "%s", temp->md_elem);
+			temp = temp->next;
+		}
+		fputs("\n", stderr);
+	}
+#endif
+
 	return nptr;
 }
 
