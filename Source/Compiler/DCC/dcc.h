@@ -57,8 +57,9 @@ direct char *frkprmp = 0;
 char        *tmproot[] = { "/R", "/R0", "/DD/TMP"} ;
 char        tmptail[] = "ctmp.XXXXXX";
 char        tmpname[64] = "";
+char		rlib[60] = "";
 
-char        mainline[20] = "cstart.r";
+char        mainline[30] = "cstart.r";
 
 char        *libarray[4],
             *namarray[100],
