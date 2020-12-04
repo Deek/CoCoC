@@ -7,4 +7,7 @@
 
 #define BYTE_ORDER		BIG_ENDIAN
 
+/* This is used by OS9000 today -- _BIG_END and _LIL_END */
+#define _BIG_END	1
+
 #endif	/* _ENDIAN_H_ */
