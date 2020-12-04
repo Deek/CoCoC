@@ -10,7 +10,7 @@ BINARY	= dcc68
 CKEYS	= ckeys
 OBJS	= bool.o build.o cmain.o codgen.o declare.o floats.o get.o inits.o \
 	lex.o local.o longs.o misc.o optim.o prtree.o regscont.o stats.o tb.o \
-	tranexp.o
+	tranexp.o fltconv.o
 
 $(BINARY):	$(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@

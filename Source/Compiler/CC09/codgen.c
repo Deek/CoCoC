@@ -360,7 +360,7 @@ dofloats(op,arg)
 register int arg;
 {
     switch (op) {
-        case FCONST:    getcon(arg,4); break;
+        case FCONST:    getcon(arg,4,1); break;
         case STACK:     fcall("_dstack"); sp -= 8; break;
         case TEST:
             fprintf(code," lda %c,x\n",arg == FLOAT ? '3' : '7');
@@ -404,21 +404,25 @@ register int arg;
 #endif
 
 
-getcon(p,n)
+getcon(p,n,f)
 int *p;
 {
     int temp;
 
     ot("bsr ");
     label(temp = getlabel());
-    defcon(p,n);
+    defcon(p,n,f);
     olbl(temp);
     ol("puls x");
 }
 
+#ifdef IEEE_FLOATS
+double dadjust();
+#endif
 
-defcon(p,n)
-register int *p;
+defcon(p,n,f)
+register int16_t *p;
+int n, f;
 {
     register int i;
 
@@ -427,8 +431,46 @@ register int *p;
     else if (p == NULL) {
         for (i = 1; i++ < n; ) os("0,");
         ob('0');
-    } else {
-#if defined(_LIL_END) || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__))
+#ifdef IEEE_FLOATS
+    } else if (f == 1) { /* f = float format */
+        int16_t *temp = alloca(n * 2); /* n is in words, so we double it */
+
+# ifdef DEBUG
+        fprintf(stderr, "converting float: %g (%016llx)\n", *(double *)p, *(int64_t *)p);
+# endif
+
+        switch (n) {
+            case 4: /* double */
+                *(double *)temp = dadjust(*(double *)p);
+                break;
+            case 2: /* float */
+            default:
+                error("codgen - float conv");
+        }
+
+# ifdef DEBUG
+        fprintf(stderr, "after conversion: %016llx\n", *(int64_t *)temp);
+# endif
+
+# if defined(_LIL_END) || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__))
+        /*
+         * We're only swapping the order in which we output the words, the
+         * individual words will format correctly since they're native.
+         */
+        temp += (n - 1);
+        for (i = n; i > 0; --i){
+            od(*temp--);
+            if (i > 1) ob(',');
+        }
+# else	/* assume bigendian */
+        for (i = 0; i < n; ++i){
+            od(*temp++);
+            if (i != n - 1) ob(',');
+        }
+# endif /* ! _LIL_END */
+#endif /* IEEE_FLOATS */
+	} else {
+# if defined(_LIL_END) || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__))
         /*
          * We're only swapping the order in which we output the words, the
          * individual words will format correctly since they're native.
@@ -443,7 +485,7 @@ register int *p;
             od(*p++);
             if (i != n - 1) ob(',');
         }
-#endif
+#endif	/* ! _LIL_END */
     }
     nl();
 }

@@ -1,3 +1,4 @@
+#include <stdint.h>
 #ifdef unix
 # define getline UNIX_getline
 # include <errno.h>
@@ -14,6 +15,16 @@
 #define global extern
 #endif
 
+/*	Floating-point format
+ *
+ *	The native compiler uses a variant of PDP-11 D_floating format for
+ *	'double'. The cross-compiler tries to convert the system's native double
+ *	format into as close a form as possible. 'float' isn't really a problem
+ *	until we have prototypes.
+ */
+#ifdef __STDC_IEC_559__
+# define IEEE_FLOATS
+#endif /* __STDC_IEC_559__ */
 /*  Machine/Operating System dependent definitions.
  *
  *  see also 'local.c'.

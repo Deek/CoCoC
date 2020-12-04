@@ -916,10 +916,17 @@ char c;
 
 static double
 normaliz(n)
+#ifdef _LIL_END
+int64_t *n;
+{
+    return (double)(*n);
+}
+#else /* big endian */
 long n[];
 {
     return n[0] * 4294967296. + n[1];
 }
+#endif
 
 
 #if defined(OS9) || defined(_OSK)
