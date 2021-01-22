@@ -1,4 +1,7 @@
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 /*	Canonicalize our system definitions: __unix__, _OS9, _OSK, _OS9000
  */
 #if defined(unix) || defined(__linux__) || defined(__MACH__)
@@ -6,16 +9,6 @@
 #  define __unix__	1
 # endif
 #endif
-
-#ifdef __unix__
-# define getline UNIX_getline
-# include <errno.h>
-# include <string.h>
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-
-#undef getline
 
 #ifdef OS9
 # ifndef _OS9
@@ -112,6 +105,8 @@
 #endif
 
 #ifdef __unix__
+# include <errno.h>
+# include <string.h>
 # include <fcntl.h>
 
 # define direct
