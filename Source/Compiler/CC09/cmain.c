@@ -30,7 +30,7 @@ char **argv;
 
         int tidy();
 
-#ifdef unix
+#ifdef __unix__
         signal(2,tidy);
 #else
         intercept(tidy);

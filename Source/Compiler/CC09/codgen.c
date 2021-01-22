@@ -452,7 +452,7 @@ int n, f;
         fprintf(stderr, "after conversion: %016llx\n", *(int64_t *)temp);
 # endif
 
-# if defined(_LIL_END) || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__))
+# ifdef _LIL_END
         /*
          * We're only swapping the order in which we output the words, the
          * individual words will format correctly since they're native.
@@ -470,7 +470,7 @@ int n, f;
 # endif /* ! _LIL_END */
 #endif /* IEEE_FLOATS */
 	} else {
-# if defined(_LIL_END) || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__))
+# ifdef _LIL_END
         /*
          * We're only swapping the order in which we output the words, the
          * individual words will format correctly since they're native.
@@ -745,7 +745,7 @@ os(s)
 
 od(n)
 {
-#ifdef OS9
+#ifdef _OS9
     fprintf(code,"%d",n & 0xFFFF);
 #else
     fprintf(code,"%hd",n & 0xFFFF);

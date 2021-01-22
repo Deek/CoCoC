@@ -1,5 +1,13 @@
 #include <stdint.h>
-#ifdef unix
+/*	Canonicalize our system definitions: __unix__, _OS9, _OSK, _OS9000
+ */
+#if defined(unix) || defined(__linux__) || defined(__MACH__)
+# ifndef __unix__
+#  define __unix__	1
+# endif
+#endif
+
+#ifdef __unix__
 # define getline UNIX_getline
 # include <errno.h>
 # include <string.h>
@@ -9,10 +17,29 @@
 
 #undef getline
 
+#ifdef OS9
+# ifndef _OS9
+#  define _OS9	1
+# endif
+#endif
+
+#ifdef OSK
+# ifndef _OSK
+#  define _OSK	1
+# endif
+#endif
+
+/*	In some cases, we just want to know if we're running on a Microware-style
+ *	operating system, because that means we've got paths like /dd/foo.
+ */
+#if defined(_OS9) || defined(_OSK) || defined(_OS9000)
+# define MWOS	1
+#endif
+
 #ifdef MAIN
-#define global
+# define global
 #else
-#define global extern
+# define global	extern
 #endif
 
 /*	Floating-point format
@@ -25,32 +52,74 @@
 #ifdef __STDC_IEC_559__
 # define IEEE_FLOATS
 #endif /* __STDC_IEC_559__ */
+
+/*	Endianness definitions.
+ *
+ *	We want the UNIX-style BYTE_ORDER/foo_ENDIAN definitions as well as the
+ *	simple flag-based ones OSK/OS-9000 use today.
+ */
+#ifdef __unix__
+# include <endian.h>
+# if BYTE_ORDER == BIG_ENDIAN
+#  define _BIG_END 1
+# elif BYTE_ORDER == LITTLE_ENDIAN
+#  define _LIL_END 1
+# elif BYTE_ORDER == PDP_ENDIAN
+#  define _PDP_END 1
+# else
+#  error "unknown endianness, can't continue"
+# endif
+#else /* not UNIX */
+# define LITTLE_ENDIAN	1234
+# define BIG_ENDIAN	4321
+# define PDP_ENDIAN	3412
+# if defined(MWOS)
+#  if defined(_OS9) || defined(_OSK) || defined(_BIG_END) /* predefined bigendian */
+#   define BYTE_ORDER	BIG_ENDIAN
+#   ifndef _BIG_END
+#    define _BIG_END 1
+#   endif
+#  elif defined(_LIL_END)
+#   define BYTE_ORDER	LITTLE_ENDIAN
+#  endif /* done with MWOS */
+# elif defined(_WIN32)
+#  define BYTE_ORDER	LITTLE_ENDIAN
+#  define _LIL_END 1 /* done with Win32 */
+# else
+#  warning "unknown system, arbitrarily assuming big-endian"
+#  define BYTE_ORDER	BIG_ENDIAN
+#  define _BIG_END 1
+# endif
+#endif /* not UNIX */
+
 /*  Machine/Operating System dependent definitions.
  *
  *  see also 'local.c'.
  */
 
-#ifdef OS9
-#define INTTYPE     int
-#define LONGTYPE    long
-#define FLOATYPE    float
-#define DBLETYPE    double
+#ifdef _OS9
+# define INTTYPE	int
+# define LONGTYPE	long
+# define FLOATYPE	float
+# define DBLETYPE	double
 #endif
 
-#ifdef OSK
-#define INTTYPE     short
-#define LONGTYPE    long
-#define FLOATYPE    float
-#define DBLETYPE    double
+#ifdef _OSK
+# define INTTYPE	short
+# define LONGTYPE	long
+# define FLOATYPE	float
+# define DBLETYPE	double
 #endif
 
-#ifdef unix
-#define direct
-#define register
-#define INTTYPE     short
-#define LONGTYPE    long
-#define FLOATYPE    float
-#define DBLETYPE    double
+#ifdef __unix__
+# include <fcntl.h>
+
+# define direct
+# define register
+# define INTTYPE	short
+# define LONGTYPE	long
+# define FLOATYPE	float
+# define DBLETYPE	double
 #endif
 
 #define MICRO               /* suppresses word boundary forcing */
@@ -422,8 +491,8 @@ global symnode  *hashtab[128],  /* main hash table */
 
 #ifdef PTREE
 global char *kw[200];           /* pointers to symbol names */
-#ifndef CKEYSFILE
-# if defined(OS9) || defined(OSK) || defined(_OSK) ||defined(_OS9000)
+# ifndef CKEYSFILE
+#  ifdef MWOS
 #   define CKEYSFILE "/dd/lib/ckeys"
 #  else
 #   define CKEYSFILE "/usr/local/share/cc09/ckeys"

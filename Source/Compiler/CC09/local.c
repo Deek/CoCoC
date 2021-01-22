@@ -18,7 +18,8 @@
 #define LCLB ' '    /* local asm declarator */
 
 static direct unsigned stklab;       /* label for stack check equ value */
-#ifndef unix
+
+#ifndef __unix__
 extern int errno;
 #endif
 

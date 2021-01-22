@@ -558,7 +558,7 @@ fraction:
         return DOUBLE;
     }
 
-#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#ifdef _LIL_END
     if (*(int64_t *)&n > __INT32_MAX__) return 0;
     *np.lp = *((long*)&n);
     if (cc=='l' || cc=='L') {       /* explicitly long */
@@ -573,17 +573,17 @@ longint:
     } else {    /*  int  */
         return INT;
     }
-#else
+#else /* big endian */
     if (*((long*)&n)) return 0;     /*  overflow  */
     if (cc=='l' || cc=='L') {   /* explicitly long */
         getch();
 longint:
 # ifdef DEBUG
-#  if defined(OS9) || defined(_OSK)
+#  ifdef MWOS
         pflinit();
 #  endif
         fprintf(stderr,"number: n=%08lX%08lX\n",*((long*)&n),*((long*)&n+1));
-# endif
+# endif	/* DEBUG */
         *np.lp = *((long*)&n+1);
         return LONG;
     } else if (*((short*)&n+2)) {
@@ -592,20 +592,26 @@ longint:
         *np.ip = *((short*)&n+3);
         return INT;
     }
-#endif
+#endif	/* ! _LIL_END */
 }
 
 #ifndef SPLIT
+
+#ifndef _OS9
+/*
+	These functions are already in the Kreider C library, and somehow these
+	versions break the native compiler.
+*/
 double
 scale(n,power,esign)
 double n;
 {
-        double scale0();
+	double scale0();
 
-        if (power > 9)
-                n = scale0(n,(power / 10) + 9,esign);
+	if (power > 9)
+		n = scale0(n,(power / 10) + 9,esign);
 
-        return scale0(n, power % 10, esign);
+	return scale0(n, power % 10, esign);
 }
 
 
@@ -658,10 +664,10 @@ double atoftbl[] = {
         1.000000e+20,
         1.000000e+30,
 };
+#endif /* ! _OS9 */
 
-
-#endif
-#else
+#endif  /* !SPLIT */
+#else   /* !DOFLOATS */
 number(np)
 register long *np;
 {
@@ -726,7 +732,7 @@ register long *np;
                return INT;
        }
 }
-#endif
+#endif  /* !DOFLOATS */
 
 
 pstr()
@@ -928,8 +934,7 @@ long n[];
 }
 #endif
 
-
-#if defined(OS9) || defined(_OSK)
+#if defined(MWOS) && defined(_BIG_END)
 static numshf(n);
 
 addin(n,c)
