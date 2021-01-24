@@ -1,8 +1,9 @@
+DCCDIR	= $(HOME)/.dcc
 CFLAGS	= -g -mx32 -fsigned-char -DUNIX -DPTREE -DPROF -DREGCONTS \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type \
-	-DCKEYSFILE=\"$(HOME)/.ckeys\"
+	-DCKEYSFILE=\"$(DCCDIR)/ckeys\"
 
 LDFLAGS = -mx32
 
@@ -23,10 +24,11 @@ clean:
 install: $(BINARY) $(CKEYS)
 	install -D -t $(HOME)/bin $(BINARY)
 	chmod 0600 ckeys
-	cp -p $(CKEYS) $(HOME)/.ckeys
+	install -D -t $(DCCDIR) ckeys
 
 uninstall:
 	-rm $(HOME)/bin/$(BINARY)
+	-rm $(DCCDIR)/ckeys
 	-rm $(HOME)/.ckeys
 
 $(OBJS) : cj.h GNUmakefile

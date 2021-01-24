@@ -490,7 +490,7 @@ global char *kw[200];           /* pointers to symbol names */
 #  ifdef MWOS
 #   define CKEYSFILE "/dd/lib/ckeys"
 #  else
-#   define CKEYSFILE "/usr/local/share/cc09/ckeys"
+#   define CKEYSFILE "/usr/local/share/dcc/ckeys"
 #  endif
 # endif
 #endif
