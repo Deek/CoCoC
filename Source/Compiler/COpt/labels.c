@@ -56,7 +56,7 @@ register char *s;
 {
     int i = 0;
 
-    while(*s)
+    while (s && *s)
         i += *s++;
 
     return i & 127;
