@@ -11,35 +11,34 @@ extern direct chain *freeins;
 extern char *bratab[];
 
 #ifdef DEBUG
+static char *p1 = "<1>";
+static char *p2 = "<2>";
+static char *zero = "<any>";
+
+char *
+strinst (val)
+char *val;
+{
+	switch ((int) val) {
+		case 0:		return zero;
+		case 1:		return p1;
+		case 2:		return p2;
+		default:	return val;
+	}
+}
+
+
 dbgaction (act)
 action *act;
 {
     register instr *ap, *rp;
-    static char *one = "<curr>", *two = "<prev>";
-    char *tmp, *tmp2;
 
     debug("\n    %-17s  %s\n","action","replacement");
     for (ap = act->actp, rp = act->repp; ap; ap = ap->nxtins) {
-        if (ap->opp) {
-            if (ap->opp == 0x1) tmp = two;
-            else tmp = ap->opp;
-        }
-        debug("    %-8s %-8s",(ap->mnp ? ap->mnp : "<any>"),
-                              (ap->opp ? tmp : "<any>"));
+        debug("    %-8s %-8s", strinst(ap->mnp), strinst(ap->opp));
         if (rp) {
-            tmp2 = NULL;
-            if (rp->mnp) {
-                if (rp->mnp == 0x1) tmp = one;
-                else if (rp->mnp == 0x2) tmp = two;
-                else tmp = rp->mnp;
-            }
-            if (rp->opp) {
-                if (rp->opp == 0x1) tmp2 = one;
-                else if (rp->opp == 0x2) tmp2 = two;
-                else tmp2 = rp->opp;
-            }
-            debug(", %-8s %-8s",(rp->mnp ? tmp : "<same>"),
-                                (rp->opp ? tmp2 : "<same>"));
+            debug(", %-8s %-8s",(rp->mnp ? strinst(rp->mnp) : "<same>"),
+                                (rp->opp ? strinst(rp->opp) : "<same>"));
             rp = rp->nxtins;
         }
         debug("\n");
@@ -256,7 +255,7 @@ loop:   if (i == &ilist || (i2 = i->succ) == &ilist)
 restart:
         for (found = FALSE; a ; a = a->nxtact) {
 #ifdef DEBUG
-            debug("  matching action %04x.\n",a);
+            debug("  matching action %p.\n",a);
 #endif
             i = i2;
             c = 0;
@@ -270,9 +269,8 @@ restart:
                     } else if (match(i->args,ap->opp) == 0) break;
                 }
 #ifdef DEBUG
-                debug("    matched: %-8s %-8s, %-8s %-8s\n",i->mnem,i->args,
-                               (ap->mnp ? ap->mnp : "<any>"),
-                               (ap->opp ? ap->opp : "<any>"));
+                debug("    matched: %s %s <=> %s %s\n",i->mnem,i->args,
+                               strinst(ap->mnp), strinst(ap->opp));
 #endif
                 i = i->pred;
                 ++c;
@@ -292,7 +290,7 @@ restart:
             return;
         }
 #ifdef DEBUG
-        debug("  all matched action %04x.\n",a);
+        debug("  all matched action %p.\n",a);
 #endif
         /* all matched - replace */
 		i = i2;
@@ -341,6 +339,7 @@ restart:
         return;
     }
 }
+
 
 fixcond(i)
 register instruction *i;

@@ -14,7 +14,7 @@ unsigned n;
 error(s1,s2,s3,s4)
 char *s1,*s2,*s3,*s4;
 {
-    fprintf(stderr,"C optimiser error: ");
+    fprintf(stderr,"error: ");
     fprintf(stderr,s1,s2,s3,s4);
     putc('\n',stderr);
     exit(1);
@@ -33,10 +33,11 @@ instruction *i;
     register label *l;
 
     if (dbflag) {
-        fprintf(stderr,"@%04x ",i);
+        fprintf(stderr,"@%p ",i);
         for (l = i->llist; l; l = l->nextl)
             fprintf(stderr,"%s%s",l->lname,l->nextl ? "/" : "");
-        fprintf(stderr," %s %s\n",i->mnem,
+		if (i && i->lab && i->lab->lname)
+	        fprintf(stderr," %s %s\n",i->mnem,
                 (i->itype & BRANCH ? i->lab->lname : i->args));
     }
 }

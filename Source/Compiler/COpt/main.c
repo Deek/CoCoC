@@ -28,6 +28,7 @@ char **argv;
         if (*(argp = *argv) == '-')
             switch(*++argp) {
                 case '\0':
+                case 'D':
                     dbflag = 1;
                     break;
                 case '2':
@@ -91,15 +92,15 @@ char **argv;
         int totbytes,bytes;
 
         fprintf(stderr,"statistics:\n");
-        fprintf(stderr,"   total instructions : %d\n",inserts);
-        fprintf(stderr,"        long branches :  %5d, %5d, %3d%%\n",
+        fprintf(stderr,"   total instructions: %d\n",inserts);
+        fprintf(stderr,"        long branches:  %5d, %5d, %3d%%\n",
                 lbf,lbdone,percent(lbdone,lbf)) ;
-        fprintf(stderr,"        removed       :         %5d, %3d%%\n",
+        fprintf(stderr,"        removed      :         %5d, %3d%%\n",
                 opsdone,percent(opsdone,inserts));
         bytes = 2 * lbdone;
         bytes += estimate(opsdone);
         totbytes = estimate(inserts);
-        fprintf(stderr,"        total bytes   :  %5d, %5d, %3d%%\n",
+        fprintf(stderr,"        total bytes  :  %5d, %5d, %3d%%\n",
                 totbytes,bytes,percent(bytes,totbytes));
     }
 }

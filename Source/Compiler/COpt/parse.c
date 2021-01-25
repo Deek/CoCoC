@@ -1,6 +1,7 @@
 #include "op.h"
 #include "ctype.h"
 
+char *
 parse(type,s,p,globflag)
 int type,*globflag;
 register char *s,*p;
@@ -31,20 +32,20 @@ register char *s,*p;
             while (size-- && *p) *s++ = *p++;
             break;
         default:
-            error("parse called with bad type : %d",type);
+            error("parse called with bad type: %d",type);
     }
 
     *s = '\0';
 #ifdef DEBUG
     switch(type) {
         case LABEL:
-            debug("parsed label : \"%s\"\n", save);
+            debug("parsed label: \"%s\"\n", save);
             break;
         case MNEM:
-            debug("parsed mnemonic : \"%s\"\n",save);
+            debug("parsed mnemonic: \"%s\"\n",save);
             break;
         case ARGS:
-            debug("parsed args : \"%s\"\n",save);
+            debug("parsed args: \"%s\"\n",save);
     }
 #endif
     return p;
