@@ -1,10 +1,8 @@
 #include "op.h"
 /* #include "../ident.c"*/
 
-#define LINESIZE 100
-
 FILE *in,*out,*datfile;
-direct int dbflag,inserts,inlcnt;
+direct int dbflag,l2flag,inserts,inlcnt;
 
 #ifdef DEBUG
 direct int debugon,debugcnt;
@@ -31,6 +29,9 @@ char **argv;
             switch(*++argp) {
                 case '\0':
                     dbflag = 1;
+                    break;
+                case '2':
+                    l2flag = 1;
                     break;
 #ifdef DEBUG
                 case 'd':
@@ -124,7 +125,6 @@ optimise()
     char lab[LABELSIZE+1],mnem[MNEMSIZE+1],args[ARGSIZE+1];
     label *l,*lp1,*lp2;
     char *p;
-    instruction *i;
     int dpflag,globflag;
 
     l = NULL;

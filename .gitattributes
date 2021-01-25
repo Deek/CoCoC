@@ -12,6 +12,7 @@ Sys/** filter=crtext
 *.hlp filter=crtext
 *.lsp filter=crtext
 *.man filter=crtext
+*.patterns filter=crtext
 *.txt filter=crtext
 *.README filter=crtext
 comp.* filter=crtext

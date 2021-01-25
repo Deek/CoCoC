@@ -1,4 +1,5 @@
-CFLAGS	= -g -mx32 -fsigned-char -DUNIX -DDEBUG \
+DCCDIR	= $(HOME)/.dcc
+CFLAGS	= -g -mx32 -fsigned-char -DUNIX -DDEBUG -DCONFDIR=\"$(DCCDIR)\" \
 	-Wall -Wno-char-subscripts -Wno-incompatible-pointer-types \
 	-Wno-implicit-int -Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type
@@ -6,7 +7,8 @@ CFLAGS	= -g -mx32 -fsigned-char -DUNIX -DDEBUG \
 LDFLAGS = -mx32
 
 BINARY	= dco68
-OBJS    = main.o parse.o labels.o inst.o optim.o misc.o ctype.o
+OBJS    = main.o parse.o labels.o inst.o optim.o match.o misc.o ctype.o
+CONFS=	level1.patterns level2.patterns
 
 $(BINARY):	$(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
@@ -18,8 +20,11 @@ clean:
 
 install: $(BINARY) $(CKEYS)
 	install -D -t $(HOME)/bin $(BINARY)
+	install -D -m0600 -t $(DCCDIR) $(CONFS)
 
 uninstall:
 	-rm $(HOME)/bin/$(BINARY)
+	-rm $(foreach file,$(CONFS),$(DCCDIR)/$(file))
+	-rmdir $(DCCDIR)
 
-$(OBJS) : op.h ctype.h GNUmakefile
+$(OBJS) : op.h ctype.h actions.h GNUmakefile

@@ -4,6 +4,8 @@
 #define MNEMSIZE        10
 #define ARGSIZE         90
 
+#define LINESIZE 100
+
 #define LABEL       1
 #define MNEM        2
 #define ARGS        3
@@ -70,4 +72,16 @@ extern instruction *insins(),*newins();
 extern direct int inscount;
 extern FILE *in,*out,*datfile;
 extern direct int lbf,lbdone,opsdone;
-extern direct int dbflag;
+extern direct int dbflag,l2flag;
+extern char *parse();
+
+extern match();
+extern matchcpy();
+
+#ifndef CONFDIR
+# ifdef _OS9
+#  define CONFDIR "/DD/Lib"
+# else
+#  define CONFDIR "/usr/local/share/dcc"
+# endif
+#endif

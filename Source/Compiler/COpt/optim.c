@@ -1,10 +1,11 @@
 #include "op.h"
 #include "actions.h"
-#include "ctype.h"
 
 direct int opsdone;
 int labelnum = 0;
 action *acslots[128];
+
+static char empty[1] = {'\0'};	/* the empty string */
 
 extern direct chain *freeins;
 extern char *bratab[];
@@ -46,58 +47,167 @@ action *act;
 }
 #endif
 
-addsimpl(s)
-simplact *s;
+static instr *
+mkInstr(line)
+char *line;
 {
-    register action *a, **slot;
-    instr *i, *i2, *r;
-    simplact    *sa;
+	instr *i = grab(sizeof(instr));
+	register char *c = line;
+	char *idx, *mnem, *oper;
+	int count;
 
-    for (sa = s; sa, *sa; sa++) {
-        if (!(i = malloc(3 * (sizeof instr)))) error ("malloc\n");
-        if (!(a = malloc((sizeof action)))) error ("malloc\n");
-        i2 = (char *) i + (sizeof instr);
-        r = (char *) i2 + (sizeof instr);
+	i->nxtins = NULL;
+	while (*c) {
 
-        i->nxtins = NULL;
-        i->mnp = sa->amn1;
-        i->opp = sa->aop1;
-        i2->nxtins = i;
-        i2->mnp = sa->amn2;
-        i2->opp = sa->aop2;
-        r->nxtins = NULL;
-        r->mnp = sa->rmnm;
-        r->opp = sa->rop;
+		if (idx = index(c, ' ')) {
+			count = (idx - c);
+		} else {	/* this is an error, no possible operand */
+			error ("incomplete instruction");
+		}
 
-        a->actp = i2; a->repp = r;
-
-#ifdef DEBUG
-        dbgaction(a);
+		if (count == 1 && *c == '*') {
+			i->mnp = NULL;	/* "don't care" */
+		} else if (*c == '^') switch (*(c+1)) {
+			case '0':
+				i->mnp = NULL;
+				break;
+			case '1':
+				i->mnp = (char *)1;
+				break;
+			case '2':
+				i->mnp = (char *)2;
+				break;
+			default:
+				error ("bad opcode reference");
+				break;
+		} else {
+			mnem = grab (count+1);
+			strncpy (mnem, c, count);
+			*(mnem+count) = '\0';
+#if 0 && defined DEBUG
+			debug("\nmnem: \"%s\"", mnem);
 #endif
+			i->mnp = mnem;
+		}
 
-        slot = &acslots[hash(a->actp->mnp)];
-        a->nxtact = *slot;
-        *slot = a;
-    }
+		c += count + 1;
+		if (idx = index(c, ' ')) {
+			count = (idx - c);
+		} else {	/* this is the last operand */
+			count = strlen(c) - 1;	/* eat the newline */
+		}
+
+
+		if (count == 0) {
+			i->opp = empty;	/* empty operands use the same string */
+		} else if (count == 1 && *c == '*') {
+			i->opp = NULL;	/* "don't care" */
+		} else if (*c == '^') switch (*(c+1)) {
+			case '0':
+				i->opp = NULL;
+				break;
+			case '1':
+				i->opp = (char *)1;
+				break;
+			case '2':
+				i->opp = (char *)2;
+				break;
+			default:
+				error ("bad operand reference");
+				break;
+		} else {
+			oper = grab (count+1);
+			strncpy (oper, c, count);
+			*(oper+count) = '\0';
+#if 0 && defined DEBUG
+			debug("\noper: \"%s\"", oper);
+#endif
+			i->opp = oper;
+		}
+		c += count + 1;
+
+		if (strlen(c) < 2) { /* we're at the end */
+			return i;
+		} else {	/* make another instruction to fill */
+			instr *i2 = grab (sizeof (instr));
+
+			i2->nxtins = i;
+			i = i2;
+		}
+	}
+	return i;
 }
 
+loadfile(patfile)
+FILE *patfile;
+{
+	register action *a, **slot;
+	char line[LINESIZE];
+	int which = 1;
+
+	while (fgets (line, LINESIZE, patfile)) {
+		char *c = line;
+
+		if (*c == '#') {
+			continue;	/* comment line */
+		}
+		if (*c == '\n') {
+			which = 1;
+			continue;
+		}
+
+		switch (which) {
+			case 1:	{
+				instr *i = mkInstr (line);
+				a = grab (sizeof (action)); /* new action */
+				a->actp = i;
+				break;
+			}
+			case 2:	{
+				instr *i = mkInstr (line);
+				a->repp = i;
+#ifdef DEBUG
+				dbgaction(a);
+#endif
+				if (!a->actp->mnp || index(a->actp->mnp, '*') || index(a->actp->mnp, '?')) {
+					slot = &acslots[0];
+				} else {
+					slot = &acslots[hash (a->actp->mnp)];
+				}
+				a->nxtact = *slot;
+				*slot = a;
+
+				break;
+			}
+		}
+
+		which++;
+	}
+}
 
 optinit()
 {
-    register action *a,**slot;
+	char	path[255];
+	char	*dir = CONFDIR;
+	char	*pat = "%s/level%d.patterns";
+	char	*err = "can't open %s\n";
+	FILE	*patfile;
 
-    for(a = actions; a->nxtact; a++) {
+	sprintf(path, pat, dir, 1);
+	if (!(patfile = fopen (path, "r")))
+		error (err, path);
 
-#ifdef DEBUG
-        dbgaction(a);
-#endif
+	loadfile(patfile);
+	fclose(patfile);
 
-        slot = &acslots[hash(a->actp->mnp)];
-        a->nxtact = *slot;
-        *slot = a;
-    }
+	if (l2flag) {
+		sprintf(path, pat, dir, 2);
+		if (!(patfile = fopen (path, "r")))
+			error (err, path);
 
-    addsimpl(simple);
+		loadfile(patfile);
+		fclose(patfile);
+	}
 }
 
 
@@ -107,10 +217,8 @@ register instruction *i;
 {
     register instruction *i2;
     action *a;
-    instr *ap;
-    label *l;
+    instr *ap, *mp;
     int found,c,fallback = FALSE;
-    char *m;
 
     i = i->pred;
     for (;;) {
@@ -126,7 +234,7 @@ loop:   if (i == &ilist || (i2 = i->succ) == &ilist)
                     remins(i);
                     i = i2->pred;
                     ++opsdone;
-                    goto loop;
+                    goto loop; /* TODO: use continue? */
                 } else if ((i->itype & CODEBRK)
                             && i->llist == NULL
                             && (i = i->pred) != &ilist
@@ -156,7 +264,7 @@ restart:
                 if (i == &ilist) break; /* || i->llist -- i has labels */
                 if (ap->mnp && match(i->mnem,ap->mnp) == 0) break;
                 if (ap->opp) {
-                    if (ap->opp == 1) {
+                    if ((int)ap->opp == 1) {
                         if (i->pred == &ilist) break;
                         if (match(i->args,i->pred->args) == 0) break;
                     } else if (match(i->args,ap->opp) == 0) break;
@@ -187,21 +295,41 @@ restart:
         debug("  all matched action %04x.\n",a);
 #endif
         /* all matched - replace */
-        i = i2;
-        for (ap = a->repp; ap; ap = ap->nxtins) {
-            if (ap->mnp) {
-                if (ap->mnp == 1) /* do nothing, same as NULL */;
-                else if (ap->mnp == 2) strcpy(i->mnem,i->pred->mnem);
-                else strcpy(i->mnem,ap->mnp);
+		i = i2;
+		for (ap = a->repp, mp = a->actp; ap; ap = ap->nxtins,mp = mp->nxtins) {
+			char *ts;
+			if (ap->mnp) {
+				if ((int)ap->mnp == 1) /* do nothing, same as NULL */;
+				else if ((int)ap->mnp == 2) strcpy(i->mnem,i->pred->mnem);
+				else if (ts = index(ap->mnp, '\\')) {	// mnp has \#
+					if (*(ts+1) > '0' && *(ts+1) < '3')
+						matchcpy (ap->mnp,
+						          i->mnem, mp->mnp,
+						          (i->pred) ? i->pred->mnem : 0,
+						          (mp->nxtins) ? mp->nxtins->mnp : 0);
+					else error("bad opcode reference");
+				} else {
+					strcpy(i->mnem,ap->mnp);
+				}
             }
             if (ap->opp) {
-                if (ap->opp == 1) /* do nothing, same as NULL */;
-                else if (ap->opp == 2) strcpy(i->args,i->pred->args);
-                else strcpy(i->args,ap->opp);
+				if ((int)ap->opp == 1) /* do nothing, same as NULL */;
+				else if ((int)ap->opp == 2) strcpy(i->args,i->pred->args);
+				else if (ts = index(ap->opp, '\\')) {	// opp has \#
+					if (*(ts+1) > '0' && *(ts+1) < '3')
+						matchcpy (ap->opp,
+						          i->args, mp->opp,
+						          (i->pred) ? i->pred->args : 0,
+						          (mp->nxtins) ? mp->nxtins->opp : 0);
+					else error("bad operand reference");
+				} else {
+					strcpy(i->args,ap->opp);
+				}
             }
             i = i->pred;
             --c;
         }
+		/* FIXME: may need to dig until we get to &ilist */
         while (c > 0) {
             if (i->llist) movlab(i,i2); // move any labels in i to i2
             i2 = i->pred;
@@ -226,31 +354,6 @@ register instruction *i;
     ++opsdone;
 }
 
-match(s,p)
-register char *s,*p;
-{
-    if(p == NULL)
-        return 1;
-
-    while(*p) {
-        if(*p == '<') {
-            if(isdigit(*s)) {
-                unsigned n =0 ;
-                do {
-                    n = n * 10 + *s++ - '0';
-                } while(isdigit(*s));
-
-                if(n > 255)
-                    return 0;
-            }
-            else return 0;
-            p++;
-        }
-        else if(*s++ != *p++)
-            return 0;
-    }
-    return (*s == '\0');
-}
 
 finddupl(i)
 register instruction *i;
