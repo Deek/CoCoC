@@ -1,5 +1,4 @@
 #include "op.h"
-#include <string.h>
 
 direct int inscount;
 int insmax = MAXINS;
@@ -174,13 +173,13 @@ instruction *i1, *i2;
 }
 
 
-remove()
+delete()
 {
     register instruction *i;
     label *l;
 
     if ((i = ilist.succ) == &ilist)
-        error("removing too many instructions");
+        error("deleting too many instructions");
 
     if ((i->itype & LONGBRA) == LONGBRA)
         fix(i, FORWARD);

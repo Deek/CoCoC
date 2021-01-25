@@ -95,7 +95,7 @@ char **argv;
         fprintf(stderr,"   total instructions: %d\n",inserts);
         fprintf(stderr,"        long branches:  %5d, %5d, %3d%%\n",
                 lbf,lbdone,percent(lbdone,lbf)) ;
-        fprintf(stderr,"        removed      :         %5d, %3d%%\n",
+        fprintf(stderr,"        deleted      :         %5d, %3d%%\n",
                 opsdone,percent(opsdone,inserts));
         bytes = 2 * lbdone;
         bytes += estimate(opsdone);
@@ -216,21 +216,21 @@ put:                fprintf(out,"%s\n",line);
                     finddupl(ilist.pred);
                 }
                 ++inserts;
-                if (inscount >= insmax) remove();
+                if (inscount >= insmax) delete();
             }
         }
     }
 
     if (l) insins(&ilist,"nop","",&l);
     endsect();
-    while (inscount) remove();
+    while (inscount) delete();
 }
 
 endsect()
 {
     if (endflag) {
         if (datflag) datflag = FALSE;
-        else while (inscount) remove();
+        else while (inscount) delete();
         fprintf(out," endsect\n");
         endflag = FALSE;
     }
