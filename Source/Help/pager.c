@@ -63,7 +63,7 @@ char *str;
       col=0;space=0;
       while(col<width && (c=*str)!=LF && c) { /* copy one line to pagebuff */
          if(c==TAB) {
-            for(i=(col/8+1)*8-col;i>0;i--)  /* expand tabs */
+            for(i=(col/4+1)*4-col;i>0;i--)  /* expand tabs */
                pagebuff[col++]=' ';
          } else {
             if (c==' ') { strspace=str;space = col;} /* remember last space */
