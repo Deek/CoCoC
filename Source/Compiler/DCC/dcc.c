@@ -218,7 +218,7 @@ char **argv;
 						break;
 
 					default:
-						error ("unknown flag : -%c\n", *p);
+						error ("unknown flag: -%c\n", *p);
 				}	/* end of switch */
 			}	/* end of inner while */
 saver:
@@ -237,7 +237,7 @@ saver:
 					break;
 
 				default:
-					error ("%s : no recognised suffix", *argv);
+					error ("%s: no recognised suffix", *argv);
 			}	/* end of switch */
 		}	/* end of else */
 	}	/* end of outer while */
@@ -251,7 +251,7 @@ saver:
 		error ("incompatible flags");
 
 	if (fflag && filcnt > 1 && (aflag || rflag))
-		error ("%s : output name not applicable", objname);
+		error ("%s: output name not applicable", objname);
 
 	if (!fflag)
 		strcpy (objname, ((filcnt == 1) ? namarray[0] : "output"));
@@ -421,7 +421,7 @@ saver:
 					unlink (srcfile);
 			}
 		}
-	}	/* end of for each file */
+	}	/* end of "for each file" */
 
 	if (nullflag || aflag || rflag || o2flg)
 		exit (0);
@@ -431,7 +431,7 @@ saver:
 	if ((p = chkccdev ()) == 0)
 		error ("Cannot find default system drive");
 	if (bflag) {
-		strcpy (ofn, mainline);         /* use cstart.r or whatever */
+		strcpy (ofn, mainline);	/* use cstart.r or whatever */
 	} else {
 		strcat (strcat (strcpy (ofn, p), "/lib/"), mainline);   /* global */
 	}
@@ -503,14 +503,14 @@ int code;
 		return;
 #ifdef MWOS
 	if ((childid = os9fork (cmd, frkprmsiz, parmbuf, 1, 1, 0)) < 0)
-		error ("cannot execute %s", cmd);
+		error ("can't run '%s'", cmd);
 #else
 	if ((childid = fork()) == 0) { /* we're the child */
 		char foo[4096];
 		sprintf(foo, "%s%s", cmd, parmbuf);
 		exit(system (foo)); /* don't clean up */
 	} else if (childid < 0) { /* fork failed */
-		error ("cannot execute '%s' -- fork() failed, reason: %s", cmd, strerror(errno));
+		error ("can't run '%s' -- fork() failed, reason: %s", cmd, strerror(errno));
 		return;
 	}
 #endif
@@ -678,7 +678,7 @@ usage()
 		"   -n=<name>    Set name of output module",
 		"   -S           Ask linker for symbol table",
 		"   -t           Link with clibt.l (Transcendental math library)",
-		"   -x           Use the work directory for the main library",
+		"   -x           Use current directory for the main library",
 		NULL
 	};
 

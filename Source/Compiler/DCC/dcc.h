@@ -64,21 +64,22 @@ direct char	*thisfilp = 0,
 direct int	frkprmsiz = 0;
 direct char	*frkprmp = 0;
 
-char		*tmproot[] = { "/R", "/R0", "/DD/TMP"} ;
-char		tmptail[] = "ctmp.XXXXXX";
+direct char	*tmproot[] = { "/R", "/R0", "/DD/TMP"};
+direct char	*tmptail = "ctmp.XXXXXX";
 char		tmpname[64] = "";
 char		rlib[60] = "";
 
 char		mainline[30] = "cstart.r";
 
 char		*libarray[4],
-			*namarray[100],
+			*xtramem,
+			*modname,
+			*edition;
+
+char		*namarray[100],
 			suffarray[100],
 			*macarray[100],
 			ofn[60],
-			*xtramem,
-			*modname,
-			*edition,
 			destfile[60],
 			srcfile[60],
 			objname[60],
