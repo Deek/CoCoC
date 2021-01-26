@@ -32,6 +32,7 @@ extern char scratch[BUF_SIZE];  /* Available for general use */
 extern int interrupted;  /*  Set to TRUE by sighandler if an interrupt occurs */
 extern int clicked;  /*  Set to TRUE by sighandler if mouse pressed */
 extern int keyed;  /*  Set to TRUE by sighandler if key pressed */
+extern int noask;	/* Set if we are to exit when done displaying */
 
 extern char inbuff[BUF_SIZE];
 

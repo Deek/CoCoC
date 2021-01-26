@@ -16,6 +16,7 @@ char request[BUF_SIZE];
 direct int interrupted;     /* Set to TRUE when signal received */
 direct int clicked;         /* Set to TRUE when MOUSE signal received */
 direct int keyed;           /* Set to TRUE when key pressed */
+direct int noask = FALSE;
 
 main(argc,argv)
   int argc;
@@ -31,12 +32,19 @@ main(argc,argv)
     intercept(sig_handler);
     *inbuff = '\0';
 
+    if (argc > 1 && argv[1][0] == '-' && argv[1][1] == 'n') {
+        noask = TRUE;
+        argc--; argv++;
+    }
+
     if(argc<2) {   /* If no arguments, show top-level topics */
-       sprintf(scratch,"NitrOS9 Help, ver. %s", VERSION);
-       outline(scratch);
-       outline("For help using Help, enter \"?\".");
-       outline();
-       topics();
+        if (!noask) {
+            sprintf(scratch,"NitrOS9 Help, ver. %s", VERSION);
+            outline(scratch);
+            outline("For help using Help, enter \"?\".");
+        }
+        outline();
+        topics();
     } else {
        newstack(&tmp);  /* Otherwise, build list of topic desired */
        while(--argc > 0)
@@ -211,9 +219,10 @@ struct stacknode *sofar,*list;
 prompt(stack)
 struct stacknode *stack;
 {
-  if (stack == NULL)
+  if (stack == NULL) {
+     if (noask) exit(0);
      sprintf(scratch,"Topic:");
-  else {
+  } else {
      sprintstack(scratch,stack);
      strcat(scratch,"subtopic:");
   }
