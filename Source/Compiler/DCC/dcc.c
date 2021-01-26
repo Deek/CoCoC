@@ -321,13 +321,14 @@ saver:
 			strcpy (srcfile, destfile);
 			frkprmp = parmbuf;
 			thisfilp = srcfile;
-			splcat (srcfile);
-			if (sflag)
-				splcat ("-s");          /* no stack checking */
 
 			if (nullflag) {
 				splcat ("-n");          /* waste the output */
+#ifdef MWOS
 				strcpy (destfile, "/nil");
+#else
+				strcpy (destfile, "/dev/null");
+#endif
 				deltmpflg = 0;
 			} else {
 				if (aflag) {
@@ -342,11 +343,17 @@ saver:
 				}
 			}
 
-			strcpy (ofn, "-o=");
-			strcat (ofn, destfile);
+			sprintf (ofn, "-o=%s", destfile);
 			splcat (ofn);
+
+			if (sflag)
+				splcat ("-s");          /* no stack checking */
+
 			if (pflag)
 				splcat ("-p");          /* wants profiler code */
+
+			splcat (srcfile);
+
 			trmcat ();
 			lasfilp = destfile;
 			runit (COMPILER, 0);
@@ -366,8 +373,8 @@ saver:
 			} else {
 				strcpy (srcfile, destfile);
 				thisfilp = srcfile;
-				if (oflag) {
-					frkprmp = parmbuf;  /* yes, optimize it */
+				if (oflag) {	/* optimize it? */
+					frkprmp = parmbuf;
 
 					if (lv2flag)
 						splcat ("-2");          /* work only on Level II (O) */
@@ -397,7 +404,7 @@ saver:
 
 			if (!o2flg) {
 				frkprmp = parmbuf;
-				splcat (srcfile);
+
 				if ((filcnt == 1) && !rflag) {
 					strcpy (destfile, tmpname);
 					chgsuff (destfile, 'r');
@@ -411,9 +418,11 @@ saver:
 						strcat (destfile, namarray[j]);
 					}
 				}
-				strcpy (ofn, "-o=");
-				strcat (ofn, destfile);
+				sprintf (ofn, "-o=%s", destfile);
 				splcat (ofn);
+
+				splcat (srcfile);
+
 				trmcat ();
 				lasfilp = destfile;
 				runit (ASSEMBLER, 0);
@@ -428,14 +437,33 @@ saver:
 
 	/* now link all together*/
 	frkprmp = parmbuf;
-	if ((p = chkccdev ()) == 0)
-		error ("Cannot find default system drive");
+
+	if (!fflag)
+		chgsuff (objname, '\0');
+	sprintf (ofn, "-o=%s", objname);
+	splcat (ofn);
+
+	if (edition)
+		splcat (edition);
+	if (mflag)
+		splcat ("-m");
+	if (xtramem)
+		splcat (xtramem);
+	if (modname)
+		splcat (modname);
+	if (s2flg)
+		splcat ("-s");
+
+	if (!(p = chkccdev ()))
+		error ("can't find default drive");
+
 	if (bflag) {
 		strcpy (ofn, mainline);	/* use cstart.r or whatever */
 	} else {
-		strcat (strcat (strcpy (ofn, p), "/lib/"), mainline);   /* global */
+		sprintf (ofn, "%s%s%s", p, libdir, mainline);	/* global */
 	}
 	splcat (ofn);
+
 	if ((filcnt == 1) && (suffarray[0] != 'r')) {
 		splcat (thisfilp = destfile);
 	} else {
@@ -443,50 +471,34 @@ saver:
 			splcat (namarray[j]);
 		}
 	}
-	strcpy (ofn, "-o=");
-	if (fflag == 0)
-		chgsuff (objname, 0);
-	strcat (ofn, objname);
-	splcat (ofn);
+
 	for (j = 0; j < libcnt; j++) {
 		splcat (libarray[j]);
 	}
 
 	if (lgflg) {
-		strcat (strcat (strcpy (ofn, "-l="), p), "/lib/cgfx.l");
+		sprintf (ofn, "-l=%s%scgfx.l", p, libdir);
 		splcat (ofn);
 	}
 
 	if (llflg) {
-		strcat (strcat (strcpy (ofn, "-l="), p), "/lib/lexlib.l");
+		sprintf (ofn, "-l=%s%slexlib.l", p, libdir);
 		splcat (ofn);
 	}
 
 	if (lsflg) {
-		strcat (strcat (strcpy (ofn, "-l="), p), "/lib/sys.l");
+		sprintf (ofn, "-l=%s%ssys.l", p, libdir);
 		splcat (ofn);
 	}
 
 	if (p2flg) {
-		strcat (strcat (strcpy (ofn, "-l="), p), "/lib/dbg.l");
+		sprintf (ofn, "-l=%s%sdbg.l", p, libdir);
 		splcat (ofn);
 	}
 
-	strcpy (ofn, "-l=");
-	if (xflag == 0)
-		strcat (strcat (ofn, p), "/lib/");
-	strcat (ofn, (tflag) ? "clibt.l" : "clib.l");
+	sprintf (ofn, "-l=%s%sclib%s.l", xflag ? "" : p, xflag ? "" : libdir, tflag ? "t" : "");
 	splcat (ofn);
-	if (modname)
-		splcat (modname);
-	if (xtramem)
-		splcat (xtramem);
-	if (edition)
-		splcat (edition);
-	if (mflag)
-		splcat ("-m");
-	if (s2flg)
-		splcat ("-s");
+
 	trmcat ();
 	lasfilp = 0;
 	runit (LINKER, 0);
@@ -545,11 +557,9 @@ chkccdev ()
 		munlink (r);
 		return (devnam1);
 	}
-	return NULL;
+	return defdrive;
 #else
-	static char *retval = "/dd";
-
-	return retval;
+	return defdrive;
 #endif
 }
 

@@ -7,10 +7,8 @@ PROG    = dcc
 FILES   = dcc.c
 HELPDIR = /DD/SYS/HELP
 
-$(PROG): $(FILES)
+$(PROG): $(FILES) dcc.h Makefile
     $(CC) $(FILES) $(CFLAGS) $(LFLAGS) -f=$(ODIR/)$(PROG)
-
-$(FILES): dcc.h Makefile
 
 install: $(PROG)
     attr $(PROG) e

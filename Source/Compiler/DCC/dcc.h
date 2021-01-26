@@ -65,7 +65,11 @@ direct int	frkprmsiz = 0;
 direct char	*frkprmp = 0;
 
 direct char	*tmproot[] = { "/R", "/R0", "/DD/TMP"};
+
 direct char	*tmptail = "ctmp.XXXXXX";
+direct char	*libdir = "/lib/";
+direct char	*defdrive = "/dd";
+
 char		tmpname[64] = "";
 char		rlib[60] = "";
 
