@@ -147,6 +147,10 @@ char **argv;
 						o2flg = TRUE;
 						break;
 
+					case '2':                    /* Optimize for Level 2 (O) */
+						lv2flag = TRUE;
+						break;
+
 					case 'P':           /* use debug profiler (fall through) */
 						p2flg = TRUE;
 					case 'p':                            /* add profiler (C) */
@@ -364,6 +368,10 @@ saver:
 				thisfilp = srcfile;
 				if (oflag) {
 					frkprmp = parmbuf;  /* yes, optimize it */
+
+					if (lv2flag)
+						splcat ("-2");          /* work only on Level II (O) */
+
 					splcat (srcfile);
 					if ((filcnt == 1) && !o2flg) {
 						strcpy (destfile, tmpname);
@@ -641,6 +649,7 @@ usage()
 		"dcc - a compiler for the C programming language",
 		"Usage: dcc [options] FILE...",
 		"General options:",
+		"   -2           Use Level 2-only optimizations",
 		"   -a           Stop after generating assembly",
 		"   -c           Include C comments in assembly",
 		"   -dSYM[=val]  Define a preprocessor symbol",

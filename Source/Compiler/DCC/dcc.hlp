@@ -33,6 +33,7 @@ Description
     faster executables!
 
 General options:
+    -2           Generate code only for (Nitr)OS-9 Level 2
     -a           Stop after generating initial assembly code
     -c           Include C source and comments in assembly
     -dSYM[=val]  Define a preprocessor symbol
