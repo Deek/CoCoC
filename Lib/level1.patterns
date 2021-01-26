@@ -1,0 +1,144 @@
+clra * clrb * pshs d clra * clrb * pshs d
+clra  clrb  pshs d pshs d
+
+# The C compiler likes to write stuff, and immediately read it back...
+stb * ldb ^1
+^2 ^1
+
+std * ldd ^1
+^2 ^1
+
+stx * ldx ^1
+^2 ^1
+
+ldb * stb ^1
+^2 ^1
+
+ldd * std ^1
+^2 ^1
+
+ldx * stx ^1
+^2 ^1
+
+tfr u,s
+leas ,u
+
+tfr x,s
+leas ,x
+
+tfr y,s
+leas ,y
+
+tfr s,u
+leau ,s
+
+tfr x,u
+leau ,x
+
+tfr y,u
+leau ,y
+
+tfr s,x
+leax ,s
+
+tfr u,x
+leax ,u
+
+tfr y,x
+leax ,y
+
+tfr s,y
+leay ,s
+
+tfr u,y
+leay ,u
+
+tfr x,y
+leay ,x
+
+tfr u,d pshs d
+pshs u
+
+tfr y,d pshs d
+pshs y
+
+pshs u pshs d
+^2 u,d
+
+pshs u pshs y
+^2 u,y
+
+pshs x pshs d
+^2 x,d
+
+pshs y pshs d
+^2 y,d
+
+ldd * cmpd #0
+^2 ^2
+
+ldx * cmpx #0
+^2 ^2
+
+ldy * cmpy #0
+^2 ^2
+
+ldu * cmpu #0
+^2 ^2
+
+sty * cmpy #0
+^2 ^2
+
+stu * cmpu #0
+^2 ^2
+
+leas 2,s puls u,pc
+^1 x,u,pc
+
+leas 2,s pshs d
+std ,s
+
+leas 2,s * -2,s
+^1 ,s++
+
+leau -2,u * 0,u
+^1 ,--u
+
+leau -1,u * 0,u
+^1 ,-u
+
+leau 1,u * -1,u
+^1 ,u+
+
+leau 2,u * -2,u
+^1 ,u++
+
+leax -2,x * 0,x
+^1 ,--x
+
+leax -1,x * 0,x
+^1 ,-x
+
+leax 1,x * -1,x
+^1 ,x+
+
+leax 2,x * -2,x
+^1 ,x++
+
+sex * cmpd #<
+cmpb ^1
+
+clra * cmpd #<
+cmpb ^1
+
+sex * clra *
+^1 ^1
+
+pshs u leas -2,s
+^2 d,u
+
+pshs u leas -4,s
+^2 d,x,u
+
+pshs u leas -6,s
+^2 d,x,y,u
