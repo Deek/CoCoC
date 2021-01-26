@@ -84,6 +84,16 @@ char *str;
    return rtn;
 }
 
+/*
+ * sleep and wait for input ready
+ */
+getinput()
+{
+    _ss_ssig(STDIN_FILENO, 'K');    /* set up key check */
+    _ss_msig(STDIN_FILENO, 'M');    /* and mouse check */
+    pause();
+    _ss_rel(STDIN_FILENO);
+}
 
 /*
  * put line on screen, handle end-of-screen paging duties
@@ -101,10 +111,17 @@ char *str;
      fflush(stdout);
      do {
         write(1,"--More--",8); /* then put up a prompt */
-        read(0,&ch,1);         /* Get a character */
+
+        getinput();
+        if (keyed) read(0,&ch,1);         /* Get a character */
+        else if (clicked) ch = ' ';
+        else if (interrupted) ch = 'q';
+
         write(1,"\r         \r",11); /* erase the prompt */
 
-        if(interrupted) ch='q'; /* Treat interrupt as quit */
+        keyed = FALSE;
+        clicked = FALSE;
+
         switch(ch) {
            case ' ': linesleft=height-2;break; /* ahead one screen */
            case '\r':linesleft=1;break; /* ahead one line */

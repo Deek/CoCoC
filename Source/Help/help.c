@@ -8,12 +8,14 @@
 #include "help.h"
 #include <signal.h>
 #include <dir.h>
-
+#include <stdio.h>
 
 char inbuff[BUF_SIZE];   /* Input buffer for input commands */
 char scratch[BUF_SIZE];  /* Scratch buffer for temporary storage */
 char request[BUF_SIZE];
-int interrupted;     /* Set to TRUE when signal received */
+direct int interrupted;     /* Set to TRUE when signal received */
+direct int clicked;         /* Set to TRUE when MOUSE signal received */
+direct int keyed;           /* Set to TRUE when key pressed */
 
 main(argc,argv)
   int argc;
@@ -44,6 +46,7 @@ main(argc,argv)
 
     while (TRUE) {
        interrupted=FALSE;
+       clicked=FALSE;
        if (*inbuff == '\0') { /* If don't already have input, prompt for it*/
           prompt(display);
           gets(inbuff);
@@ -237,6 +240,10 @@ sig_handler(sig)
 {
    if (sig == SIGQUIT || sig == SIGINT)
       interrupted = TRUE;
+   else if (sig == 'K')
+      keyed = TRUE;
+   else if (sig == 'M')
+      clicked = TRUE;
    else
       exit(sig);
    intercept(sig_handler);  /* Re-set intercept */

@@ -28,6 +28,11 @@ struct stacknode {
 
 #define BUF_SIZE 1000
 extern char scratch[BUF_SIZE];  /* Available for general use */
+
 extern int interrupted;  /*  Set to TRUE by sighandler if an interrupt occurs */
+extern int clicked;  /*  Set to TRUE by sighandler if mouse pressed */
+extern int keyed;  /*  Set to TRUE by sighandler if key pressed */
+
 extern char inbuff[BUF_SIZE];
 
+extern getinput();
