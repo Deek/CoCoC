@@ -1,14 +1,19 @@
 #include "op.h"
 
+#ifdef UNIX
+# include <unistd.h>
+#endif
+
 #define GRABSIZE 512
 
-char *grab(n)
+char *
+grab(n)
 unsigned n;
 {
-    int ptr;
+    char *ptr;
 
-    if ((ptr = sbrk(n)) == -1) error("memory overflow");
-    return ptr;
+    if ((ptr = sbrk(n)) == (char *)-1) error("memory overflow");
+    return (char *)ptr;
 }
 
 error(s1,s2,s3,s4)

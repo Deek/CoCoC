@@ -11,8 +11,12 @@
 #define LABEL       1
 #define MNEM        2
 #define ARGS        3
-#define BRALIM     36
+#define BRALIM     36	/* used to calculate branch distance somehow */
+#ifdef _OS9
 #define MAXINS    300
+#else
+#define MAXINS    32767
+#endif
 
 /* instruction type flags */
 #define SUBR        0x0001
@@ -33,37 +37,75 @@
 #define FORWARD 4
 #define BACK    5
 
+#ifndef _OS9
+# define direct
+#endif
+
 #define GLOBAL      0x01    /* global label flag */
 
+#if defined (__STDC__)
+# if defined(__STDC_VERSION__)
+#  if (__STDC_VERSION__ >= 199409L) /* C94+ */
+#   define HAVE_C94	1
+#  endif
+#  if (__STDC_VERSION__ >= 199901L) /* C99+ */
+#   define HAVE_C99	1
+#  endif
+#  if (__STDC_VERSION__ >= 201112L) /* C11+ */
+#   define HAVE_C11	1
+#  endif
+#  if (__STDC_VERSION__ >= 201710L) /* C18+ */
+#   define HAVE_C18	1
+#  endif
+# endif
+#endif
+
 typedef struct chstruct {
-    int *succ,*pred;
+    struct chstruct *succ,*pred;
 } chain;
 
+typedef struct lstruct {
+    struct lstruct *succ,*pred;
+#ifdef HAVE_C11
+    struct istruct *dest;
+#else
+    union istruct *dest;
+#endif
+    chain *rlist;
+    struct lstruct *nextl;
+    int lflags;
+    char lname[LABELSIZE+1];
+} label;
+
+#ifdef HAVE_C11
+typedef struct istruct {
+    struct istruct *succ,*pred;
+    struct lstruct *llist;
+    int itype;
+    char mnem[MNEMSIZE+1];
+    union {
+        char *args;
+        struct lstruct *lab;
+    };
+} instruction;
+#else
 typedef union istruct {
     struct {
-        int *succ,*pred;
-        struct lstruct {
-            int *succ,*pred;
-            struct istruct *dest;
-            chain *rlist;
-            struct lstruct *nextl;
-            int lflags;
-            char lname[LABELSIZE+1];
-        } *llist;
+        union istruct *succ,*pred;
+        struct lstruct *llist;
         int itype;
         char mnem[MNEMSIZE+1];
         char *args;
     } instyp1;
     struct {
-        int *succ,*pred;
+        union istruct *succ,*pred;
         struct lstruct *llist;
         int itype;
         char mnem[MNEMSIZE+1];
         struct lstruct *lab;
     } instyp2;
 } instruction;
-
-typedef struct lstruct label;
+#endif
 
 extern direct chain ilist;
 extern chain ltable[],*newchain();
@@ -81,7 +123,7 @@ extern match();
 extern matchcpy();
 
 #ifndef CONFDIR
-# ifdef _OS9
+# if defined(_OS9) || defined(_OSK) || defined(_OS9000)
 #  define CONFDIR "/DD/Lib"
 # else
 #  define CONFDIR "/usr/local/share/dcc"

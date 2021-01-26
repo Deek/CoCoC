@@ -1,7 +1,7 @@
 #include "op.h"
 #include "ctype.h"
 
-#ifndef OS9
+#ifndef _OS9
 # include <fnmatch.h>
 #endif
 #include <stdint.h>
@@ -11,7 +11,7 @@ char *s,*p;
 {
 	if (p == NULL) {
 		return 1;
-#ifdef OS9
+#ifdef _OS9
 	} else if (patmatch (p, s, 0)) {
 #else
 	} else if (0 == fnmatch (p, s, FNM_NOESCAPE)) {
