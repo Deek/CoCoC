@@ -4,12 +4,12 @@ union
 struct
 float
 double
-unsigned
+uint
 long
 LABEL
 short
 ARG
-EXTDEF
+uchar
 AUTO
 extern
 static
@@ -33,7 +33,7 @@ CAST
 DIRECT
 EXTERND
 STATICD
-36
+EXTDEF
 37
 38
 39
@@ -131,6 +131,7 @@ CNDJMP
 ITOL
 LTOI
 CTOI
+UTOI
 UTOL
 DBLOP
 LONGOP

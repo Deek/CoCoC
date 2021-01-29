@@ -48,7 +48,7 @@ register symnode *ptr;
         nl();
     }
 
-    if (type == (CHAR | ARRAY)) {
+    if (type == (CHAR | ARRAY) || type == (UCHAR | ARRAY)) {
         datstring = 1;
         getsym();
         if (sym == STRING) {
@@ -243,6 +243,7 @@ register int *p;
 
     switch (type) {
         case CHAR:
+        case UCHAR:
             defbyte();
             od((int)p & 0xff);
             nl();

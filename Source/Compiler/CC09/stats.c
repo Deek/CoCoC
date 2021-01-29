@@ -225,6 +225,7 @@ doswitch()
            chkdecl(ptr);
            switch(ptr->type) {
                case CHAR:
+               case UCHAR:
                case LONG: cvt(ptr,INT);
                case INT:
                case UNSIGN: break;

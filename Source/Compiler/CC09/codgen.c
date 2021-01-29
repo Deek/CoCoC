@@ -120,7 +120,8 @@ register int arg;
             deref(rtype,arg,0);
             nl();
             return;
-        case CTOI:      ol("sex"); return;
+        case CTOI:      ol("sex");return;
+        case UTOI:      ol("clra");return;
         case LTOI:      ot("ld"); doref('d',rtype,arg,2); return;
         case IDOUBLE:   ol("aslb\n rola"); return;
         case HALVE:     ol("asra\n rorb"); return;
@@ -152,9 +153,11 @@ dooff:
 
     reg=regname(rtype);
     if (arg==NODE) {
-        if (val->op==CTOI) {
+        if (val->op==CTOI || val->op==UTOI) {
             gen(op,DREG,NODE,val->left);
-            switch(op) {
+            if (val->op==UTOI)
+                ol("clra");
+            else switch (op) {
                 case LOAD: ol("sex");break;
                 case RSUB:
                 case PLUS: ol("adca #0");break;
@@ -171,7 +174,8 @@ dooff:
              val,val->type,op,reg,val->op,((int*)val->value)->type);
 #endif
 #endif
-        if (val->type==CHAR && op!=LOADIM && reg != 'x') reg='b';
+        if ((val->type==CHAR || val->type==UCHAR) && op!=LOADIM && reg != 'x')
+            reg='b';
     }
 
     switch(op) {
@@ -523,7 +527,7 @@ register expnode *val;
 
     cflag = 0;
     if (arg == NODE) {
-        cflag = (val->type == CHAR);
+        cflag = (val->type == CHAR || val->type == UCHAR);
         arg = val->op;
         val = (expnode *) val->val.sp;
     }

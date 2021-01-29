@@ -398,7 +398,7 @@ symnode *fptr;
                         startfunc(cp,(sclass != STATIC),DREG);
 # endif
                         p1->offset = (paramlev -= 2);
-                        if (p1->type == CHAR) p1->offset += 1;
+                        if (p1->type == CHAR || p1->type == UCHAR) p1->offset += 1;
                         break;
                     default:
                         error("argument type in \"newfunc\"");
@@ -439,6 +439,7 @@ symnode *fptr;
                 break;
 #endif
             case CHAR:
+            case UCHAR:
                 ++p1->offset;
             default:
                 size = INTSIZE;
@@ -592,7 +593,15 @@ elem **ellist;
             case SHORT:  type=INT;
             case UNSIGN:
                 getsym();
-                if(sym==KEYWORD && symval==INT) getsym();
+                if (sym==KEYWORD) {
+                    if (symval == INT)
+                        getsym();
+                    else if (symval == CHAR) {
+                        type = UCHAR;
+                        tsize = 1;
+                        getsym();
+                    }
+                }
                 break;
             case CHAR:  tsize=1;
             case INT:
@@ -817,7 +826,8 @@ register dimnode *dimptr;
     register int n,temp;
 
     switch (btype(temp = ptr->type)) {
-        case CHAR:      n = 1; break;
+        case CHAR:
+        case UCHAR:     n = 1; break;
         case INT:
         case UNSIGN:    n = INTSIZE; break;
         case LONG:      n = LONGSIZE; break;

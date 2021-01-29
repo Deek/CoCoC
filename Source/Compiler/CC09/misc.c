@@ -186,6 +186,7 @@ istype()
         switch (symval) {
             case INT:
             case CHAR:
+            case UCHAR:
             case UNSIGN:
             case SHORT:
             case LONG:

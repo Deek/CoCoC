@@ -445,14 +445,13 @@ strcommon:
         case ARG:
             chkdecl(lhs);
             chkstrct(lhs);
-#ifdef  DOFLOATS
             switch (lhs->type) {
                 case CHAR: cvt(lhs,INT); break;
+                case UCHAR: cvt(lhs,UNSIGN); break;
+#ifdef  DOFLOATS
                 case FLOAT: cvt(lhs,DOUBLE); break;
-            }
-#else
-            if (lhs->type == CHAR) cvt(lhs,INT);
 #endif
+            }
             break;
         case COMMA:
             size = rhs->size;
@@ -621,11 +620,12 @@ chass:
 do_cht:
                         node->op = op + (PLUS - ASSPLUS);
                         node = chtype(node);
-                        if (t == CHAR) {
+                        if (t == CHAR || t == UCHAR) {
                             node->left = lhs->left;
                             release(lhs);
                             lhs = node->left;
-                            t = INT;
+                            if (t == UCHAR) t = UNSIGN;
+                            else t = INT;
                         }
                         if (node->op == op + (PLUS - ASSPLUS)) node->op = op;
                 }
@@ -694,7 +694,8 @@ register expnode *node;
 
     chkdecl(node);
     switch (t = node->type) {
-        case CHAR: cvt(node,t = INT); break;
+        case CHAR:
+        case UCHAR: cvt(node,t = INT); break;
 #ifdef  DOFLOATS
         case FLOAT: cvt(node,t = DOUBLE); break;
         case DOUBLE:
@@ -721,11 +722,13 @@ register expnode *node;
 /*    fprintf(stderr,"**cvt: entry type=%d\n",node->type);*/
 #endif
     switch (node->type) {
+        case UCHAR:
         case CHAR:
             switch (t) {
                 case INT:
                 case UNSIGN:
-                    op=CTOI;
+                    if (node->type == CHAR) op=CTOI;
+                    else if (node->type == UCHAR) op=UTOI;
                     break;
                 case LONG:
                     cvt(node,INT);
@@ -755,6 +758,9 @@ fixl:
                     break;
                 case CHAR:
                     t=INT;
+                    break;
+                case UCHAR:
+                    t=UNSIGN;
                     break;
 #ifdef  DOFLOATS
                 case FLOAT:
@@ -802,6 +808,7 @@ fixf:
                 case INT:
                 case UNSIGN:
                 case CHAR:
+                case UCHAR:
                     if (node->op==LCONST) {
                         node->val.num = *node->val.lp;
 fixint:
@@ -831,6 +838,7 @@ fixint:
                 case LONG:
                 case UNSIGN:
                 case CHAR:
+                case UCHAR:
                 case INT:
                     cvt(node,DOUBLE);
                     cvt(node,t);
@@ -843,6 +851,7 @@ fixint:
         case DOUBLE:
             switch (t) {
                 case CHAR:
+                case UCHAR:
                 case UNSIGN:
                 case INT:
                     if (node->op==FCONST) {
@@ -1020,6 +1029,7 @@ isint(t)
     switch(t){
         case INT:
         case CHAR:
+        case UCHAR:
         case LONG:
         case UNSIGN:
             return 1;

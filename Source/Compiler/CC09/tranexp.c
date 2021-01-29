@@ -100,7 +100,7 @@ register expnode *tree;
 /*              prtree(tree,"doload (after gen)");  */
 #endif
 #ifdef REGCONTS
-            if (tree->op == CTOI) {
+            if (tree->op == CTOI || tree->op == UTOI) {
                 setdreg(tree->left);
             } else {
                 setdreg(tree);
@@ -161,6 +161,7 @@ register expnode *tree;
                 doass(tree);
                 break;
             case CTOI:
+            case UTOI:
                 tranexp(tree->left);
                 break;
             case LTOI:
@@ -232,7 +233,7 @@ expnode *node;
     lhs = node->left;
     rhs = node->right;
 
-    if (lhs->type == UNSIGN)
+    if (lhs->type == UNSIGN || lhs->type == UCHAR)
         switch(op) {
             case DIV:
                 op = UDIV;
@@ -610,6 +611,7 @@ register expnode *node;
                 gen(LOADIM,lhs->op,NODE,rhs->left);
                 break;
             case CTOI:
+            case UTOI:
                 gen(LOAD,DREG,NODE,rhs);
             default:
                 gen(LOAD,lhs->op,NODE,rhs);
@@ -625,13 +627,13 @@ register expnode *node;
 #ifdef REGCONTS
         savlhs = treecopy(lhs);
 #endif
-        if (isdleaf(lhs) && lhs->type != CHAR
+        if (isdleaf(lhs) && lhs->type != CHAR && lhs->type != UCHAR
                         && (regandcon(rhs) || isaddress(rhs))){
             transexp(lhs);  /* this is tranexp in other source */
             loadxexp(rhs);
         } else if (isreg(rhs->op)) {
             transexp(lhs);  /* this is tranexp in other source */
-            if (lhs->type==CHAR) lddexp(rhs);
+            if (lhs->type==CHAR || lhs->type==UCHAR) lddexp(rhs);
         } else if (isxleaf(lhs)) {
             lddexp(rhs);
             transexp(lhs);  /* this is tranexp in other source */
@@ -710,7 +712,7 @@ expnode *node;
     tranexp(lhs);
 
     op += (PLUS - ASSPLUS);
-    if (lhs->type == UNSIGN)
+    if (lhs->type == UNSIGN || lhs->type == UCHAR)
         switch(op) {
             case DIV:
                 op = UDIV;
@@ -1072,6 +1074,7 @@ expnode *node;
             node->val.num = 0;
             break;
         case CTOI:
+        case UTOI:
             lddexp(node);
             return;
         case MINUS:

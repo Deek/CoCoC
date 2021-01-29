@@ -234,13 +234,14 @@ typedef struct initstruct {
 #endif
 #define UNSIGN      7
 #define LONG        8
+#define SHORT       10
+#define UCHAR       12
 
 #define STRTAG      8
 #define LABEL       9
 #define USTRUCT     10
-#define SHORT       10
 #define ARG         11
-#define EXTDEF      12
+#define EXTDEF      36
 #define AUTO        13
 #define EXTERN      14
 #define STATIC      15
@@ -360,28 +361,29 @@ typedef struct initstruct {
 #define ITOL        131		/* int to long */
 #define LTOI        132		/* long to int */
 #define CTOI        133		/* char to int */
-#define UTOL        134		/* unsigned to long */
-#define DBLOP       135		/* double operation (any) */
-#define LONGOP      136		/* long operation (any) */
-#define MOVE        137
-#define STOI        138
-#define TEST        139
+#define UTOI        134		/* unsigned char to int */
+#define UTOL        135		/* unsigned to long */
+#define DBLOP       136		/* double operation (any) */
+#define LONGOP      137		/* long operation (any) */
+#define MOVE        138
+#define STOI        139
+#define TEST        140
 #ifdef DOFLOATS
-#define FTOD        140
-#define DTOF        141
-#define ITOD        142
-#define DTOI        143
-#define LTOD        144
-#define DTOL        145
-#define UTOD        146
+#define FTOD        141
+#define DTOF        142
+#define ITOD        143
+#define DTOI        144
+#define LTOD        145
+#define DTOL        146
+#define UTOD        147
 #endif
-#define XIND        147		/* x indexed */
-#define YIND        148		/* y indexed */
-#define UIND        149		/* u indexed */
+#define XIND        148		/* x indexed */
+#define YIND        149		/* y indexed */
+#define UIND        150		/* u indexed */
 
-#define HALVE       150
-#define UHALVE      151
-#define IDOUBLE     152
+#define HALVE       151
+#define UHALVE      152
+#define IDOUBLE     153
 
 #define ASSPLUS     160		/* += */
 #define ASSMIN      161		/* -= */
