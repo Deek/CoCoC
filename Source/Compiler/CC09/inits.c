@@ -239,11 +239,12 @@ datdef(p,type)
 register int *p;
 {
     register int size;
+	int flt = 0;
 
     switch (type) {
         case CHAR:
             defbyte();
-            od(p);
+            od((int)p & 0xff);
             nl();
             return;
         case INT:
@@ -251,11 +252,11 @@ register int *p;
         default:        size = (POINTSIZE/2);   break;
         case LONG:      size = (LONGSIZE/2);    break;
 #ifdef DOFLOATS
-        case FLOAT:     size = (FLOATSIZE/2);   break;
-        case DOUBLE:    size = (DOUBLESIZE/2);  break;
+        case FLOAT:     size = (FLOATSIZE/2);   flt = 1; break;
+        case DOUBLE:    size = (DOUBLESIZE/2);  flt = 1; break;
 #endif
     }
-    defcon(p,size);
+    defcon(p,size,flt);
 }
 
 
