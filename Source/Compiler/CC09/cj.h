@@ -223,6 +223,7 @@ typedef struct initstruct {
 #define XTYPE       0x30
 #define BASICT      0x0F
 
+/* primitive types */
 #define INT         1
 #define CHAR        2
 #define UNION       3
@@ -233,10 +234,10 @@ typedef struct initstruct {
 #endif
 #define UNSIGN      7
 #define LONG        8
-#define LABEL       9
-#define USTRUCT     10
 
 #define STRTAG      8
+#define LABEL       9
+#define USTRUCT     10
 #define SHORT       10
 #define ARG         11
 #define EXTDEF      12
@@ -278,26 +279,26 @@ typedef struct initstruct {
 #define CONST       54
 #define STRING      55
 #define SIZEOF      59
-#define INCBEF      60
-#define DECBEF      61
-#define INCAFT      62
-#define DECAFT      63
+#define INCBEF      60	/* ++x */
+#define DECBEF      61	/* --x */
+#define INCAFT      62	/* x++ */
+#define DECAFT      63	/* x-- */
 #define NOT         64
-#define AMPER       65
-#define STAR        66
+#define AMPER       65	/* & address-of operator */
+#define STAR        66	/* pointer dereference */
 #define NEG         67
 #define COMPL       68
-#define DOT         69
-#define ARROW       70
-#define DBLAND      71
-#define DBLOR       72
-#define LCONST      74
+#define DOT         69	/* struct member access */
+#define ARROW       70	/* struct member pointer access */
+#define DBLAND      71	/* && logical AND */
+#define DBLOR       72	/* || logical OR */
+#define LCONST      74	/* long constant */
 #ifdef DOFLOATS
-#define FCONST      75
+#define FCONST      75	/* float constant */
 #endif
-#define UMOD        76
-#define USHR        77
-#define UDIV        78
+#define UMOD        76	/* % modulus (unsigned) */
+#define USHR        77	/* >> (unsigned) */
+#define UDIV        78	/* unsigned integer division */
 #define RSUB        79
 #define PLUS        80
 #define MINUS       81
@@ -310,6 +311,7 @@ typedef struct initstruct {
 #define OR          88
 #define XOR         89
 
+/* conditional branch types */
 #define EQ          90
 #define NEQ         91
 #define LEQ         92
@@ -355,12 +357,12 @@ typedef struct initstruct {
 
 #define COMPARE     129
 #define CNDJMP      130
-#define ITOL        131
-#define LTOI        132
-#define CTOI        133
-#define UTOL        134
-#define DBLOP       135
-#define LONGOP      136
+#define ITOL        131		/* int to long */
+#define LTOI        132		/* long to int */
+#define CTOI        133		/* char to int */
+#define UTOL        134		/* unsigned to long */
+#define DBLOP       135		/* double operation (any) */
+#define LONGOP      136		/* long operation (any) */
 #define MOVE        137
 #define STOI        138
 #define TEST        139
@@ -373,24 +375,24 @@ typedef struct initstruct {
 #define DTOL        145
 #define UTOD        146
 #endif
-#define XIND        147
-#define YIND        148
-#define UIND        149
+#define XIND        147		/* x indexed */
+#define YIND        148		/* y indexed */
+#define UIND        149		/* u indexed */
 
 #define HALVE       150
 #define UHALVE      151
 #define IDOUBLE     152
 
-#define ASSPLUS     160
-#define ASSMIN      161
-#define ASSMUL      162
-#define ASSDIV      163
-#define ASSMOD      164
-#define ASSSHR      165
-#define ASSSHL      166
-#define ASSAND      167
-#define ASSOR       168
-#define ASSXOR      169
+#define ASSPLUS     160		/* += */
+#define ASSMIN      161		/* -= */
+#define ASSMUL      162		/* *= */
+#define ASSDIV      163		/* /= */
+#define ASSMOD      164		/* %= */
+#define ASSSHR      165		/* >>= */
+#define ASSSHL      166		/* <<= */
+#define ASSAND      167		/* &= */
+#define ASSOR       168		/* |= */
+#define ASSXOR      169		/* ^= -- rarely seen */
 
 /* indirection masks */
 #define INDIRECT    0x8000
