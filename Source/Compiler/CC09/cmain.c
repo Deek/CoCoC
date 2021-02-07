@@ -57,8 +57,6 @@ char **argv;
 #endif
                             case 's':
                                 sflag = 1; break;
-                            case 'n':
-                                ++nocode; break;
 #ifdef  PTREE
                             case 'd':
                                 dflag = 1;
@@ -84,9 +82,6 @@ char **argv;
                         done: ;
                 }
                 else {
-                        if(tflag)
-                                continue;       /* have we one open already? */
-                        ++tflag;
 #ifdef DEBUG
                         if((in = fopen(*argv,"r")) == NULL)
 #else

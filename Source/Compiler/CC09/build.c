@@ -69,7 +69,7 @@ primary()
 {
     register expnode *nodep,*prim;
     expnode *temp;
-    register int op,lno,size;
+    register int op,lno;
     register char *errpnt;
 
     nodep = NULL;

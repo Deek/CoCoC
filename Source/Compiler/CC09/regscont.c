@@ -248,8 +248,6 @@ static
 wlktr(tree)
 register expnode *tree;
 {
-    expnode *t;
-
     if (tree) {
         wlktr(tree->left);
         wlktr(tree->right);

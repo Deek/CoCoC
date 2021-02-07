@@ -227,7 +227,7 @@ tranbinop(op,node)
 int op;
 expnode *node;
 {
-    register expnode *lhs,*rhs,*temp;
+    register expnode *lhs,*rhs;
     int s;
 
     lhs = node->left;
@@ -465,7 +465,7 @@ docall(node)
 expnode *node;
 {
     register expnode *lhs,*rhs;
-    int oldsp,op;
+    int oldsp;
 
     oldsp = sp;
 
@@ -932,7 +932,6 @@ register int dest;
     int op, size, reg;
 #ifdef REGCONTS
     register expnode *temp;
-    int inreg;
 #endif
 
 #ifdef DEBUG

@@ -19,7 +19,7 @@ register expnode *ptr;
 trandexp(node)
 register expnode *node;
 {
-    register expnode *p, *rhs;
+    register expnode *p;
     register int op, type;
 
     type = node->type;

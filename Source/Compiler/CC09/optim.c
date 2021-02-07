@@ -15,8 +15,7 @@ optim(tree)
 register expnode *tree;
 {
     register expnode *lhs,*rhs,*tptr;
-    int temp,op;
-    char *cptr;
+    int op;
 
 #ifdef DEBUG
 /*    fprintf(stderr,"**optim: entry\n");*/
@@ -74,7 +73,7 @@ fold(tree)
 register expnode *tree;
 {
     register expnode *lhs,*rhs,*ptr;
-    register int op,val,opl,opr;
+    register int op,opl,opr;
 
     if (!tree) return NULL;
 

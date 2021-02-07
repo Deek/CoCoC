@@ -454,7 +454,6 @@ global direct int   lineno,     /* current line number */
 #ifdef PROF
                     pflag,      /* if set generate profile calls */
 #endif
-                    nocode,     /* if set no code output */
                     ftype,      /* type of current function */
                     lastst,     /* last statement type */
                     blklev,     /* current block level */
@@ -502,7 +501,6 @@ global char *kw[200];           /* pointers to symbol names */
 
 global direct int   dflag,  /* debug flag; if set causes tree prints */
                     lflag,  /* if set, source lines copied to code file */
-                    tflag,  /* got an input file indicator */
                     tcount;
 
 global symnode  sdummy;         /* dummy expression node */

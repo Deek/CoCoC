@@ -198,7 +198,7 @@ next:
 blkdef()
 {
     register symnode *ptr;
-    symnode *p, *ptemp;
+    symnode *ptemp;
     dimnode *dimptr, *tdp;
     expnode *ep;
     int sclass,type,temp,size,stemp,ssize;

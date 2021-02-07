@@ -373,7 +373,6 @@ char name[];
     /* return a pointer to a symbol table entry for 'name'  */
     /* if one is not found create one                       */
     register symnode *nptr,**tptr,**tab;
-    char *cp;
 
     /* which symbol table is it in? */
     tab = mosflg ? mostab : hashtab;

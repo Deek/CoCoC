@@ -16,7 +16,6 @@ pushdown(sptr)
 register symnode *sptr;
 {
     register symnode *nptr;
-    register char *sp, *ep;
 
     if (nptr = freedown) freedown = nptr->snext;
     else nptr = (symnode *) grab(DOWNSIZE);

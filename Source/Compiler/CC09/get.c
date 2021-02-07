@@ -47,7 +47,7 @@ getch()
 
 getlin()
 {
-        int lno, n,x,*ptr;
+        int lno, n, x;
         static char temp[LINESIZE];
         static direct int lineflg;
         char *cgets();
