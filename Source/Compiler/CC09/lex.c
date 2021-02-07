@@ -16,7 +16,7 @@
 
 #include "cj.h"
 
-static double normaliz(n);
+static double normaliz();
 
 #define     isdigit(c)  (chartab[c]==DIGIT)
 

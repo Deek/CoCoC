@@ -19,8 +19,8 @@
 
 #include "cj.h"
 
-static addoff(offset);
-static outlea(reg);
+static addoff();
+static outlea();
 
 direct int datflag;
 

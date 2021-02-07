@@ -1,9 +1,10 @@
 #ifdef REGCONTS
 #include "cj.h"
 
-static wlktr(tree);
-static fixnode(tree);
-static graft(limb,tree);
+static wlktr();
+static fixnode();
+static graft();
+
 direct expnode *dregcont,*xregcont,*currexpr;
 /* extern int fixnode(),graft(); */
 extern expnode *subtree(),*treecont(),*regcont();

@@ -7,9 +7,9 @@
 */
 
 #include "cj.h"
-static ilist(type,ptr,list,level);
-static defobject(type);
-static datdef(p,type);
+static ilist();
+static defobject();
+static datdef();
 static iskip();
 extern direct int stringlen;
 direct int datstring;
