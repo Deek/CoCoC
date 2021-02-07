@@ -575,6 +575,88 @@ setclass()
      return 0;
 }
 
+int
+modifier (size)
+int *size;
+{
+    int is_long=0, isshort=0, issign=0, isunsign=0;
+    int type=0, tsize=0;
+
+    while (sym == KEYWORD) {
+        switch (symval) {
+        default:    /* some keyword other than what we're interested in... */
+            goto err;
+        /* type modifiers (nonterminal) */
+        case SIGN:
+            if (issign || isunsign) goto err;
+            issign=1;
+            break;
+        case UNSIGN:
+            if (is_long || issign || isunsign) goto err;
+            isunsign=1;
+            break;
+        case LONG:
+            if (is_long || isshort || isunsign) goto err; /* FIXME: change for ulong */
+            is_long=1;
+            break;
+        case SHORT:
+            if (is_long || isshort) goto err;
+            isshort=1;
+            break;
+        /* final types (terminal) */
+        case CHAR:
+            if (is_long || isshort) goto err;
+            tsize = 1;
+            type = isunsign ? UCHAR : CHAR;
+            getsym();
+            goto done;
+        case INT:
+            if (is_long) {
+                tsize = LONGSIZE;
+                type = LONG;
+            } else {
+                tsize = INTSIZE;
+                type = isunsign ? UNSIGN : INT;
+            }
+            getsym();
+            goto done;
+#ifdef DOFLOATS
+        case DOUBLE:
+            if (isshort || issign || isunsign) goto err;
+            tsize = DOUBLESIZE;
+            type = DOUBLE;
+            getsym();
+            goto done;
+        case FLOAT:
+            if (isshort || issign || isunsign) goto err;
+            if (is_long) {
+                tsize = DOUBLESIZE;
+                type = DOUBLE;
+            } else {
+                tsize = FLOATSIZE;
+                type = FLOAT;
+            }
+            getsym();
+            goto done;
+#endif
+        }
+        getsym();
+    }
+done:
+    if (!type) {    /* allow only modifiers, default "int" size */
+        if (is_long) {
+            tsize = LONGSIZE;
+            type = LONG;
+        } else {
+            tsize = INTSIZE;
+            type = isunsign ? UNSIGN : INT;
+        }
+    }
+    *size = tsize;
+    return type;
+err:
+    return 0;
+}
 
 settype(size,dimptr,ellist)
 int *size;
@@ -590,43 +672,25 @@ elem **ellist;
     *ellist = 0;
     if (sym==KEYWORD) {
         switch (type=symval) {
-            case SHORT:  type=INT;
+            case LONG:
+            case SHORT:
+            case SIGN:
             case UNSIGN:
-                getsym();
-                if (sym==KEYWORD) {
-                    if (symval == INT)
-                        getsym();
-                    else if (symval == CHAR) {
-                        type = UCHAR;
-                        tsize = 1;
-                        getsym();
-                    }
-                }
+                type = modifier(&tsize);
                 break;
-            case CHAR:  tsize=1;
+            case CHAR:
+                tsize=1;
             case INT:
                 getsym();
                 break;
-            case LONG:
-                getsym();
-                tsize=LONGSIZE;
-#ifdef  DOFLOATS
-                if(sym!=KEYWORD) break;
-                if(symval==INT) {
-                    getsym();
-                    break;
-                }
-                if(symval!=FLOAT) break;
+#ifdef DOFLOATS
             case DOUBLE:
-                type=DOUBLE;
                 tsize=8;
                 getsym();
                 break;
             case FLOAT:
                 tsize=4;
                 getsym();
-#else
-                if (sym == KEYWORD && symval == INT) getsym();
 #endif
                 break;
 default:

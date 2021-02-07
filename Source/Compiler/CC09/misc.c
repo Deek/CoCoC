@@ -188,6 +188,7 @@ istype()
             case CHAR:
             case UCHAR:
             case UNSIGN:
+            case SIGN:
             case SHORT:
             case LONG:
             case STRUCT:

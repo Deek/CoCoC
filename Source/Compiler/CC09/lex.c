@@ -329,6 +329,7 @@ lexinit()
      install("struct",STRUCT);
      install("union",UNION);
      install("unsigned",UNSIGN);
+     install("signed", SIGN);
      install("long",LONG);
      ptr=lookup("errno");
      ptr->type=INT;

@@ -265,6 +265,7 @@ typedef struct initstruct {
 #define DIRECT      33   /* direct */
 #define EXTERND     34   /* extern direct */
 #define STATICD     35   /* static direct */
+#define SIGN        37   /* mostly ignored */
 
 #define SEMICOL     40
 #define LBRACE      41
