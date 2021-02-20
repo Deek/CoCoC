@@ -428,6 +428,7 @@ symnode *fptr;
         p1->offset = offset;
         switch (p1->type) {
             case LONG:
+            case ULONG:
                 size = LONGSIZE;
                 break;
 #ifdef  DOFLOATS
@@ -592,11 +593,11 @@ int *size;
             issign=1;
             break;
         case UNSIGN:
-            if (is_long || issign || isunsign) goto err;
+            if (issign || isunsign) goto err;
             isunsign=1;
             break;
         case LONG:
-            if (is_long || isshort || isunsign) goto err; /* FIXME: change for ulong */
+            if (is_long || isshort) goto err;
             is_long=1;
             break;
         case SHORT:
@@ -613,7 +614,7 @@ int *size;
         case INT:
             if (is_long) {
                 tsize = LONGSIZE;
-                type = LONG;
+                type = isunsign ? ULONG : LONG;
             } else {
                 tsize = INTSIZE;
                 type = isunsign ? UNSIGN : INT;
@@ -646,7 +647,7 @@ done:
     if (!type) {    /* allow only modifiers, default "int" size */
         if (is_long) {
             tsize = LONGSIZE;
-            type = LONG;
+            type = isunsign ? ULONG : LONG;
         } else {
             tsize = INTSIZE;
             type = isunsign ? UNSIGN : INT;
@@ -894,7 +895,8 @@ register dimnode *dimptr;
         case UCHAR:     n = 1; break;
         case INT:
         case UNSIGN:    n = INTSIZE; break;
-        case LONG:      n = LONGSIZE; break;
+        case LONG:
+        case ULONG:     n = LONGSIZE; break;
 #ifdef  DOFLOATS
         case FLOAT:     n = FLOATSIZE; break;
         case DOUBLE:    n = DOUBLESIZE; break;

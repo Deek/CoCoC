@@ -49,6 +49,7 @@ register expnode *tree;
 {
     switch(tree->type) {
         case LONG:
+        case ULONG:
             lload(tree);
             break;
 #ifdef  DOFLOATS
@@ -233,7 +234,7 @@ expnode *node;
     lhs = node->left;
     rhs = node->right;
 
-    if (lhs->type == UNSIGN || lhs->type == UCHAR)
+    if (isuint(lhs))
         switch(op) {
             case DIV:
                 op = UDIV;
@@ -712,7 +713,7 @@ expnode *node;
     tranexp(lhs);
 
     op += (PLUS - ASSPLUS);
-    if (lhs->type == UNSIGN || lhs->type == UCHAR)
+    if (isuint(lhs))
         switch(op) {
             case DIV:
                 op = UDIV;

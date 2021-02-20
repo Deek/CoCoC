@@ -332,7 +332,11 @@ int *arg;
         case GEQ:
         case LEQ:
         case GT:
-        case LT:        lcall("_lcmpr"); break;
+        case LT:
+        case UGEQ:
+        case ULEQ:
+        case UGT:
+        case ULT:       lcall("_lcmpr"); break;
         case NEG:       lcall("_lneg"); sp-=4; break;
         case COMPL:     lcall("_lcompl"); sp-=4; break;
         case ITOL:      lcall("_litol"); sp-=4; break;

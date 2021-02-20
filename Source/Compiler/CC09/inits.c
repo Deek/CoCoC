@@ -168,6 +168,9 @@ register int type;
         switch(t) {
             case LONG:
                 cvt(p,INT);
+                break;
+            case ULONG:
+                cvt(p,UNSIGN);
             case INT:
             case UNSIGN:
                 break;
@@ -217,8 +220,10 @@ err:
                 if (type == FLOAT) *p->val.fp = *p->val.dp;
 #endif
             case CONST:
-            case LCONST:
                 datdef(p->val.num,type);
+                break;
+            case LCONST:
+                datdef(p->val.lp,type);
                 break;
             case STRING:
                 defword();
@@ -251,7 +256,8 @@ register int *p;
         case INT:
         case UNSIGN:    size = (INTSIZE/2);     break;
         default:        size = (POINTSIZE/2);   break;
-        case LONG:      size = (LONGSIZE/2);    break;
+        case LONG:
+        case ULONG:     size = (LONGSIZE/2);    break;
 #ifdef DOFLOATS
         case FLOAT:     size = (FLOATSIZE/2);   flt = 1; break;
         case DOUBLE:    size = (DOUBLESIZE/2);  flt = 1; break;

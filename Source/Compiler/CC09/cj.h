@@ -226,49 +226,55 @@ typedef struct initstruct {
 #define XTYPE       0x30
 #define BASICT      0x0F
 
-/* primitive types */
-#define INT         1
-#define CHAR        2
-#define UNION       3
-#define STRUCT      4
+/* primitive (basic) types */
+#define UNDECL      0   /* type hasn't been declared */
+#define INT         1   /* most convenient integer type */
+#define CHAR        2   /* smallest unit of memory */
+#define LONG        3   /* long int (and type modifier token) */
+#define UNSIGN      4   /* unsigned int (and unsigned modifier token) */
+#define UCHAR       5   /* unsigned char */
+#define ULONG       6   /* unsigned long int */
 #ifdef  DOFLOATS
-#define FLOAT       5
-#define DOUBLE      6
+#define FLOAT       7   /* 32-bit floating point */
+#define DOUBLE      8   /* 64-bit floating point */
 #endif
-#define UNSIGN      7
-#define LONG        8
-#define SHORT       10
-#define UCHAR       12
+#define STRUCT      9
+#define UNION       10
+#define LABEL       11
+#define USTRUCT     12  /* incomplete struct or union type */
+/* 13, 14, 15 free */
 
-#define STRTAG      8
-#define LABEL       9
-#define USTRUCT     10
-#define ARG         11
-#define EXTDEF      36
-#define AUTO        13
-#define EXTERN      14
-#define STATIC      15
-#define REG         16
-#define RETURN      18
-#define MOS         17
-#define IF          19
-#define WHILE       20
-#define ELSE        21
-#define SWITCH      22
-#define CASE        23
-#define BREAK       24
-#define CONTIN      25
-#define DO          26
-#define DEFAULT     27
-#define FOR         28
-#define GOTO        29
-#define TYPEDEF     30
-#define DEFTYPE     31
-#define CAST        32
-#define DIRECT      33   /* direct */
-#define EXTERND     34   /* extern direct */
-#define STATICD     35   /* static direct */
-#define SIGN        37   /* mostly ignored */
+/* storage classes */
+#define ARG         12  /* function arguments */
+#define AUTO        13  /* "auto" storage (on stack) */
+#define STRTAG      14  /* struct tag */
+#define EXTERN      15
+#define STATIC      16
+#define REG         17  /* register storage */
+#define MOS         18  /* member of struct or union */
+#define DIRECT      19  /* on direct page */
+#define EXTERND     20  /* extern direct */
+#define STATICD     21  /* static direct */
+#define EXTDEF      22
+
+#define RETURN      23
+#define IF          24
+#define WHILE       25
+#define ELSE        26
+#define SWITCH      27
+#define CASE        28
+#define BREAK       29
+#define CONTIN      30
+#define DO          31
+#define DEFAULT     32
+#define FOR         33
+#define GOTO        34
+#define TYPEDEF     35
+#define DEFTYPE     36
+#define CAST        37
+
+#define SIGN        38  /* mostly ignored */
+#define SHORT       39	/* short type modifier */
 
 #define SEMICOL     40
 #define LBRACE      41
@@ -319,6 +325,10 @@ typedef struct initstruct {
 /* conditional branch types */
 #define EQ          90
 #define NEQ         91
+/* HACK ALERT
+	The fact that e.g. ULEQ is LEQ+4 is used by the code. Don't change these
+	numbers in relation to one another!
+*/
 #define LEQ         92
 #define LT          93
 #define GEQ         94
@@ -413,7 +423,6 @@ typedef struct initstruct {
 #define NDP         0  /* not on dp */
 
 #define UNKN        0
-#define UNDECL      0
 
 #ifdef TRUE
 #undef TRUE
@@ -439,7 +448,8 @@ typedef struct initstruct {
 
 #define getlabel(a) (++curlabel)
 
-#define islong(t)   (t->type == LONG)
+#define islong(t)   ((t)->type == LONG || (t)->type == ULONG)
+#define isuint(t)   ((t)->type == UNSIGN || (t)->type == UCHAR || (t)->type == ULONG)
 #ifdef DOFLOATS
 #define isfloat(t)  (t->type == FLOAT || t->type == DOUBLE)
 #endif

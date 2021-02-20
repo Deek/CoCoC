@@ -121,6 +121,10 @@ register expnode *node;
         case LEQ:
         case GT:
         case LT:
+        case UGEQ:
+        case ULEQ:
+        case UGT:
+        case ULT:
         case PLUS:
         case MINUS:
         case MOD:

@@ -524,9 +524,13 @@ dblerr:         terror(node,"both must be integral");
         case GT:
         case LEQ:
         case GEQ:
-            if ((isptr(lhs->type) && isptr(rhs->type)) ||
-                                                tymatch(lhs,rhs) == UNSIGN)
-                node->op=op+4;
+            /* HACK ALERT
+             *  unsigned compares have token numbers 4 numbers higher than
+             *  signed compares. This is fragile!
+             */
+            if ((isptr(lhs->type) && isptr(rhs->type))
+                || tymatch(lhs,rhs) == UNSIGN || tymatch(lhs,rhs) == ULONG)
+                node->op = op + 4;
             break;
         case EQ:
         case NEQ:
@@ -700,6 +704,7 @@ register expnode *node;
         case DOUBLE:
 #endif
         case LONG:
+        case ULONG:
         case INT:
         case UNSIGN: break;
         default: terror(node,"type error");
@@ -732,6 +737,10 @@ register expnode *node;
                 case LONG:
                     cvt(node,INT);
                     op=ITOL;
+                    break;
+                case ULONG:
+                    cvt(node,UNSIGN);
+                    op=UTOL;
 #ifdef  DOFLOATS
                     break;
                 case DOUBLE:
@@ -746,6 +755,7 @@ register expnode *node;
         case INT:
             switch(t) {
                 case LONG:
+                case ULONG:
                     if (node->op == CONST) {
                         register long *ptr = (long *)grab(LONGSIZE);
                         *ptr = node->val.num;
@@ -784,6 +794,7 @@ fixf:
         case UNSIGN:
             switch (t) {
                 case LONG:
+                case ULONG:
                     op=UTOL;
                     break;
 #ifdef  DOFLOATS
@@ -796,11 +807,13 @@ fixf:
                     break;
 #endif
                 case CHAR:
+                case UCHAR:
                     t = INT;
                     break;
             }
             break;
         case LONG:
+        case ULONG:
             switch (t) {
                 default:
                     if (!isptr(t)) break;
@@ -835,6 +848,7 @@ fixint:
         case FLOAT:
             switch (t) {
                 case LONG:
+                case ULONG:
                 case UNSIGN:
                 case CHAR:
                 case UCHAR:
@@ -860,6 +874,7 @@ fixint:
                     op=DTOI;
                     break;
                 case LONG:
+                case ULONG:
                     if (node->op == FCONST) {
 #ifdef DEBUG
 /*                        fprintf(stderr,"**cvt: dtol start\n");*/
@@ -906,6 +921,8 @@ register expnode *lhs,*rhs;
 #endif
         if (tl == LONG) return cvt(rhs,LONG);
     else if (tr == LONG) return cvt(lhs,LONG);
+    else if (tl == ULONG) return cvt(rhs,ULONG);
+    else if (tr == ULONG) return cvt(lhs,ULONG);
     else if (tl == UNSIGN || tr == UNSIGN)
         return (lhs->type = rhs->type = UNSIGN);
     else return INT;
@@ -1029,8 +1046,9 @@ isint(t)
         case INT:
         case CHAR:
         case UCHAR:
-        case LONG:
         case UNSIGN:
+        case LONG:
+        case ULONG:
             return 1;
     }
     return 0;

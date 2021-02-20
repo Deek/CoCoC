@@ -226,7 +226,8 @@ doswitch()
            switch(ptr->type) {
                case CHAR:
                case UCHAR:
-               case LONG: cvt(ptr,INT);
+               case LONG:
+               case ULONG: cvt(ptr,INT);
                case INT:
                case UNSIGN: break;
                default: integerr(ptr);
@@ -433,6 +434,7 @@ doreturn()
 #else
             switch(ftype) {
                 case LONG:
+                case ULONG:
                     lload(ptr);
 #ifdef  DOFLOATS
                     goto common;
