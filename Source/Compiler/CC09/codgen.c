@@ -345,7 +345,7 @@ int *arg;
         case INCAFT:    lcall("_linc"); sp-=4; break;
         case DECBEF:
         case DECAFT:    lcall("_ldec"); sp-=4; break;
-        case LCONST:    getcon(arg,2); break;
+        case LCONST:    getcon(arg,2,0); break;
 
         default:
             error("codgen - longs");
