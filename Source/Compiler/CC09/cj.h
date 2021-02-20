@@ -95,6 +95,7 @@
 # define LONGTYPE	long
 # define FLOATYPE	float
 # define DBLETYPE	double
+# define ALLOCATE	ibrk
 #endif
 
 #ifdef _OSK
@@ -102,6 +103,7 @@
 # define LONGTYPE	long
 # define FLOATYPE	float
 # define DBLETYPE	double
+# define ALLOCATE	ebrk
 #endif
 
 #ifdef __unix__
@@ -115,6 +117,7 @@
 # define LONGTYPE	long
 # define FLOATYPE	float
 # define DBLETYPE	double
+# define ALLOCATE	sbrk
 #endif
 
 #define MICRO               /* suppresses word boundary forcing */
@@ -524,6 +527,7 @@ typedef struct {
 
 
 /*  function type definitions  */
+char *grab();
 
 extern  expnode *parsexp(), *primary(), *explist(), *getcast(),
                 *newnode(), *optim(), *fold(), *chtype(), *fixup(),

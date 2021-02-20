@@ -443,9 +443,8 @@ grab(size)
 int size;
 {
     char *oldptr;
-    extern char *sbrk();
 
-    if ((oldptr = sbrk(size)) == (char *) -1) fatal("out of memory");
+    if ((oldptr = ALLOCATE(size)) == (char *) -1) fatal("out of memory");
 
     if (!lobrk) lobrk = oldptr;
     hibrk = oldptr+size;
