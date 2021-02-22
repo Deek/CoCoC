@@ -266,7 +266,7 @@ blkdef()
                 getsym();
                 if (isary(temp) || temp == STRUCT) initerr();
                 else {
-                    if (ep = parsexp(2)) {
+                    if (ep = parsexp(LEV_2)) {
                         if (initfree) {
                             initfree = (i = initfree)->initnext;
                             i->initnext = NULL;

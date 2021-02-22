@@ -221,7 +221,7 @@ doswitch()
     brk.labsp = sp;
 
     need(LPAREN);
-    if (ptr = optim(parsexp(0))) {
+    if (ptr = optim(parsexp(LEV_0))) {
            chkdecl(ptr);
            switch(ptr->type) {
                case CHAR:
@@ -389,7 +389,7 @@ dofor()
     need(SEMICOL);
 
     /* update */
-    if (uptr = optim(parsexp(0))) chkdecl(uptr);
+    if (uptr = optim(parsexp(LEV_0))) chkdecl(uptr);
     need(RPAREN);
 
     /* statement */
@@ -424,7 +424,7 @@ doreturn()
     if (sym != SEMICOL) {
         register expnode *ptr;
 
-        if (ptr=parsexp(0)) {
+        if (ptr=parsexp(LEV_0)) {
             ptr=optim(ptr);
             chkdecl(ptr);
             chkstrct(ptr);
@@ -612,7 +612,7 @@ gettest()
 {
     register expnode *ptr;
 
-    if (ptr = optim(parsexp(0))) chkdecl(ptr);
+    if (ptr = optim(parsexp(LEV_0))) chkdecl(ptr);
     else error("condition needed");
     return ptr;
 }

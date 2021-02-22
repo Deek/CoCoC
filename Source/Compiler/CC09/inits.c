@@ -159,7 +159,7 @@ register int type;
     int addon, done, t;
     extern direct int datflag;
 
-    if ((p= optim(parsexp(2))) == NULL) return 0;
+    if ((p = optim(parsexp(LEV_2))) == NULL) return 0;
 
     addon = 0;
     done = 1;

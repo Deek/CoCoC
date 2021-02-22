@@ -46,8 +46,8 @@ int priority;
                 } else {
                     errpnt = symptr;
                     lno = symline;
-                    if (temp = parsexp(3)) {
-                        rhs = newnode(COLON,rhs,temp,3,lno,errpnt);
+                    if (temp = parsexp(LEV_3)) {
+                        rhs = newnode(COLON,rhs,temp,LEV_3,lno,errpnt);
                     } else {
                         error("third expression missing");
                         reltree(rhs);
@@ -96,7 +96,7 @@ primary()
                     nodep=NULL;
                 }
                 break;
-            } else if ((nodep = parsexp(0)) == NULL) {
+            } else if ((nodep = parsexp(LEV_0)) == NULL) {
 noexp:
                 experr();
                 nodep = newnode(CONST,0,0,0,symline,symptr);
@@ -115,7 +115,7 @@ noexp:
             errpnt=symptr;
             getsym();
             if (prim = primary())
-                nodep = newnode(op,prim,0,14,lno,errpnt);
+                nodep = newnode(op,prim,0,LEV_14,lno,errpnt);
             else error("primary expected");
             break;
         case SIZEOF:
@@ -126,7 +126,7 @@ noexp:
             if(sym==LPAREN){
                 getsym();
                 if (istype()) prim = getcast();
-                else if ((prim = parsexp(0)) == NULL) goto noexp;
+                else if ((prim = parsexp(LEV_0)) == NULL) goto noexp;
                 need(RPAREN);
             } else prim = primary();
             temp = prim;
@@ -142,18 +142,18 @@ noexp:
                 errpnt=symptr;
                 lno=symline;
                 getsym();
-                nodep=newnode(CALL,nodep,explist(),15,lno,errpnt);
+                nodep=newnode(CALL,nodep,explist(),LEV_15,lno,errpnt);
                 need(RPAREN);
                 continue;
 
             case LBRACK:
                 getsym();
-                if ((prim = parsexp(2)) == NULL) {
+                if ((prim = parsexp(LEV_2)) == NULL) {
                     experr();
                     prim = newnode(CONST,0,0,0,symline,symptr);
                 }
-                nodep=newnode(PLUS,nodep,prim,12,symline,symptr);
-                nodep=newnode(STAR,nodep,0,15,symline,symptr);
+                nodep=newnode(PLUS,nodep,prim,LEV_12,symline,symptr);
+                nodep=newnode(STAR,nodep,0,LEV_15,symline,symptr);
                 need(RBRACK);
                 continue;
 
@@ -170,7 +170,7 @@ noexp:
                     break;
                 }
                 prim = newnode(sym,0,0,symval,symline,symptr);
-                nodep = newnode(op,nodep,prim,15,lno,errpnt);
+                nodep = newnode(op,nodep,prim,LEV_15,lno,errpnt);
                 getsym();
                 continue;
         }
@@ -183,7 +183,7 @@ noexp:
             goto dblop;
         case DECBEF:
             sym=DECAFT;
-dblop:      nodep = newnode(sym,nodep,0,14,symline,symptr);
+dblop:      nodep = newnode(sym,nodep,0,LEV_14,symline,symptr);
             getsym();
     }
 
@@ -198,7 +198,7 @@ explist()
 
     for ( ; ; ) {
         if (sym == RPAREN) break;
-        if (ptr = parsexp(2)){
+        if (ptr = parsexp(LEV_2)){
             ptr = newnode(ARG,ptr,list,0,ptr->lno,ptr->pnt);
             list = ptr;
         }
@@ -230,15 +230,15 @@ isop()
     switch (sym) {
         case AMPER:
             sym=AND;
-            symval=8;
+            symval=LEV_8;
             return 1;
         case STAR:
             sym=TIMES;
-            symval=13;
+            symval=LEV_13;
             return 1;
         case NEG:
             sym=MINUS;
-            symval=12;
+            symval=LEV_12;
         case COMMA:
         case ASSIGN:
         case QUERY:

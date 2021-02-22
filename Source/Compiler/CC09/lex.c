@@ -71,7 +71,7 @@ getsym()
             if((sym=ptr->type)==KEYWORD){
                 if((symval=ptr->storage)==SIZEOF){
                     sym=SIZEOF;
-                    symval=14;
+                    symval = LEV_14;    /* high level unary operator */
                 }
             } else {
                 sym = NAME;
@@ -139,11 +139,11 @@ donum:
                         case '&':
                             sym=DBLAND;
                             getch();
-                            symval=5;
+                            symval = LEV_5; /* boolean "and" level */
                             break;
                         case '=':
                             sym=ASSAND;
-                            symval=2;
+                            symval = LEV_2; /* assignment operator level */
                             getch();
                             break;
                     }
@@ -151,7 +151,7 @@ donum:
                 case ASSIGN:
                     if (cc=='=') {
                         sym=EQ;
-                        symval=9;
+                        symval = LEV_9; /* boolean "equality" level */
                         getch();
                     }
                     break;
@@ -160,12 +160,12 @@ donum:
                         case '|':
                             sym=DBLOR;
                             getch();
-                            symval=4;
+                            symval = LEV_4; /* boolean "or" level */
                             break;
                         case '=':
                             sym=ASSOR;
                             getch();
-                            symval=2;
+                            symval = LEV_2; /* assignment operator level */
                             break;
                     }
                     break;
@@ -173,14 +173,14 @@ donum:
                     if(cc=='=') {
                         sym=NEQ;
                         getch();
-                        symval=9;
+                        symval = LEV_9; /* boolean "equality" level */
                     }
                     break;
                 case STAR:
                     if (cc=='=') {
                         sym=ASSMUL;
                         getch();
-                        symval=2;
+                        symval = LEV_2; /* assignment operator level */
                     }
                     break;
                 case DIV:
@@ -189,24 +189,24 @@ donum:
                     if(cc=='=') {
                         sym=sym+(ASSPLUS-PLUS);
                         getch();
-                        symval=2;
+                        symval = LEV_2; /* assignment operator level */
                     }
                     break;
                 case LT:
                     switch (cc) {
                         case '<':
                             sym=SHL;
-                            symval=11;
+                            symval = LEV_11;    /* shift operator level */
                             getch();
                             if (cc=='='){
                                 sym=ASSSHL;
-                                symval=2;
+                                symval = LEV_2; /* assignment operator level */
                                 getch();
                             }
                             break;
                         case '=':
                             sym=LEQ;
-                            symval=10;
+                            symval = LEV_10;    /* boolean "relational" level */
                             getch();
                             break;
                     }
@@ -215,17 +215,17 @@ donum:
                     switch (cc) {
                         case '>':
                             sym=SHR;
-                            symval=11;
+                            symval = LEV_11;    /* shift operator level */
                             getch();
                             if (cc=='=') {
                                 sym=ASSSHR;
-                                symval=2;
+                                symval = LEV_2; /* assignment operator level */
                                 getch();
                             }
                             break;
                         case '=':
                             sym=GEQ;
-                            symval=10;
+                            symval = LEV_10;    /* boolean "relational" level */
                             getch();
                             break;
                     }
@@ -234,12 +234,12 @@ donum:
                     switch(cc){
                         case '+':
                             sym=INCBEF;
-                            symval=14;
+                            symval = LEV_14;    /* high level unary operator */
                             getch();
                             break;
                         case '=':
                             sym=ASSPLUS;
-                            symval=2;
+                            symval = LEV_2;     /* assignment operator level */
                             getch();
                             break;
                     }
@@ -248,17 +248,17 @@ donum:
                     switch(cc){
                         case '-':
                             sym=DECBEF;
-                            symval=14;
+                            symval = LEV_14;    /* high level unary operator */
                             getch();
                             break;
                         case '=':
                             sym=ASSMIN;
-                            symval=2;
+                            symval = LEV_2;     /* assignment operator level */
                             getch();
                             break;
                         case '>':
                             sym=ARROW;
-                            symval=15;
+                            symval = LEV_15;    /* top level binding */
                             getch();
                             break;
                     }
@@ -269,25 +269,46 @@ donum:
 }
 
 char chartab[] = {
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  109,64,105,0,0,84,65,104,45,46,66,80,48,67,69,83,
-  107,107,107,107,107,107,107,107,107,107,47,40,93,120,95,100,
-  0,106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,
-  106,106,106,106,106,106,106,106,106,106,106,43,102,44,89,106,
-  0,106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,
-  106,106,106,106,106,106,106,106,106,106,106,41,88,42,68,0,
+    0,      0,      0,      0,      0,      0,      0,      0,      /* 00-07 */
+    0,      0,      0,      0,      0,      0,      0,      0,      /* 08-0f */
+    0,      0,      0,      0,      0,      0,      0,      0,      /* 10-17 */
+    0,      0,      0,      0,      0,      0,      0,      0,      /* 18-1f */
+    SPACE,  NOT,    QUOTE,  0,      0,      MOD,    AMPER,  PRIME,  /* 20-27 */
+    LPAREN, RPAREN, STAR,   PLUS,   COMMA,  NEG,    DOT,    DIV,    /* 28-2f */
+    DIGIT,  DIGIT,  DIGIT,  DIGIT,  DIGIT,  DIGIT,  DIGIT,  DIGIT,  /* 30-37 */
+    DIGIT,  DIGIT,  COLON,  SEMICOL,LT,     ASSIGN, GT,     QUERY,  /* 38-3f */
+    0,      LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 40-47 */
+    LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 48-4f */
+    LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 50-57 */
+    LETTER, LETTER, LETTER, LBRACK, BSLASH, RBRACK, XOR,    LETTER, /* 58-5f */
+    0,      LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 60-67 */
+    LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 68-6f */
+    LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, LETTER, /* 70-77 */
+    LETTER, LETTER, LETTER, LBRACE, OR,     RBRACE, COMPL,  0,      /* 78-7f */
 };
 
 char valtab[] = {
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,9,0,0,0,13,14,0,0,0,14,12,1,14,15,13,
-  0,0,0,0,0,0,0,0,0,0,3,0,10,2,10,3,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,6,0,14,0
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      LEV_9,  0,      0,      0,      LEV_13, LEV_14, 0,
+/*          NOT                             MOD     AMPER */
+    0,      0,      LEV_14, LEV_12, LEV_1,  LEV_14, LEV_15, LEV_13,
+    /*              STAR    PLUS    COMMA   NEG     DOT     DIV */
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      LEV_3,  0,      LEV_10, LEV_2,  LEV_10, LEV_3,
+/*                  COLON           LT      ASSIGN  GT      QUERY */
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      0,      0,      LEV_7,  0,
+/*                                                  XOR */
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      0,      0,      0,      0,
+    0,      0,      0,      0,      LEV_6,  0,      LEV_14, 0
+/*                                  OR              COMPL */
 };
 
 lexinit()
