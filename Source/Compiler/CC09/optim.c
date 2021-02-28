@@ -524,13 +524,9 @@ dblerr:         terror(node,"both must be integral");
         case GT:
         case LEQ:
         case GEQ:
-            /* HACK ALERT
-             *  unsigned compares have token numbers 4 numbers higher than
-             *  signed compares. This is fragile!
-             */
             if ((isptr(lhs->type) && isptr(rhs->type))
                 || tymatch(lhs,rhs) == UNSIGN || tymatch(lhs,rhs) == ULONG)
-                node->op = op + 4;
+                node->op = op + (ULEQ-LEQ);
             break;
         case EQ:
         case NEQ:
@@ -573,7 +569,7 @@ dblerr:         terror(node,"both must be integral");
                                                         node->lno,node->pnt);
                         }
                     }
-                    size = 2;
+                    size = POINTSIZE;
                     dptr = NULL;
                     t = INT;
                 } else {

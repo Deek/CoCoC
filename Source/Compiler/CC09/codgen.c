@@ -58,7 +58,7 @@ register int arg;
     switch(op) {
         case PUSH:
             fprintf(code," pshs %c\n",regname(rtype));
-            if((sp-=2) < maxpush) maxpush=sp;
+            if((sp-=INTSIZE) < maxpush) maxpush=sp;
             return;
         case JMPEQ:
             gen(COMPARE,XREG,CONST,arg);
@@ -101,7 +101,7 @@ register int arg;
             label(arg);
             return;
         case CALL:
-            callflag = 4;
+            callflag = 4;   /* basic amount of stack needed to push U,PC */
 
 #ifdef DEBUG
 #if 0
@@ -345,7 +345,7 @@ int *arg;
         case INCAFT:    lcall("_linc"); sp-=4; break;
         case DECBEF:
         case DECAFT:    lcall("_ldec"); sp-=4; break;
-        case LCONST:    getcon(arg,2,0); break;
+        case LCONST:    getcon(arg,LONGSIZE/2,FALSE); break;
 
         default:
             error("codgen - longs");
@@ -368,8 +368,8 @@ dofloats(op,arg)
 register int arg;
 {
     switch (op) {
-        case FCONST:    getcon(arg,4,1); break;
-        case STACK:     fcall("_dstack"); sp -= 8; break;
+        case FCONST:    getcon(arg,DOUBLESIZE/2,TRUE); break;
+        case STACK:     fcall("_dstack"); sp -= DOUBLESIZE; break;
         case TEST:
             fprintf(code," lda %c,x\n",arg == FLOAT ? '3' : '7');
             break;
@@ -377,16 +377,16 @@ register int arg;
             fcall(arg == FLOAT ? "_fmove" : "_dmove");
             sp += 2;
             break;
-        case PLUS:      fcall("_dadd"); sp += 8; break;
-        case MINUS:     fcall("_dsub"); sp += 8; break;
-        case TIMES:     fcall("_dmul"); sp += 8; break;
-        case DIV:       fcall("_ddiv"); sp += 8; break;
+        case PLUS:      fcall("_dadd"); sp += DOUBLESIZE; break;
+        case MINUS:     fcall("_dsub"); sp += DOUBLESIZE; break;
+        case TIMES:     fcall("_dmul"); sp += DOUBLESIZE; break;
+        case DIV:       fcall("_ddiv"); sp += DOUBLESIZE; break;
         case EQ:
         case NEQ:
         case GEQ:
         case LEQ:
         case GT:
-        case LT:        fcall("_dcmpr"); sp += 8; break;
+        case LT:        fcall("_dcmpr"); sp += DOUBLESIZE; break;
         case NEG:       fcall("_dneg"); break;
         case INCBEF:
         case INCAFT:    fcall(arg == FLOAT ? "_finc" : "_dinc"); break;
@@ -503,7 +503,7 @@ mwsyscall(s)
 {
     ot(lbsr);
     ol(s);
-    sp += 2;
+    sp += INTSIZE;
 }
 
 
@@ -511,7 +511,7 @@ lcall(s)
 {
     ot(lbsr);
     ol(s);
-    sp += 4;
+    sp += LONGSIZE;
 }
 
 
@@ -589,7 +589,7 @@ register expnode *val;
             break;
         case STACK:
             fprintf(code," %sa ,s+\n %sb ,s+\n",s,s);
-            sp+=2;
+            sp+=INTSIZE;
             break;
         default:
             error("compiler trouble");

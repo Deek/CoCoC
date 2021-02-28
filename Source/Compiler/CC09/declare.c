@@ -300,9 +300,9 @@ register elem *eptr;
      if (ptr->type != type
                 || (type == STRUCT && ptr->x.elems != eptr)) {
           error("declaration mismatch");
-          return 1;
+          return TRUE;
      }
-     return NULL;
+     return FALSE;
 }
 
 
@@ -686,11 +686,11 @@ elem **ellist;
                 break;
 #ifdef DOFLOATS
             case DOUBLE:
-                tsize=8;
+                tsize=DOUBLESIZE;
                 getsym();
                 break;
             case FLOAT:
-                tsize=4;
+                tsize=FLOATSIZE;
                 getsym();
 #endif
                 break;
@@ -916,7 +916,7 @@ register dimnode *dptr;
 {
     int n;
 
-    if (isptr(t) || isftn(t)) return 2;
+    if (isptr(t) || isftn(t)) return POINTSIZE;
 
     if (isary(t)) {
         n = 1;

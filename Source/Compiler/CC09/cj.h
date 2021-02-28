@@ -350,8 +350,8 @@ typedef struct initstruct {
 #define EQ          90
 #define NEQ         91
 /* HACK ALERT
-    The fact that e.g. ULEQ is LEQ+4 is used by the code. Don't change these
-    numbers in relation to one another!
+    The fact that these numbers are in exactly this order is used by the code.
+    Don't change these numbers in relation to one another!
 */
 #define LEQ         92
 #define LT          93  /* < less than character */
