@@ -1,0 +1,123 @@
+
+                            AR Version 1.2
+
+Ar is a utility modeled loosely after the archive utility in the 
+Kernigan & Plauger book, Software Tools. It's purpose is to gather 
+together files into a common file, in order to save space, to keep 
+related files together, to ease the transmission of files by 
+telephone, and other similar uses.  It uses Lempel-Zev compression on 
+text files, so substantial space savings can result.  Several versions 
+of the same file can be kept in one archive without file name 
+contention.  This version compiles and runs on OS9 LI and LII, and on 
+OSK.  
+
+The command line syntax is: 
+
+  Ar <-command>[options] <archive_name> [file_specification(s)] 
+
+The items enclosed in <> are required and those in [] are optional.  
+The commands available operate on the archive in some way: 
+
+  -p print a file(s) to standard output 
+  -t print a table of contents for the archive 
+  -u update/add file(s) to the archive 
+  -x extract file(s) from the archive 
+
+The options modify the behavior of a command: 
+
+  -a causes all old files to be included in the command 
+  -s supresses compress on storage, no effect on retrieval 
+  -z names of files to process are read on standard input 
+
+Most of these commands and modifiers are obvious, but not so the 
+detail operation.  A version number is kept as part of the header 
+record associated with each file in the archive.  The current file has 
+a version number of '0'. Older versions of files with the same names 
+have succedingly greater numbers.  Commands normally operate only on 
+current copies, or those with a version of '0'. The 'a' option will 
+cause all to be selected.  To avoid name conflicts on extraction, the 
+version number for all but the current version will be appended to the 
+name of the created file.  
+
+A file spec can include the meta characters '?' (matches any 
+character) and '*' (matches any string of characters).  Thus the 
+following examples are valid file specifications: 
+
+   *.c matches ar.c, dir.c, but not dir.h or dir.cc 
+   ar.?  matches ar.c, ar.h, but not ar.ch 
+   a*z matches az, abz, abcz, abcdz, etc.  
+   *.* matches anything with a dot in it 
+   * matches anything and everything 
+
+Since the OS9 (6809) shell does not expand any meta characters, I have 
+provided internal expansion of same.  When run on OSK this is 
+transparent for update since 'ar' also accepts a list of files on the 
+command line.  In the case of extraction and printing, we do not want 
+the shell generating filenames from the current directory.  In this 
+case, any file specification containing a meta character must be 
+quoted to protect it from the shell.  
+
+Meta characters can be used for files both bound for the archive and 
+for files to be extracted.  The p, t, and x commands default to '*' if 
+no explicit file list is given.  The u command MUST have a file spec.  
+The file specification can include a path list if it is not absolute.  
+That is, '/d0/work/*.c' will not be accepted, but 'work/*.c' will be.  
+During extraction, if the directory in the path list of the archived 
+file cannot be found, it will be created.  Here are some sample 
+command lines: 
+
+   ar -pa archfile print all files, even old versions 
+   ar -p archfile print all current files 
+   ar -p archfile *.c print all current files with '.c' suffix 
+   ar -p archfile file.c print only 'file.c' 
+
+The x and t commands would work the same way, but the u command is 
+slightly different.  Sample command lines follow: 
+
+   ar -us archfile *.c add all files with '.c' suffix without 
+compression 
+   ar -u archfile * add ALL files using compression unless binary 
+   ar -u archfile file.c add only 'file.c' 
+
+If a file with the same name as the one to be added exists in the 
+archive already, the version number of the existing one is incremented 
+and the new version is added to the end of the archive.  The atribute 
+section of the file descriptor is saved in the archive and restored to 
+the file (as much as is possible) on extraction.  OS9 limits this to 
+owner, creation date, and last modified date.  Size of course will be 
+the same, but the file permissions will default to some value.  It is 
+possible (I do it in 'arc') to preserve permissions, but that requires 
+that the disk be opened raw and written raw.  I chose not to do that 
+here.  
+
+Pre-extension is used during extraction to avoid segment table 
+overflow problems, and will be added to update as soon as the 
+mechanism becomes clear.  
+
+There is no way in this version of 'ar' to recover space of obsoleted 
+or updated files, or to delete files.  This does not seem important, 
+given the design goal.  This can be simulated with a burst/re-archive 
+operation, which is, in principle, how 'ar' will have to do it.  
+
+The concatenation of two '.ar' files is still an archive, with certain 
+limitations.  If a duplicate file with duplicate version appears in 
+both archives prior to concatenation, only the last one physically in 
+the archive file will be saved on extraction.  One could, of course, 
+double the size of 'ar' with all manner of prompting, perusing, and 
+choosing in cases like that but I prefer to rely on the inate ability 
+of the user deal with such problems outside of 'ar'.  
+
+The archive file is opened in update only if necessary, so the last 
+modified date of the archive is not disturbed by extraction or 
+perusal.  This should go a long way toward making rational backup of 
+archives possible.  
+
+I would like to maintain control of the evolution of this utility, 
+primarily since it is used to generate and burst most of the files in 
+the new User Group Data Base on CIS.  It is important to maintain 
+backwards compatibility.  I will be open to suggestions for 
+improvements, additions, and (of course) bug fixes.  The first likely 
+addition will be the newer LZ compression to improve the compaction.  
+
+                        Carl Kreider  71076,76
+

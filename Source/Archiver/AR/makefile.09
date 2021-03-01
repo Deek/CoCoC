@@ -1,0 +1,23 @@
+/d0/cmds/ar: ar.r arsup.r dir.r lz1.r delz1.r lz1glob.r lz1init.r
+=d;cc -m=8 -f=Ar -MS ar.r arsup.r dir.r  lz1.r delz1.r lz1glob.r lz1init.r >map
+
+lz1init.r: lz1init.c lz1.h
+=cc -r lz1init.c
+
+lz1glob.r: lz1glob.c lz1.h
+=cc -r lz1glob.c
+
+delz1.r: delz1.c lz1glob.c lz1.h
+=cc -r delz1.c
+
+lz1.r: lz1.c lz1glob.c lz1.h
+=cc -r lz1.c
+
+dir.r: dir.c
+=cc -r dir.c
+
+arsup.r: arsup.c ar.h
+=cc -r arsup.c
+
+ar.r: ar.c ar.h
+=cc -r ar.c
