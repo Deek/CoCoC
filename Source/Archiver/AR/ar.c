@@ -175,22 +175,25 @@ FILE  *fp;
    HEADER   header;
    FN       *fnp;
    long     n, c4tol();
+   static char *attrs[8]={"---","--r","-w-","-wr","e--","e-r","ew-","ewr"};
+   
 
    if (fnhead == (FN *) NULL)
       stash_name("*");                     /* fake for special case */
 
-   printf("                                                    file   stored\n");
-   printf("  file name                   ver    file date      size    size\n");
-   printf("----------------------------- --- --------------   -----   -----\n");
+   printf("                                                  file    file   stored\n");
+   printf("  file name                   ver    file date    attr    size    size\n");
+   printf("----------------------------- --- -------------- ------   -----   -----\n");
    while ((get_header(fp, &header)) != EOF)
       for (fnp = fnhead; fnp; fnp = fnp->fn_link)
          {
          if (patmatch(fnp->fn_name, header.a_name, TRUE) == TRUE
             && (header.a_stat == 0 || all == TRUE))
-            printf("%-29s %2d  %02d/%02d/%02d %02d:%02d %7ld %7ld\n",
+            printf("%-29s %2d  %02d/%02d/%02d %02d:%02d %s%s %7ld %7ld\n",
                header.a_name, header.a_stat, header.a_attr.fd_date[0],
                header.a_attr.fd_date[1], header.a_attr.fd_date[2],
                header.a_attr.fd_date[3], header.a_attr.fd_date[4],
+               attrs[(header.a_attr.fd_attr>>3) & 7],attrs[header.a_attr.fd_attr & 7],
                c4tol(header.a_attr.fd_fsize), header.a_size);
          fseek(fp, header.a_size, 1);
          }
@@ -336,7 +339,10 @@ HEADER   *hp;
    if ((fread(hp, sizeof(HEADER), 1, fp)) == NULL)
       return (EOF);
    if (strncmp(hp->a_hid, hid, HIDSIZ) != 0)
-      fatal(1, "file not archive or damaged\n");
+    if (hp->a_hid[0] && hp->a_hid[0]!=26) /* check for xmodem padding */
+     fatal(1, "file not archive or damaged\n");
+    else
+     return (EOF); /* if it is padding, return EOF */
    return (0);
    }
 
@@ -390,9 +396,9 @@ HEADER   *hp;
          while (bytes--)
             {
             if ((byt = getc(ifp)) == ERROR)
-               fatal(errno, "read error while copying\n");
+               fatal(errno, "read error while extracting\n");
             if (putc(byt, ofp) == ERROR)
-               fatal(errno, "write error while copying\n");
+               fatal(errno, "write error while extracting\n");
             }
          break;
 
@@ -402,7 +408,7 @@ HEADER   *hp;
          break;
 
       default :
-         fatal(1, "unknown compression algo\n");
+         fatal(1, "unknown compression algorithm\n");
       }
    }
 /*page*/
@@ -423,11 +429,11 @@ HEADER   *hp;
       case PLAIN :
          while ((byt = getc(ifp)) != ERROR)
             if (putc(byt, ofp) == ERROR)
-               fatal(errno, "write error while copying\n");
+               fatal(errno, "write error while archiving\n");
             else
                ++bytes;
          if (ferror(ifp))
-            fatal(errno, "read error while copying\n");
+            fatal(errno, "read error while archiving\n");
          break;
 
       case COMP1 :
@@ -436,7 +442,7 @@ HEADER   *hp;
          break;
 
       default :
-         fatal(1, "unknown compression algo\n");
+         fatal(1, "unknown compression algorithm\n");
       }
    return (bytes);
    }
@@ -452,7 +458,7 @@ int   n;
    char  *p;
 
    if ((p = malloc(n)) == NULL)
-      fatal(errno, "Can't get memory\n");
+      fatal(errno, "Can't allocate memory\n");
    return (p);
    }
 
@@ -463,7 +469,7 @@ int   n;
 
 help()
    {
-   fprintf(stderr, "Ar V1.2 - archive file manager\n");
+   fprintf(stderr, "Ar V1.3 - archive file manager\n");
    fprintf(stderr, "Usage:  Ar -<cmd>[<modifier>] [file .. ]\n");
    fprintf(stderr, "      <cmd> is one of the following:\n");
    fprintf(stderr, "         t  show table of contents for archive\n");

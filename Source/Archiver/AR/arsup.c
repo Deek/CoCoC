@@ -19,18 +19,7 @@ get_fstat(pn, fs)
 int      pn;
 FILDES   *fs;
    {
-#ifdef   OSK
    _gs_gfd(pn, fs, sizeof(FILDES));
-#else
-
-   struct registers regs;
-
-   regs.rg_a = pn;
-   regs.rg_b = SS_FD;
-   regs.rg_x = fs;
-   regs.rg_y = sizeof(FILDES);
-   _os9(I_GETSTT, &regs);
-#endif
    }
 
 
@@ -42,18 +31,8 @@ set_fstat(pn, fs)
 int      pn;
 FILDES   *fs;
    {
-#ifdef   OSK
    _ss_pfd(pn, fs, sizeof(FILDES));
-#else
-
-   struct registers regs;
-
-   regs.rg_a = pn;
-   regs.rg_b = SS_FD;
-   regs.rg_x = fs;
-   regs.rg_y = sizeof(FILDES);
-   _os9(I_SETSTT, &regs);
-#endif
+   _ss_attr(pn,fs->fd_attr);
    }
 /*page*/
 /*
@@ -66,11 +45,7 @@ int   pn;
    {
    long  size;
 
-#ifdef   OSK
    size = _gs_size(pn);
-#else
-   getstat(SS_SIZE, pn, &size);
-#endif
    return (size);
    }
 
@@ -83,11 +58,7 @@ set_fsize(pn, size)
 int   pn;
 long  size;
    {
-#ifdef   OSK
    _ss_size(pn, size);
-#else
-   setstat(SS_SIZE, pn, size);
-#endif
    }
 
 
@@ -111,41 +82,6 @@ char  *s;
 /*page*/
 
 /*
-**      Returns true if string s matches pattern p.
-*/
-
-patmatch(p, s, f)
-char           *p;                                       /* pattern */
-register char  *s;                               /* string to match */
-char           f;                            /* flag for case force */
-   {
-   char  pc;                     /* a single character from pattern */
-
-   while (pc = (f ? toupper(*p++) : *p++))
-      {
-      if (pc == '*')
-         {
-         do {                    /* look for match till s exhausted */
-            if (patmatch (p, s, f))
-                  return (1);
-            } while (*s++);
-         return (0);
-         }
-      else
-         if (*s == 0)
-            return (0);                       /* s exhausted, p not */
-         else
-            if (pc == '?')
-               s++;                       /* matches all, just bump */
-            else
-               if (pc != (f ? toupper(*s++) : *s++))
-                  return (0);
-      }
-   return (!*s);            /* p exhausted, ret true if s exhausted */
-   }
-
-
-/*
 ** initialize memory (variables) of string type
 */
 
@@ -158,21 +94,3 @@ char  v;                                                   /* value */
       *p++ = v;
    }
 
-
-#include <ctype.h>
-/*
-** special strcmp to ignore case
-*/
-
-strucmp(s1, s2)
-char          *s1;
-register char *s2;
-   {
-   while (toupper(*s1) == toupper(*s2))
-      {
-      if (*s2++ == 0)
-            return (0);
-      s1++;
-      }
-   return (toupper(*s1) - toupper(*s2));
-   }

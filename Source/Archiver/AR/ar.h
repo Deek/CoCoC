@@ -1,6 +1,6 @@
 #include <modes.h>
 
-#define  DIRMAK   S_IFDIR+S_IOEXEC+S_IOWRITE+S_IOREAD+S_IEXEC+S_IWRITE+S_IREAD
+#define  DIRMAK   S_IFDIR+S_IOEXEC+S_IOREAD+S_IEXEC+S_IWRITE+S_IREAD
 #define  DIRCHK   S_IFDIR+S_IREAD
 
 #ifdef   OSK
@@ -33,7 +33,7 @@ typedef struct {
 
 
 typedef struct {                             /* obvious definitions */
-      char     fd_att;
+      char     fd_attr;
       char     fd_own[2];
       char     fd_date[5];
       char     fd_link;

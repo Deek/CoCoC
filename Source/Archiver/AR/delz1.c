@@ -62,6 +62,10 @@ long     bytes;
 /*page*/
 /*
  * Read one code from the input file.  If EOF, return -1.
+ * Inputs:
+ *      infile:    Input file.
+ * Outputs:
+ *      code or -1 is returned.
  */
 
 WORD
@@ -108,14 +112,14 @@ fetch()
 
    if (w_offset + n_bits <= WSIZE)
       {
-      return((buf[word] >> ((WSIZE - n_bits) - w_offset))
+      return(((unsigned) buf[word] >> ((WSIZE - n_bits) - w_offset))
          & LowOrder(n_bits));
       }
    else
       {
       size2 = n_bits - (WSIZE - w_offset);
       return(((buf[word] << size2) |
-            (buf[word + 1] >> (WSIZE - size2)))
+            ((unsigned) buf[word + 1] >> (WSIZE - size2)))
             & LowOrder(n_bits));
       }
    }

@@ -1,4 +1,0 @@
-/d0/cmds/ar: ar.r arsup.r dir.r lz1.r delz1.r lz1glob.r lz1init.r
-  cc -m=8 -f=Ar ar.r arsup.r dir.r  lz1.r delz1.r lz1glob.r lz1init.r
-lz1.r delz1.r lz1init.r lz1glob.r: lz1.h
-ar.r arsup.r dir.c: ar.h

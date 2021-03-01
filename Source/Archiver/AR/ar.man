@@ -1,14 +1,14 @@
 
-                            AR Version 1.2
+                            AR Version 1.3
 
 Ar is a utility modeled loosely after the archive utility in the 
 Kernigan & Plauger book, Software Tools. It's purpose is to gather 
 together files into a common file, in order to save space, to keep 
 related files together, to ease the transmission of files by 
 telephone, and other similar uses.  It uses Lempel-Zev compression on 
-text files, so substantial space savings can result.  Several versions 
-of the same file can be kept in one archive without file name 
-contention.  This version compiles and runs on OS9 LI and LII, and on 
+text and generic binary files, so substantial space savings can result.
+Several versions of the same file can be kept in one archive without
+file name contention.  This version compiles and runs on OS9 LII and
 OSK.  
 
 The command line syntax is: 
@@ -49,13 +49,10 @@ following examples are valid file specifications:
    *.* matches anything with a dot in it 
    * matches anything and everything 
 
-Since the OS9 (6809) shell does not expand any meta characters, I have 
-provided internal expansion of same.  When run on OSK this is 
-transparent for update since 'ar' also accepts a list of files on the 
-command line.  In the case of extraction and printing, we do not want 
-the shell generating filenames from the current directory.  In this 
+In the case of extraction and printing, we do not want the shell 
+generating filenames from the current directory.  In this 
 case, any file specification containing a meta character must be 
-quoted to protect it from the shell.  
+quoted to protect it from the shell.
 
 Meta characters can be used for files both bound for the archive and 
 for files to be extracted.  The p, t, and x commands default to '*' if 
@@ -63,7 +60,8 @@ no explicit file list is given.  The u command MUST have a file spec.
 The file specification can include a path list if it is not absolute.  
 That is, '/d0/work/*.c' will not be accepted, but 'work/*.c' will be.  
 During extraction, if the directory in the path list of the archived 
-file cannot be found, it will be created.  Here are some sample 
+file cannot be found, it will be created (the owner of the directory
+is set to the owner of the file being extracted.)  Here are some sample 
 command lines: 
 
    ar -pa archfile print all files, even old versions 
@@ -76,19 +74,15 @@ slightly different.  Sample command lines follow:
 
    ar -us archfile *.c add all files with '.c' suffix without 
 compression 
-   ar -u archfile * add ALL files using compression unless binary 
+   ar -u archfile * add ALL files using compression unless a module
    ar -u archfile file.c add only 'file.c' 
 
 If a file with the same name as the one to be added exists in the 
 archive already, the version number of the existing one is incremented 
-and the new version is added to the end of the archive.  The atribute 
+and the new version is added to the end of the archive.  The attribute 
 section of the file descriptor is saved in the archive and restored to 
-the file (as much as is possible) on extraction.  OS9 limits this to 
-owner, creation date, and last modified date.  Size of course will be 
-the same, but the file permissions will default to some value.  It is 
-possible (I do it in 'arc') to preserve permissions, but that requires 
-that the disk be opened raw and written raw.  I chose not to do that 
-here.  
+the file on extraction.  Directories are rebuilt on extraction as necessary
+(but the owner and permissions of the directory(s) are not restored.)
 
 Pre-extension is used during extraction to avoid segment table 
 overflow problems, and will be added to update as soon as the 

@@ -13,5 +13,5 @@ WORD        maxbits,
             debug;
 
 long        lz_bytes;
-UWORD       buf[BITS];
+WORD        buf[BITS];
 CodeTable   Code[1 << BITS];
