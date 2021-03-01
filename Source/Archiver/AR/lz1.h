@@ -1,13 +1,15 @@
 /*
  * header file for LZ compression routines
  */
+#ifdef  VAX
+#define WORD short
+#endif
+
 #ifndef WORD
 # ifdef  OSK
 #  define WORD short
-#  define UWORD unsigned short
 #else
 #  define WORD int
-#  define UWORD unsigned int
 # endif
 #endif
 
@@ -57,5 +59,5 @@ extern WORD       verbose,
                   debug;
 
 extern long       lz_bytes;
-extern UWORD      buf[BITS];
+extern WORD       buf[BITS];
 extern CodeTable  Code[1 << BITS];

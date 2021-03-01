@@ -1,5 +1,5 @@
 
-                            AR Version 1.2
+                            AR Version 1.2 (VAX/VMS capable)
 
 Ar is a utility modeled loosely after the archive utility in the 
 Kernigan & Plauger book, Software Tools. It's purpose is to gather 
@@ -120,4 +120,29 @@ improvements, additions, and (of course) bug fixes.  The first likely
 addition will be the newer LZ compression to improve the compaction.  
 
                         Carl Kreider  71076,76
+
+VAX/VMS Version Notes:
+
+This VAX version of AR does not emulate all functionality of the original.
+In particular:
+
+   1. It does not handle path names.
+   2. It does not try to get or set any file attributes.
+   3. Wildcards in file names do not work for the "u" (update) command, but
+        they do work for the "x" (extract) command.
+   4. The original AR recognizes OS-9 module headers and does not compress
+        them.  If you want to archive VAX binaries, I suggest you use the
+        explicit "s" option to suppress file compression.
+
+I made all changes relating to the VAX/VMS port using the "#ifdef" construct
+in order to maintain backwards compatibility.  I have built and run the
+VAX-version of this source on a CoCo III running OS-9 Level II.  Perhaps
+this should be called the "Portable Version" of AR, since it is now byte-
+order independent.
+
+Please send me any problems or suggestions about this program.
+
+    Greg Walker             Internet:  walker@asc.slb.com
+                            CIS:       73577,677
+                            Delphi:    WALKERG
 

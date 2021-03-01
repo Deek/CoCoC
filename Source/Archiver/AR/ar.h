@@ -1,7 +1,9 @@
-#include <modes.h>
 
+#ifndef VAX
 #define  DIRMAK   S_IFDIR+S_IOEXEC+S_IOWRITE+S_IOREAD+S_IEXEC+S_IWRITE+S_IREAD
 #define  DIRCHK   S_IFDIR+S_IREAD
+#include <modes.h>
+#endif
 
 #ifdef   OSK
 #define  MSYNC    0x4AFC

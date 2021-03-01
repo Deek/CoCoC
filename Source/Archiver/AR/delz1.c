@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include "lz1.h"
 
+WORD c2tol();
+
 WORD
 de_LZ_1(infile, outfile, bytes)
 FILE     *infile, *outfile;
@@ -14,7 +16,12 @@ long     bytes;
    WORD  getcode();
    char  stack[MAXSTACK];
 
-   if (fread(&tag, sizeof(tag), 1, infile) < 1 || tag != TAG)
+   if (fread(&tag, sizeof(tag), 1, infile) < 1)
+      return (-2);
+#ifdef VAX
+   tag = c2tol(&tag);
+#endif
+   if (tag != TAG)
       return (-2);
 
    lz1_init();
@@ -62,6 +69,10 @@ long     bytes;
 /*page*/
 /*
  * Read one code from the input file.  If EOF, return -1.
+ * Inputs:
+ *      infile:    Input file.
+ * Outputs:
+ *      code or -1 is returned.
  */
 
 WORD
@@ -84,6 +95,9 @@ FILE    *infile;
       size = fread(buf, 1, size, infile);    /* read new buffer too */
       if (size <= 0)
          return (-1);
+#ifdef VAX
+      swap_bytes(buf, size);
+#endif
       lz_bytes -= size;
       offset = 0;
       /*
@@ -108,14 +122,39 @@ fetch()
 
    if (w_offset + n_bits <= WSIZE)
       {
-      return((buf[word] >> ((WSIZE - n_bits) - w_offset))
+      return(((unsigned) buf[word] >> ((WSIZE - n_bits) - w_offset))
          & LowOrder(n_bits));
       }
    else
       {
       size2 = n_bits - (WSIZE - w_offset);
-      return(((buf[word] << size2) |
-            (buf[word + 1] >> (WSIZE - size2)))
-            & LowOrder(n_bits));
+#ifdef VAX
+      return( ((buf[word] << size2) |
+               ( (buf[word + 1] & 0xffff) >> (WSIZE - size2))  )
+             & LowOrder(n_bits) );
+#else
+      return( ((buf[word] << size2) |
+               ( (unsigned) buf[word + 1]  >> (WSIZE - size2))  )
+             & LowOrder(n_bits) );
+#endif
       }
    }
+
+WORD
+c2tol(s)
+   char *s;
+{
+   WORD x = 0;
+
+   x = (x + (*s++ &0xff)) << 8;
+   x = (x + (*s &0xff));
+   return (x);
+   }
+
+swap_bytes( buf, size)
+    WORD *buf, size;
+{
+    int i;
+
+    for(i=0; i<size; ++i) buf[i] = c2tol(&buf[i]);
+}

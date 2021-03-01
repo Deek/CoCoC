@@ -6,6 +6,10 @@
 #include <ctype.h>
 #include "ar.h"
 
+#ifdef  VAX
+#define  index(x,y)  strchr(x,y)
+#define  rindex(x,y)  strrchr(x,y)
+#endif
 
 FN    *fnhead = (FN *)NULL;
 char  *hid = HID,
@@ -27,7 +31,9 @@ char  **argv;
    int   n, updating;
    FILE  *afp;
 
+#ifndef  VAX
    pflinit();
+#endif
    mod = *argv++;                              /* save program name */
 
    if ((argc < 3) || (*(p = *argv++) != '-'))
@@ -152,11 +158,13 @@ int   flag;                     /* 0 = listing, 1 = writing to file */
          if (!flag)
             copy_from(afp, stdout, &header);
          else
-				{
-				printf("extracting <%s>\n", header.a_name);
+         {
+            printf("extracting <%s>\n", header.a_name);
             ofp = spl_open(&header);
             copy_from(afp, ofp, &header);
+#ifndef VAX
             set_fstat(ofp->_fd, &header.a_attr);
+#endif
             fclose(ofp);
             }
          }
@@ -208,6 +216,9 @@ FILE  *afp;
    FN       *fnp;
    int      synch, n;
    long     bytes, head_pos, tail_pos, copy_to(), c4tol();
+#ifdef VAX
+   long     FileSize;
+#endif
 
    while ((get_header(afp, &header)) != EOF)
       {
@@ -216,8 +227,15 @@ FILE  *afp;
             {
             ++header.a_stat;                       /* mark it older */
             fseek(afp, (long) -sizeof(HEADER), 1);
+#ifdef VAX
+            FileSize = header.a_size;
+            vaxltoc4(FileSize,&header.a_size);
+#endif
             if ((fwrite(&header, sizeof(HEADER), 1, afp)) == NULL)
                fatal(errno, "write failure on delete\n");
+#ifdef  VAX
+            header.a_size = c4tol(&header.a_size);
+#endif
             }
       fseek(afp, header.a_size, 1);
       }
@@ -225,26 +243,41 @@ FILE  *afp;
    for (fnp = fnhead; fnp; fnp = fnp->fn_link)
       {
       if ((ifp = fopen(fnp->fn_name, "r")) == NULL)
-			if (errno == 214)
-				continue;                    /* a directory, we presume */
-			else
+#ifndef VAX
+        if (errno == 214)
+            continue;                    /* a directory, we presume */
+        else
+#endif
             fatal(errno, "can't find %s\n", fnp->fn_name);
       printf("archiving <%s>\n", fnp->fn_name);
-      if (supflag || ((synch = getw(ifp)) == MSYNC))
+      synch = getw(ifp);
+#ifdef  VAX
+      synch = c2tol(&synch);
+#endif
+      if (supflag || (synch == MSYNC) )
          header.a_type = PLAIN;
       else
          header.a_type = COMP1;
       strcpy(header.a_hid, hid);
       setmem(header.a_name, FNSIZ + 1, ' ');
       strcpy(header.a_name, fnp->fn_name);
+#ifdef VAX
+      get_vaxstat(ifp, &header.a_attr);
+#else
       get_fstat(ifp->_fd, &header.a_attr);
+#endif
       header.a_stat = '\0';
       rewind(ifp);
       head_pos = ftell(afp);                     /* save for update */
       fwrite(&header, sizeof(HEADER), 1, afp);        /* skip ahead */
       bytes = head_pos + c4tol(header.a_attr.fd_fsize) + sizeof(HEADER);
+#ifndef VAX
       set_fsize(afp->_fd, bytes);
+#endif
       header.a_size = copy_to(afp, ifp, &header);
+#ifdef  VAX
+      header.a_size = c4tol(&header.a_size);
+#endif
       tail_pos = ftell(afp);
       fclose(ifp);
       fseek(afp, head_pos, 0);             /* back up to header pos */
@@ -252,7 +285,9 @@ FILE  *afp;
          fatal(errno, "write error on header for %s\n", fnp->fn_name);
       fseek(afp, tail_pos, 0);                 /* go to end of file */
       }
+#ifndef VAX
    set_fsize(afp->_fd, tail_pos);         /* now set real file size */
+#endif
    }
 /*page*/
 /*
@@ -290,13 +325,13 @@ int   updating;                        /* TRUE if command is update */
          if (*p)
             *r++ = '/';                        /* set up for append */
          while ((dirp = nextdir(dirfd)) != -1)
-            if (patmatch(q, strhcpy(r, dirp->dir_name), TRUE))
+            if (patmatch(q, strcpy(r, dirp->dir_name), TRUE))
                if ((strucmp(p, archfile)) != 0)         /* not self */
                   found += stash_name(p);
          }
    if (zflag)
       while (gets(buf))
-			if (buf[0] != '\0')
+                        if (buf[0] != '\0')
             found += stash_name(buf);
    return (found);
    }
@@ -337,6 +372,9 @@ HEADER   *hp;
       return (EOF);
    if (strncmp(hp->a_hid, hid, HIDSIZ) != 0)
       fatal(1, "file not archive or damaged\n");
+#ifdef  VAX
+   hp->a_size = c4tol(&hp->a_size);
+#endif
    return (0);
    }
 
@@ -354,6 +392,7 @@ HEADER   *hp;
    char  *p;
    long  c4tol();
 
+#ifndef VAX
    p = hp->a_name;
    while (p = index(p, '/'))
       {
@@ -363,13 +402,16 @@ HEADER   *hp;
             fatal(errno, "can't make <%s>\n", hp->a_name);
       *p++ = '/';                             /* put back the delim */
       }
+#endif
 
    strcpy(buf, hp->a_name);
    if (hp->a_stat)
       sprintf(&buf[strlen(buf)], ".%d", hp->a_stat); /* make  unique */
    if ((ofp = fopen(buf, "w")) == NULL)
       fatal(errno, "create failure on %s\n", buf);
+#ifndef VAX
    set_fsize(ofp->_fd, c4tol(hp->a_attr.fd_fsize));
+#endif
    return (ofp);
    }
 /*page*/

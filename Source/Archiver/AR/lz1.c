@@ -19,6 +19,9 @@ long     *bytes;
 
    lz1_init();
    lz_bytes = sizeof(tag);
+#ifdef VAX
+   tag = c2tol(&tag);
+#endif
    fwrite(&tag, 1, sizeof(tag), outfile);             /* mark as LZ */
 
    ent = getc(infile);
@@ -103,7 +106,11 @@ FILE     *ofp;
       /* at EOF--flush buffers and pack up */
       if (offset > 0)
          {
-         fwrite(buf, 1, n = (offset + 7) / 8, ofp);
+         n = (offset + 7) / 8;
+#ifdef VAX
+         swap_bytes(buf, n);
+#endif
+         fwrite(buf, 1, n, ofp);
          lz_bytes += n;
          offset = 0;
          }
@@ -115,6 +122,9 @@ FILE     *ofp;
 
    if ((offset += n_bits) == BytesToBits(n_bits))
       {
+#ifdef VAX
+      swap_bytes(buf, n_bits);
+#endif
       fwrite(buf, 1, n_bits, ofp);
       lz_bytes += n_bits;
       offset = 0;
@@ -133,6 +143,9 @@ FILE     *ofp;
     */
    if (offset > 0)
       {
+#ifdef VAX
+      swap_bytes(buf, n_bits);
+#endif
       fwrite(buf, 1, n_bits, ofp);
       lz_bytes += n_bits;
       offset = 0;
@@ -167,8 +180,13 @@ WORD    value;
       {
       size1 = WSIZE - w_offset;
       size2 = n_bits - size1;
+#ifdef VAX
+      buf[word] = (buf[word] & HighOrder(size1)) |
+            ((value & 0xffff) >> size2);
+#else
       buf[word] = (buf[word] & HighOrder(size1)) |
             ((unsigned) value >> size2);
+#endif
       shift = WSIZE - size2;
       buf[word + 1] = (buf[word + 1] & ~(LowOrder(size2) << shift)) |
               (value << shift);
