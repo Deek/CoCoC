@@ -87,7 +87,7 @@ register int arg;
         case MOD:       mwsyscall("ccmod");  return;
         case NEG:       ol("nega\n negb\n sbca #0"); return;
         case COMPL:     ol("coma\n comb"); return;
-        case GOTO:      ot("leax "); od(-sp); os(spind); nl();
+        case GOTO:      outlea('x'); od(-sp); os(spind); nl();
 
 /* all branches are long; assembly code optimizer fixes them up */
         case JMP:       ot(lbra); label(rtype); return;
@@ -95,7 +95,7 @@ register int arg;
             ot(lbra);
             label(arg = getlabel());
             label(rtype);
-            ot("leas ");
+            outlea('s');
             od(sp);
             os(",x\n");
             label(arg);
@@ -136,7 +136,7 @@ dooff:
             os(spind);nl();
             return;
         case LEAX:
-            ot("leax ");
+            outlea('x');
             switch (rtype) {
                 case NODE:
                     reg = (reg = ((expnode *)arg)->op) == YIND
@@ -261,7 +261,7 @@ simple:
             fprintf(code," exg %c,%c\n",reg,regname(arg));
             return;
         case LEA:
-            outlea(reg); /*fprintf(code," lea%c ",reg);*/
+            outlea(reg);
             switch (arg) {
                 case DREG:
                     os("d,");
@@ -746,8 +746,9 @@ ob(b)
 
 
 os(s)
+char *s;
 {
-    fprintf(code,s);
+    fputs(s,code);
 }
 
 
@@ -777,6 +778,7 @@ olbl(n)
 
 
 on(s)
+char *s;
 {
     fprintf(code,"%.8s",s);
 }
@@ -787,7 +789,7 @@ modstk(nsp)
     int x;
 
     if (x=nsp-sp) {
-        ot("leas ");
+        outlea('s');
         od(x);
         os(spind);
         nl();
