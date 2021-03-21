@@ -76,7 +76,7 @@ char **argv;
                                    break;
 #endif
                             default:
-                                fprintf(stderr,"unknown flag : -%c\n",*p);
+                                fprintf(stderr,"unknown flag: -%c\n",*p);
                                 errexit();
                         }
                         done: ;
@@ -108,11 +108,11 @@ char **argv;
         epilogue();
 
         if(ferror(code))
-                fatal("error writing assembly code file");
+                fatal("error writing assembly");
         fflush(stdout);
 
         if (errcount) {
-                fprintf(stderr,"errors in compilation : %d\n",errcount);
+                fprintf(stderr,"errors: %d\n",errcount);
                 errexit();
         }
 }

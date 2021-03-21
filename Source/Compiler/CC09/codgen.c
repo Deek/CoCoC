@@ -30,7 +30,7 @@ static char *spind = ",s";
 static char *lbsr = "lbsr ";
 static char *lbra = "lbra ";
 static char *clra = "clra";
-static char *unkopr = "unknown operator : ";
+static char *unkopr = "unknown operator: ";
 
 extern char *getrel(),regname();
 

@@ -114,13 +114,13 @@ getlin()
                                 if(cgets() == NULL)
                                         return EOF;
                                 if (lno)
-                                        printf("%s : line %d ",filename,lno );
+                                        printf("%s:%d: ",filename,lno);
                                 else
-                                        printf("argument : ");
-                                printf("**** %s ****\n",line);
+                                        printf("args: ");
+                                printf("*** %s ***\n",line);
                                 if(temp[0]){
-                                        puts(temp);
-                                        for(;x--;)
+                                        eputs(temp);
+                                        for(;x;--x)
                                                 putchar(' ');
                                         puts("^");
                                 }
@@ -181,8 +181,8 @@ cgets()                 /* Function to input a line of source.
 #endif
         if((c = getc(in)) == EOF){
                 if(ferror(in)) {
-                        fputs("INPUT FILE ERROR : TEMPORARY FILE\n",stderr);
-#ifdef  SPLIT
+                        fputs("error reading input\n",stderr);
+#ifdef SPLIT
                         tidy();
 #else
                         exit(1);

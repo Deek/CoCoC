@@ -54,7 +54,7 @@ int count;
 
 pfile()
 {
-    eprintf("%s : ",filename);
+    eprintf("%s:",filename);
 }
 
 
@@ -105,8 +105,7 @@ register int n;
 char errstr[];
 {
     pfile();
-    eprintf("line %d  ",lno);
-    eprintf("****  %s  ****\n",errstr);
+    eprintf("%d: *** %s ***\n", lno, errstr);
     if (lno == lineno) {
         eputs(line);
         goto dopoint;
@@ -118,20 +117,27 @@ dopoint:
     }
     if(++errcount>30) {
         fflush(stderr);
-        eputs("too many errors - ABORT") ;
+        eputs("too many errors");
         tidy();
     }
 }
 
 
-eprintf(s1,s2,s3)
+eprintf(msg,s1,s2,s3,s4)
+char *msg;
 {
-    fprintf(stderr,s1,s2,s3);
+    fprintf(stderr,msg,s1,s2,s3,s4);
 }
 
 
 eputs(s)
+char *s;
 {
+	char *tmp;
+	int i=0, len = strlen(s);
+	for (tmp = s; i < len; tmp++, i++) {
+		if (*tmp == '\t') *tmp = ' ';
+	}
     fputs(s,stderr);
     eputchar('\n');
 }
