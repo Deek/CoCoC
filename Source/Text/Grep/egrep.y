@@ -20,6 +20,11 @@
 #define NCHARS 128
 #define NSTATES 128
 #define FINAL -1
+#ifdef _OS9
+# define BLOCKSIZE 256
+#else
+# define BLOCKSIZE 512
+#endif
 char gotofn[NSTATES][NCHARS];
 int state[NSTATES];
 char out[NSTATES];
@@ -495,7 +500,7 @@ char *file;
 	register char *p;
 	register cstat;
 	register ccount;
-	char buf[1024];
+	char buf[2*BLOCKSIZE];
 	char *nlp;
 	int istat;
 	if (file) {
@@ -515,7 +520,7 @@ char *file;
 	blkno = 0;
 	p = buf;
 	nlp = p;
-	if ((ccount = read(f,p,512))<=0) goto done;
+	if ((ccount = read(f,p,BLOCKSIZE))<=0) goto done;
 	istat = cstat = gotofn[0]['\n'];
 	if (out[cstat]) goto found;
 	for (;;) {
@@ -538,7 +543,7 @@ char *file;
 							if (bflag) printf("%d:", blkno);
 							if (nflag) printf("%ld:", lnum);
 							if (p <= nlp) {
-								while (nlp < &buf[1024]) putchar(*nlp++);
+								while (nlp < &buf[2*BLOCKSIZE]) putchar(*nlp++);
 								nlp = buf;
 							}
 							while (nlp < p) putchar(*nlp++);
@@ -550,15 +555,15 @@ char *file;
 				}
 				cfound:
 				if (--ccount <= 0) {
-					if (p <= &buf[512]) {
-						if ((ccount = read(f, p, 512)) <= 0) goto done;
+					if (p <= &buf[BLOCKSIZE]) {
+						if ((ccount = read(f, p, BLOCKSIZE)) <= 0) goto done;
 					}
-					else if (p == &buf[1024]) {
+					else if (p == &buf[2*BLOCKSIZE]) {
 						p = buf;
-						if ((ccount = read(f, p, 512)) <= 0) goto done;
+						if ((ccount = read(f, p, BLOCKSIZE)) <= 0) goto done;
 					}
 					else {
-						if ((ccount = read(f, p, &buf[1024]-p)) <= 0) goto done;
+						if ((ccount = read(f, p, &buf[2*BLOCKSIZE]-p)) <= 0) goto done;
 					}
 					blkno++;
 				}
@@ -574,15 +579,15 @@ char *file;
 		}
 		brk2:
 		if (--ccount <= 0) {
-			if (p <= &buf[512]) {
-				if ((ccount = read(f, p, 512)) <= 0) break;
+			if (p <= &buf[BLOCKSIZE]) {
+				if ((ccount = read(f, p, BLOCKSIZE)) <= 0) break;
 			}
-			else if (p == &buf[1024]) {
+			else if (p == &buf[2*BLOCKSIZE]) {
 				p = buf;
-				if ((ccount = read(f, p, 512)) <= 0) break;
+				if ((ccount = read(f, p, BLOCKSIZE)) <= 0) break;
 			}
 			else {
-				if ((ccount = read(f, p, &buf[1024] - p)) <= 0) break;
+				if ((ccount = read(f, p, &buf[2*BLOCKSIZE] - p)) <= 0) break;
 			}
 			blkno++;
 		}

@@ -9,8 +9,15 @@
 
 #include <stdio.h>
 
-#define	MAXSIZ 6000
-#define QSIZE 400
+#ifdef _OS9
+# define BLOCKSIZE 256
+# define QSIZE 394
+#else
+# define BLOCKSIZE 512
+# define QSIZE 400
+#endif
+
+#define	MAXSIZ (QSIZE*15)
 struct words {
 	char 	inp;
 	char	out;
@@ -117,7 +124,7 @@ char *file;
 	register char *p;
 	register struct words *c;
 	register ccount;
-	char buf[1024];
+	char buf[2*BLOCKSIZE];
 	int f;
 	int failed, ecnt;
 	char *nlp;
@@ -142,11 +149,11 @@ char *file;
 	c = w;
 	for (;;) {
 		if (--ccount <= 0) {
-			if (p == &buf[1024]) p = buf;
-			if (p > &buf[512]) {
-				if ((ccount = read(f, p, &buf[1024] - p)) <= 0) break;
+			if (p == &buf[2*BLOCKSIZE]) p = buf;
+			if (p > &buf[BLOCKSIZE]) {
+				if ((ccount = read(f, p, &buf[2*BLOCKSIZE] - p)) <= 0) break;
 			}
-			else if ((ccount = read(f, p, 512)) <= 0) break;
+			else if ((ccount = read(f, p, BLOCKSIZE)) <= 0) break;
 			blkno++;
 		}
 		nstate:
@@ -178,11 +185,11 @@ char *file;
 			while (*p++ != '\n') {
 				ecnt++;
 				   if (--ccount <= 0) {
-					if (p == &buf[1024]) p = buf;
-					if (p > &buf[512]) {
-						if ((ccount = read(f, p, &buf[1024] - p)) <= 0) break;
+					if (p == &buf[2*BLOCKSIZE]) p = buf;
+					if (p > &buf[BLOCKSIZE]) {
+						if ((ccount = read(f, p, &buf[2*BLOCKSIZE] - p)) <= 0) break;
 					}
-					else if ((ccount = read(f, p, 512)) <= 0) break;
+					else if ((ccount = read(f, p, BLOCKSIZE)) <= 0) break;
 					blkno++;
 				   }
 			}
@@ -203,7 +210,7 @@ char *file;
 					if (bflag) printf("%d:", blkno);
 					if (nflag) printf("%ld:", lnum);
 					if (p <= nlp) {
-						while (nlp < &buf[1024]) putchar(*nlp++);
+						while (nlp < &buf[2*BLOCKSIZE]) putchar(*nlp++);
 						nlp = buf;
 					}
 					while (nlp < p) putchar(*nlp++);
