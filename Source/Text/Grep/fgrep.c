@@ -33,6 +33,8 @@ char	*argptr;
 main(argc, argv)
 char **argv;
 {
+	pflinit();
+
 	while (--argc > 0 && (++argv)[0][0]=='-')
 		switch (argv[0][1]) {
 
