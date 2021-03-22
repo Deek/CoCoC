@@ -87,7 +87,7 @@ char **argv;
 			continue;
 
 		default:
-			fprintf(stderr, "egrep: unknown flag\n");
+			fprintf(stderr, "fgrep: unknown flag\n");
 			continue;
 		}
 out:
@@ -96,7 +96,7 @@ out:
 	if (fflag) {
 		wordf = fopen(*argv, "r");
 		if (wordf==NULL) {
-			fprintf(stderr, "egrep: can't open %s\n", *argv);
+			fprintf(stderr, "fgrep: can't open %s\n", *argv);
 			exit(2);
 		}
 	}
