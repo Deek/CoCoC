@@ -263,176 +263,185 @@ typedef struct initstruct {
 /* 13, 14, 15 free */
 
 /* storage classes */
-#define ARG         12  /* function arguments */
-#define AUTO        13  /* "auto" storage (on stack) */
-#define STRTAG      14  /* struct tag */
-#define EXTERN      15
-#define STATIC      16
-#define REG         17  /* register storage */
-#define MOS         18  /* member of struct or union */
-#define DIRECT      19  /* on direct page */
-#define EXTERND     20  /* extern direct */
-#define STATICD     21  /* static direct */
-#define EXTDEF      22
+#define ARG         16  /* function arguments */
+#define AUTO        17  /* "auto" storage (on stack) */
+#define STRTAG      18  /* struct tag */
+#define EXTERN      19  /* stored somewhere else */
+#define STATIC      20  /* global but "hidden" */
+#define REG         21  /* register storage */
+#define MOS         22  /* member of struct or union */
+#define DIRECT      23  /* on direct page */
+#define EXTERND     24  /* extern direct */
+#define STATICD     25  /* static direct */
+#define EXTDEF      26
+/* 27..31 free */
+#define RETURN      32
+#define IF          33
+#define WHILE       34
+#define ELSE        35
+#define SWITCH      36
+#define CASE        37
+#define BREAK       38
+#define CONTIN      39
+#define DO          40
+#define DEFAULT     41
+#define FOR         42
+#define GOTO        43
+#define TYPEDEF     44
+#define DEFTYPE     45
+#define CAST        46
 
-#define RETURN      23
-#define IF          24
-#define WHILE       25
-#define ELSE        26
-#define SWITCH      27
-#define CASE        28
-#define BREAK       29
-#define CONTIN      30
-#define DO          31
-#define DEFAULT     32
-#define FOR         33
-#define GOTO        34
-#define TYPEDEF     35
-#define DEFTYPE     36
-#define CAST        37
+#define SIGN        47  /* mostly ignored */
+#define SHORT       48  /* short type modifier */
 
-#define SIGN        38  /* mostly ignored */
-#define SHORT       39  /* short type modifier */
+/* 49..63 reserved to avoid conflicting with functions returning types */
 
-#define SEMICOL     40  /* ; expression terminator */
-#define LBRACE      41  /* { block start */
-#define RBRACE      42  /* } block end */
-#define LBRACK      43  /* [ array index start */
-#define RBRACK      44  /* ] array index end */
-#define LPAREN      45  /* ( left parenthesis */
-#define RPAREN      46  /* ) right paren */
-#define COLON       47  /* : lots of uses */
-#define COMMA       48  /* , comma operator */
-#define KEYWORD     51
-#define NAME        52
-#define CONST       54  /* int constant */
-#define STRING      55  /* string constant */
-#define SIZEOF      59
-#define INCBEF      60  /* ++x */
-#define DECBEF      61  /* --x */
-#define INCAFT      62  /* x++ */
-#define DECAFT      63  /* x-- */
-#define NOT         64  /* ! logical NOT */
-#define AMPER       65  /* & address-of operator */
-#define STAR        66  /* * pointer dereference, multiply */
-#define NEG         67  /* - minus/negative */
-#define COMPL       68  /* ~ complement */
-#define DOT         69  /* . struct member access */
-#define ARROW       70  /* -> struct member pointer access */
-#define DBLAND      71  /* && logical AND */
-#define DBLOR       72  /* || logical OR */
-#define LCONST      74  /* long constant */
+#define SEMICOL     64  /* ; expression terminator */
+#define LBRACE      65  /* { block start */
+#define RBRACE      66  /* } block end */
+#define LBRACK      67  /* [ array index start */
+#define RBRACK      68  /* ] array index end */
+#define LPAREN      69  /* ( left parenthesis */
+#define RPAREN      70  /* ) right paren */
+#define COLON       71  /* : lots of uses */
+#define COMMA       72  /* , comma operator */
+#define KEYWORD     73
+#define NAME        74
+#define CONST       75  /* int constant */
+#define STRING      76  /* string constant */
+#define SIZEOF      77
+#define INCBEF      78  /* ++x */
+#define DECBEF      79  /* --x */
+#define INCAFT      80  /* x++ */
+#define DECAFT      81  /* x-- */
+#define NOT         82  /* ! logical NOT */
+#define AMPER       83  /* & address-of operator */
+#define STAR        84  /* * pointer dereference, multiply */
+#define NEG         85  /* - minus/negative */
+#define COMPL       86  /* ~ complement */
+#define DOT         87  /* . struct member access */
+#define ARROW       88  /* -> struct member pointer access */
+#define DBLAND      89  /* && logical AND */
+#define DBLOR       90  /* || logical OR */
+#define LCONST      91  /* long constant */
 #ifdef DOFLOATS
-#define FCONST      75  /* float constant */
+#define FCONST      92  /* float constant */
 #endif
-#define UMOD        76  /* % modulus (unsigned) */
-#define USHR        77  /* >> (unsigned) */
-#define UDIV        78  /* unsigned integer division */
-#define RSUB        79
+#define UMOD        93  /* % modulus (unsigned) */
+#define USHR        94  /* >> (unsigned) */
+#define UDIV        95  /* unsigned integer division */
+#define RSUB        96
 /* HACK ALERT
     These token numbers must be in the same order as the ASSPLUS numbers, or
     stuff *will* break. When processing assignment operators, the compiler
     generates the math operation by subtracting the difference between ASSPLUS
     and PLUS.
 */
-#define PLUS        80  /* + add/positive */
-#define MINUS       81
-#define TIMES       82
-#define DIV         83  /* / division character */
-#define MOD         84  /* % modulus character */
-#define SHR         85
-#define SHL         86
-#define AND         87
-#define OR          88
-#define XOR         89
+#define PLUS        97  /* + add/positive */
+#define MINUS       98
+#define TIMES       99
+#define DIV         100  /* / division character */
+#define MOD         101  /* % modulus character */
+#define SHR         102
+#define SHL         103
+#define AND         104
+#define OR          105
+#define XOR         106  /* ^ caret character */
 
 /* conditional branch types */
-#define EQ          90
-#define NEQ         91
+#define EQ          107
+#define NEQ         108
 /* HACK ALERT
     The fact that these numbers are in exactly this order is used by the code.
     Don't change these numbers in relation to one another!
 */
-#define LEQ         92
-#define LT          93  /* < less than character */
-#define GEQ         94
-#define GT          95  /* > greater than character */
-#define ULEQ        96
-#define ULT         97
-#define UGEQ        98
-#define UGT         99
+#define LEQ         109
+#define LT          110  /* < less than character */
+#define GEQ         111
+#define GT          112  /* > greater than character */
+#define ULEQ        113
+#define ULT         114
+#define UGEQ        115
+#define UGT         116
 
-#define ASSIGN      120 /* = equals character */
+#define QUERY       117 /* ? conditional operator */
+#define CALL        118
+#define BSLASH      119 /* \ backslash character */
+#define SHARP       120 /* # pound char (unused) */
+#define PRIME       121 /* ' char constant start/end */
+#define QUOTE       122 /* " quote mark */
+#define LETTER      123
+#define DIGIT       124
+#define NEWLN       125 /* newline character (unused) */
+#define SPACE       126 /* ' ' -- space character */
 
-#define QUERY       100 /* ? conditional operator */
-#define CALL        101
-#define BSLASH      102 /* \ backslash character */
-#define SHARP       103 /* # pound char (unused) */
-#define PRIME       104 /* ' char constant start/end */
-#define QUOTE       105 /* " quote mark */
-#define LETTER      106
-#define DIGIT       107
-#define NEWLN       108 /* newline character (unused) */
-#define SPACE       109 /* ' ' -- space character */
+#define ASSIGN      127 /* = equals character */
 
 /* code generator symbols */
-#define STACK       110
-#define UREG        111 /* in register U */
-#define DREG        112 /* in register D */
-#define XREG        113 /* in register X */
-#define EXG         115 /* exchange two registers */
-#define LEA         116
-#define LOAD        117 /* load data into register */
-#define YREG        118 /* in register Y */
-#define NODE        119
-#define STORE       121
-#define PUSH        122
-#define LEAX        123
-#define JMP         124
-#define JMPEQ       125
-#define JMPNE       126
-#define LOADIM      127 /* load immediate value into register */
-#define FREG        128
+#define STACK       128
+#define DREG        129 /* in register D */
+#define UREG        130 /* in register U */
+#define XREG        131 /* in register X */
+#define YREG        132 /* in register Y */
+#define EXG         133 /* exchange two registers */
+#define LEA         134
+#define LOAD        135 /* load data into register */
+#define NODE        136
+#define STORE       137
+#define PUSH        138
+#define LEAX        139
+#define JMP         140
+#define JMPEQ       141
+#define JMPNE       142
+#define LOADIM      143 /* load immediate value into register */
+#define FREG        144
 
-#define COMPARE     129
-#define CNDJMP      130 /* conditional jump */
-#define ITOL        131 /* int to long */
-#define LTOI        132 /* long to int */
-#define CTOI        133 /* char to int */
-#define UTOI        134 /* unsigned char to int */
-#define UTOL        135 /* unsigned to long */
-#define DBLOP       136 /* double operation (any) */
-#define LONGOP      137 /* long operation (any) */
-#define MOVE        138
-#define STOI        139 /* short to int? (unused) */
-#define TEST        140
+#define COMPARE     145
+#define CNDJMP      146 /* conditional jump */
+#define ITOL        147 /* int to long */
+#define LTOI        148 /* long to int */
+#define CTOI        149 /* char to int */
+#define UTOI        150 /* unsigned char to int */
+#define UTOL        151 /* unsigned to long */
+#define DBLOP       152 /* double operation (any) */
+#define LONGOP      153 /* long operation (any) */
+#define MOVE        154
+#define STOI        155 /* short to int? (unused) */
+#define TEST        156
 #ifdef DOFLOATS
-#define FTOD        141 /* float to double */
-#define DTOF        142 /* double to float */
-#define ITOD        143 /* int to double */
-#define DTOI        144 /* double to int or unsigned */
-#define LTOD        145 /* long to double */
-#define DTOL        146 /* double to long */
-#define UTOD        147 /* unsigned to double */
+#define FTOD        157 /* float to double */
+#define DTOF        158 /* double to float */
+#define ITOD        159 /* int to double */
+#define DTOI        160 /* double to int or unsigned */
+#define LTOD        161 /* long to double */
+#define DTOL        162 /* double to long */
+#define UTOD        163 /* unsigned to double */
 #endif
-#define XIND        148 /* x indexed */
-#define YIND        149 /* y indexed */
-#define UIND        150 /* u indexed */
+#define XIND        164 /* x indexed */
+#define YIND        165 /* y indexed */
+#define UIND        166 /* u indexed */
 
-#define HALVE       151 /* division by two */
-#define UHALVE      152 /* same (unsigned) */
-#define IDOUBLE     153 /* multiplication by two */
+#define HALVE       167 /* division by two */
+#define UHALVE      168 /* same (unsigned) */
+#define IDOUBLE     169 /* multiplication by two */
 
-#define ASSPLUS     160 /* += */
-#define ASSMIN      161 /* -= */
-#define ASSMUL      162 /* *= */
-#define ASSDIV      163 /* /= */
-#define ASSMOD      164 /* %= */
-#define ASSSHR      165 /* >>= */
-#define ASSSHL      166 /* <<= */
-#define ASSAND      167 /* &= */
-#define ASSOR       168 /* |= */
-#define ASSXOR      169 /* ^= -- rarely seen */
+/* 170..189 reserved for expansion */
+
+#define ASSPLUS     190 /* += */
+#define ASSMIN      191 /* -= */
+#define ASSMUL      192 /* *= */
+#define ASSDIV      193 /* /= */
+#define ASSMOD      194 /* %= */
+#define ASSSHR      195 /* >>= */
+#define ASSSHL      196 /* <<= */
+#define ASSAND      197 /* &= */
+#define ASSOR       198 /* |= */
+#define ASSXOR      199 /* ^= -- rarely seen */
+/*
+ * THIS IS THE END.
+ * Do not add tokens higher than 199 without also changing the size of the kw[]
+ * array below and in misc.c!
+ */
 
 /* indirection masks */
 #define INDIRECT    0x8000
