@@ -323,14 +323,20 @@ lexinit()
      install("static",STATIC);
      install("sizeof",SIZEOF);
      install("int",INT);
-     mosflg=1;
-     install("int",INT);
-#ifdef  DOFLOATS
-     install("float",FLOAT);
-#endif
-     mosflg=0;
      install("char",CHAR);
      install("short",SHORT);
+     install("long",LONG);
+     mosflg=1; /* These keywords may appear inside struct defs */
+     install("int",INT);
+     install("char",CHAR);
+     install("short",SHORT);
+     install("long",LONG);
+     install("signed", SIGN);
+     install("unsigned",UNSIGN);
+#ifdef DOFLOATS
+     install("float",FLOAT);
+#endif
+     mosflg=0; /* back out of struct member mode */
      install("auto",AUTO);
      install("extern",EXTERN);
      install("direct",DIRECT);
@@ -349,9 +355,8 @@ lexinit()
      install("for",FOR);
      install("struct",STRUCT);
      install("union",UNION);
-     install("unsigned",UNSIGN);
      install("signed", SIGN);
-     install("long",LONG);
+     install("unsigned",UNSIGN);
      ptr=lookup("errno");
      ptr->type=INT;
      ptr->storage=EXTERN;

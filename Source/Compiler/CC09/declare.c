@@ -700,10 +700,10 @@ default:
             case UNION:
             case STRUCT:
                 tsize=offset=0;
-                ++mosflg;
+                ++mosflg;	/* go into special "struct" lexer mode */
                 tagptr=NULL;
                 getsym();
-                --mosflg;
+                --mosflg;	/* and get back out */
                 if (sym==NAME) {
                     tagptr= (symnode *) symval;
                     if (tagptr->type==UNDECL) {
@@ -724,7 +724,7 @@ default:
                 }
                 if (sym!=LBRACE) error("struct syntax");
                 else {
-                    ++mosflg;
+                    ++mosflg;	/* go into special "struct" lexer mode */
                     do {
                         savflg=mosflg;
                         mosflg=0;
@@ -780,7 +780,7 @@ next:
                             getsym();
                         }
                     } while(sym == SEMICOL);
-                    --mosflg;
+                    --mosflg;	/* get back out of "struct mode" */
                     if (tagptr) {
                         tagptr->size = tsize;
                         tagptr->type = STRUCT;
