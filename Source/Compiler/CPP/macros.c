@@ -98,11 +98,10 @@ register char	*name,*string;
 				char delim = cch;
 				*cptr++ = cch; gch(KEEPSP);
 				while (cch && cch != delim) {
-					*cptr++ = cch; gch(KEEPSP);
 					if (cch == '\\') {
 						*cptr++ = cch; gch(KEEPSP);
-						*cptr++ = cch; gch(KEEPSP);
 					}
+					*cptr++ = cch; gch(KEEPSP);
 				}
 				if (!cch)
 					lerror("missing end of string or character literal");
