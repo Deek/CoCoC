@@ -368,6 +368,7 @@ symnode *fptr;
 # endif
         switch (p1->type) {
             case LONG:
+            case ULONG:
 # ifdef DOFLOATS
             case FLOAT:
             case DOUBLE:

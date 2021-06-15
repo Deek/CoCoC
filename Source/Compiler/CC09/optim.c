@@ -693,8 +693,8 @@ register expnode *node;
 
     chkdecl(node);
     switch (t = node->type) {
-        case CHAR:
-        case UCHAR: cvt(node,t = INT); break;
+        case CHAR:  cvt(node,t = INT); break;
+        case UCHAR: cvt(node,t = UNSIGN); break;
 #ifdef  DOFLOATS
         case FLOAT: cvt(node,t = DOUBLE); break;
         case DOUBLE:
