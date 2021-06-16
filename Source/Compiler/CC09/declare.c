@@ -55,7 +55,7 @@ extdef()
             sclass = EXTDEF;
     }
 
-    if ((type = settype(&size,&dimptr,&eptr)) == 0) type = INT;
+    if ((type = settype(&size,&dimptr,&eptr)) == UNDECL) type = INT;
 
 #ifdef FUNCNAME
      fnline = symline;
@@ -149,7 +149,7 @@ argdef()
         case 0:     sclass = AUTO;
         case REG:   break;
     }
-    if ((type = settype(&size,&dimptr,&eptr)) == 0) type = INT;
+    if ((type = settype(&size,&dimptr,&eptr)) == UNDECL) type = INT;
 
     for ( ; ; ) {
         tdp = dimptr;
@@ -212,7 +212,7 @@ blkdef()
         case 0:
             sclass = AUTO;
     }
-    if ((type = settype(&size,&dimptr,&eptr)) == 0) type = INT;
+    if ((type = settype(&size,&dimptr,&eptr)) == UNDECL) type = INT;
 
     for ( ; ; ) {
         tdp = dimptr;
@@ -582,12 +582,12 @@ modifier (size)
 int *size;
 {
     int is_long=0, isshort=0, issign=0, isunsign=0;
-    int type=0, tsize=0;
+    int type = UNDECL, tsize = 0;
 
     while (sym == KEYWORD) {
         switch (symval) {
         default:    /* some keyword other than what we're interested in... */
-            goto err;
+            goto done;
         /* type modifiers (nonterminal) */
         case SIGN:
             if (issign || isunsign) goto err;
@@ -657,6 +657,7 @@ done:
     *size = tsize;
     return type;
 err:
+    error ("bad type");
     return 0;
 }
 
@@ -669,7 +670,7 @@ elem **ellist;
     dimnode *dptr;
     int offset,msize,mtype,savflg,dtype,s;
     elem *eptr,*elast,*elocal;
-    int type=0,tsize=2;
+    int type = UNDECL, tsize = INTSIZE;
 
     *ellist = 0;
     if (sym==KEYWORD) {
@@ -696,7 +697,7 @@ elem **ellist;
 #endif
                 break;
 default:
-                type=0;
+                type = UNDECL;
                 break;
             case UNION:
             case STRUCT:

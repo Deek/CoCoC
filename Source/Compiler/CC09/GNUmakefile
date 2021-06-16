@@ -2,7 +2,7 @@ DCCDIR	= $(HOME)/.dcc
 CFLAGS	= -g -mx32 -fsigned-char -DUNIX -DPTREE -DPROF -DREGCONTS \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
-	-Wno-return-type \
+	-Wno-return-type -Wno-char-subscripts \
 	-DCKEYSFILE=\"$(DCCDIR)/ckeys\"
 
 LDFLAGS = -mx32

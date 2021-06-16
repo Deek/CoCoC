@@ -60,9 +60,9 @@ register symnode *ptr;
             getsym();
             goto out;
         }
-        datstring = 2;
+        datstring = POINTSIZE;
     } else {
-        datstring = 2;
+        datstring = POINTSIZE;
         getsym();
     }
 

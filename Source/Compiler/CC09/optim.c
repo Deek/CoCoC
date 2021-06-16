@@ -265,7 +265,7 @@ expnode *node;
     rhs = node->right;
 
     /* defaults */
-    xtype = size = 2;
+    xtype = size = INTSIZE;
     dptr = NULL;
     t = INT;
 
@@ -429,7 +429,7 @@ strcommon:
             else if (t == UNDECL) {
                 sptr = lhs->val.sp;
                 sptr->type = INT | FUNCTION;
-                sptr->size = 2;
+                sptr->size = INTSIZE;
                 sptr->dimptr = NULL;
                 sptr->storage = EXTERN;
                 sptr->blklev = 0;
@@ -821,7 +821,7 @@ fixf:
                         node->val.num = *node->val.lp;
 fixint:
                         node->op=CONST;
-                        node->size=2;
+                        node->size = INTSIZE;
                     } else op=LTOI;
                     break;
 #ifdef  DOFLOATS
@@ -938,7 +938,7 @@ register expnode *dptr,*rhs;
     ptr = fold(newnode(TIMES,rhs,ptr,0,rhs->lno,rhs->pnt));
     ptr->sux = (ptr->op == CONST) ? 0 : 2;
     ptr->type = INT;
-    ptr->size = 2;
+    ptr->size = INTSIZE;
 
     return ptr;
 }
@@ -1008,7 +1008,7 @@ err:
     node->val.num = 0;
     node->sux = 0;
     *t = INT;
-    return 2;
+    return INTSIZE;
 }
 
 

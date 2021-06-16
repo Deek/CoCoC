@@ -484,7 +484,7 @@ typedef struct initstruct {
 #define islong(t)   ((t)->type == LONG || (t)->type == ULONG)
 #define isuint(t)   ((t)->type == UNSIGN || (t)->type == UCHAR || (t)->type == ULONG)
 #ifdef DOFLOATS
-#define isfloat(t)  (t->type == FLOAT || t->type == DOUBLE)
+#define isfloat(t)  ((t)->type == FLOAT || (t)->type == DOUBLE)
 #endif
 
 global direct FILE  *in,    /* input file pointer */
