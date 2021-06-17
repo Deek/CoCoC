@@ -1,6 +1,6 @@
 #include "cj.h"
 
-#ifdef ERROR
+#ifdef ERROR	/* work around a header bug on some OS9/6809 installs */
 # undef ERROR
 #endif
 
@@ -8,6 +8,7 @@
 #define        ERROR          '0'
 #define        FATERR         '1'
 #define        ASSLINE        '2'
+#define        WARNLEV        'W'     /* new in dcpp */
 #define        NEWLINO        '5'
 #define        SOURCE         '6'
 #define        NEWFNAME       '7'
@@ -104,6 +105,7 @@ getlin()
                                 continue;
                         case ERROR:
                         case FATERR:
+                        case WARNLEV:
                                 strcpy(temp,line);
                                 if(cgets() == NULL)
                                         return EOF;
@@ -114,10 +116,15 @@ getlin()
                                 if(cgets() == NULL)
                                         return EOF;
                                 if (lno)
-                                        printf("%s:%d: ",filename,lno);
+                                        eprintf("%s:%d: ",filename,lno);
                                 else
-                                        printf("args: ");
-                                printf("*** %s ***\n",line);
+                                        eprintf("args: ");
+                                if (n == WARNLEV)
+                                        eprintf("*** warning: %s ***\n",line);
+                                else {
+                                        ++errcount;
+                                        eprintf("*** %s ***\n",line);
+                                }
                                 if(temp[0]){
                                         eputs(temp);
                                         for(;x;--x)

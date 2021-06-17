@@ -52,12 +52,6 @@ int count;
 }
 
 
-pfile()
-{
-    eprintf("%s:",filename);
-}
-
-
 fatal(errstr)
 char *errstr;
 {
@@ -77,6 +71,13 @@ error(s)
 char s[];
 {
     doerr(symptr-line,s,symline);
+}
+
+
+warn(s)
+char s[];
+{
+    dowarn(symptr-line,s,symline);
 }
 
 
@@ -100,12 +101,28 @@ char *errstr;
 }
 
 
+dowarn(n,wstr,lno)
+register int n;
+char wstr[];
+{
+    eprintf("%s:%d: *** warning: %s ***\n", filename, lno, wstr);
+    if (lno == lineno) {
+        eputs(line);
+        goto dopoint;
+    } else if (lno == lineno - 1) {
+        eputs(lastline);
+dopoint:
+        for ( ; n > 0; --n) eputchar(' ');
+        eputs("^");
+    }
+}
+
+
 doerr(n,errstr,lno)
 register int n;
 char errstr[];
 {
-    pfile();
-    eprintf("%d: *** %s ***\n", lno, errstr);
+    eprintf("%s:%d: *** %s ***\n", filename, lno, errstr);
     if (lno == lineno) {
         eputs(line);
         goto dopoint;
