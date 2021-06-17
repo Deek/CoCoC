@@ -1,5 +1,5 @@
 DCCDIR	= $(HOME)/.dcc
-CFLAGS	= -g -mx32 -fsigned-char -DUNIX -DPTREE -DPROF -DREGCONTS \
+CFLAGS	= -g -mx32 -fsigned-char -DFUNCNAME -DUNIX -DPTREE -DPROF -DREGCONTS \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type -Wno-char-subscripts \

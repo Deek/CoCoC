@@ -96,10 +96,10 @@ int paramreg;
 {
 #ifdef FUNCNAME
     extern direct int fnline;
-#endif
+
+    fprintf(code," ttl %.8s,%.10s,%d\n",name,filename,fnline);
+#else
     fprintf(code," ttl %.8s\n",name);
-#ifdef FUNCNAME
-    printf("%-10.10s %-8.8s %5d\n",filename,name,fnline);
 #endif
     nlabel(name,flag);
 
