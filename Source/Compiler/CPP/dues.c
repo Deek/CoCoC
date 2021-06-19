@@ -246,7 +246,7 @@ doliner()
 }
 
 
-dowarn()
+dowarning()
 {
 	char lin[LINESIZE];
 	char *sptr;
@@ -254,14 +254,13 @@ dowarn()
 	if (process) {
 		skipsp(1);
 		gch(1);
-		strcpy (lin, "warning: ");
-		sptr = lin + strlen(lin);
+		sptr = lin;
 		while (cch && cch != '\n') {
 			*sptr++ = cch;
 			gch(1);
 		}
 		*sptr = '\0';
-		error(lin);
+		warning(lin);
 	}
 }
 
@@ -278,6 +277,6 @@ doerror()
 			gch(1);
 		}
 		*sptr = '\0';
-		fatal(lin);
+		lerror(lin);
 	}
 }

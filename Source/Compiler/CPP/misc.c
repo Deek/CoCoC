@@ -32,6 +32,13 @@ char	s[];
 }
 
 
+warning(s)
+char	*s;
+{
+	doerr(symptr-lbase,s,lineno,WARNLEV);
+}
+
+
 doerr(n, errstr, lno, ertype)
 int		n, lno, ertype;
 char	errstr[];
@@ -47,10 +54,10 @@ char	errstr[];
 
 	if (!aflag) {
 		putesc(ertype, tmp);
-		fprintf(out, "%d\n", lno);
-		fprintf(out, "%d\n%s\n", n, errstr);
-	} else
-		fprintf(out, " fatal line #%d - %s\n", lno, errstr);
+		fprintf(out, "%d\n%d\n%s\n", lno, n, errstr);
+	} else {
+		fprintf(out, "%s line #%d - %s\n", (ertype == WARNLEV) ? "* warning" : " fatal", lno, errstr);
+	}
 }
 
 

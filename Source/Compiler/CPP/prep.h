@@ -53,6 +53,11 @@ extern int errno;
 #define NEWFNAME    '7'     /* new file name */
 #define OLDFNAME	'8'		/* old file name */
 #define PSECT       'P'     /* generate PSECT directive */
+#ifdef DCC
+# define WARNLEV	'W'		/* generate warning (DCC) */
+#else
+# define WARNLEV	ERROR
+#endif
 
 #define HIDER       0x7f    /* a seldom-used ascii value to hide quotes */
 

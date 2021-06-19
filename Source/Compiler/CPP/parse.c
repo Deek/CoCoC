@@ -55,7 +55,7 @@ restart:
 										asmflag = 0;
 									break;
 					case LINE:		doliner(); break;
-					case WARNING:	dowarn(); break;
+					case WARNING:	dowarning(); break;
 					case ERRTOK:	doerror(); break;
 					default:		goto badhash;
 				}
