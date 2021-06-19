@@ -68,6 +68,8 @@ char **argv;
 	/* set default flag values */
 	aflag = lflag = 0;
 
+	out = stdout;	/* make sure output is good */
+
 	/* resident system define name */
 	addmac("OS9","1");			/* target operating system */
 	addmac("_OS9","1");			/* more standard version */
@@ -180,9 +182,7 @@ done: ;
 		}
 	}
 
-	if (!outfname) {
-		out = stdout;	/* make sure output is good */
-	} else if ((out = fopen(outfname,"w")) == NULL) {
+	if (outfname && (out = fopen(outfname,"w")) == NULL) {
 		fprintf(stderr, "can't open output file %s (err=%d)\n", outfname,
 			errno);
 		exit(errno);		/* all hope lost now... */
