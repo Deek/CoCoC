@@ -34,6 +34,7 @@
 static char	badop[]		= "invalid operator in constant expression";
 static char	badtyp[]	= "invalid type for constant expression";
 static char	needexpr[]	= "missing operand";
+static char	div0[]		= "division by zero";
 static long	doit();		/* evaluate constant expressions */
 
 int			gch();		/* snarfs text -- explicitly passed to scan() now */
@@ -296,7 +297,7 @@ long	lhs, rhs;
 			return lhs * rhs;
 	case DIV:
 		if (rhs == 0) {
-			error("division by zero");
+			error(div0);
 			return 0;
 		}
 		if (isunsigned)
@@ -305,7 +306,7 @@ long	lhs, rhs;
 			return lhs / rhs;
 	case MOD:
 		if (rhs == 0) {
-			error("division by zero");
+			error(div0);
 			return 0;
 		}
 		if (isunsigned)
