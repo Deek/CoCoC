@@ -66,18 +66,25 @@ char **argv;
 	register char	*outfname = NULL;
 
 	/* set default flag values */
-	aflag = lflag = kflag = 0;
+	aflag = lflag = 0;
 
 	/* resident system define name */
 	addmac("OS9","1");			/* target operating system */
 	addmac("_OS9","1");			/* more standard version */
+
+#ifdef DCC
+	kflag = 0;
+
+	addmac("__DCC__", "202011L");	/* DCC name and version */
 
 	addmac("mc6809","1");			/* target cpu */
 	addmac("__mc6809__","1");		/* target cpu */
 	addmac("__MC6809__","1");
 
 	addmac("_BIG_END","1");					/* OS9 endian marker */
-/*	addmac("_LIL_END","1");					/* OS9 endian marker */
+#else
+	kflag = 1;
+#endif
 
 	/* the current line macro */
 	(macline = addmac("__LINE__",""))->macdef->md_elem = curlinebuf;
@@ -116,10 +123,13 @@ char **argv;
 						badflag = *argv;
 						goto done;
 					}
+#ifdef DCC
 				case 'K':
 				case 'k':
 					kflag = 1;	/* K&R mode */
+					delmac("__DCC__");
 					break;
+#endif
 				case 'U':
 				case 'u':
 					delmac(p + 1);

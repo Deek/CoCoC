@@ -1,4 +1,4 @@
-CFLAGS	= -g -mx32 -fsigned-char -Dunix -DUNIX \
+CFLAGS	= -g -mx32 -fsigned-char -Dunix -DUNIX -DDCC \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type
