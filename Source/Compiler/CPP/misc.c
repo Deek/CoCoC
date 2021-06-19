@@ -99,11 +99,13 @@ unsigned	size;
 {
 	register char	*p;
 
+#ifdef unix
 	if (size & 1) ++size;			/* a certain OS pukes on odd requests */
+#endif
 #ifdef OSK
 	if ((p = (char*) ebrk(size)) == -1)
 #elif defined(OS9)
-	if ((p = (char*) sbrk(size)) == -1)
+	if ((p = (char*) ibrk(size)) == -1)	/* was sbrk() */
 #else
 	if ((p = (char*) malloc(size)) == NULL)
 #endif

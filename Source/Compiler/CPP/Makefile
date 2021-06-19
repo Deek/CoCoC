@@ -4,7 +4,7 @@ COBJS	= cpp-main.r cpp-misc.r
 DOBJS	= dcpp-main.r dcpp-misc.r
 ODIR    = ...../Source/Compiler/CPP
 IDIR    = ...../Cmds
-LFLAGS  = -e=24 -m=32
+LFLAGS  = -e=24 -m=132
 CFLAGS  = -s -dOS9
 DEPS	= prep.h Makefile
 
