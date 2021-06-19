@@ -62,7 +62,7 @@ eval(void)
 	if (sym == 0) {
 		symptr = pline;	/* gotta make symptr plausible for error()! */
 		error("constant expression expected");
-	} else if (parsexp(&result, &uresult, 0)) {
+	} else if (parsexp(&result, &uresult, 0, FALSE)) {
 		if (sym != 0)
 			error("trailing text after constant expression");
 		else
@@ -75,7 +75,7 @@ eval(void)
 
 
 long
-parsexp(resultp, uresultp, priority)
+parsexp(resultp, uresultp, priority, ignore)
 long	*resultp;		/* -> the result */
 int		*uresultp;		/* -> unsignedness of result */
 int		priority;
@@ -84,7 +84,7 @@ int		priority;
 	int				urhs, ulhs, utert;
 	register short	op, priop, rprec;
 
-	if (!primary(&lhs, &ulhs)) {
+	if (!primary(&lhs, &ulhs, ignore)) {
 		return FALSE;
 	}
 
@@ -95,10 +95,20 @@ int		priority;
 
 		switch (op) {
 		default:
-			if (op < ASSPLUS || op > ASSXOR) {
+def:		if (op < ASSPLUS || op > ASSXOR) {
 				rprec = priop + 1;
 				break;
 			}
+		case DBLAND:
+			if (!lhs)	/* LHS has determined expression must be false */
+				ignore = TRUE;
+
+			goto def;
+		case DBLOR:
+			if (lhs)	/* LHS means expression is true */
+				ignore = TRUE;
+
+			goto def;
 		case ASSIGN:
 			error(badop);	/* no assignment operators allowed! */
 			return FALSE;
@@ -106,12 +116,12 @@ int		priority;
 			;
 		}
 
-		if (parsexp(&rhs, &urhs, rprec)) {
+		if (parsexp(&rhs, &urhs, rprec, ignore)) {
 			if (op == QUERY) {
 				if (need(COLON)) {
 					return FALSE;
 				}
-				if (!parsexp(&tertius, &utert, LEV_3)) {
+				if (!parsexp(&tertius, &utert, LEV_3, ignore)) {
 					error("missing third operand for ?:");
 					return FALSE;
 				}
@@ -153,7 +163,7 @@ chkpost()
 
 
 long
-primary(resultp, uresultp)
+primary(resultp, uresultp, ignore)
 long	*resultp;
 int		*uresultp;
 {
@@ -173,7 +183,7 @@ int		*uresultp;
 		getsym();
 		return FALSE;
 	case NAME:
-		error("warning: undefined name in preprocessor constant expression");
+		if (!ignore) warning("undefined name evaluates as 0");
 		ok = TRUE;	/* sort of... */
 		nodep = 0;
 		getsym();
@@ -192,7 +202,7 @@ int		*uresultp;
 		break;
 	case LPAREN:
 		getsym();
-		if (!parsexp(&nodep, &unodep, LEV_0)) {
+		if (!parsexp(&nodep, &unodep, LEV_0, ignore)) {
 noexp:
 			error(needexpr);
 			nodep = 0;
@@ -205,8 +215,8 @@ noexp:
 	case COMPL:
 		op = sym;
 		getsym();
-		if (primary(&prim, &uprim)) {
-			nodep = doit(op, uprim, prim, 0);
+		if (primary(&prim, &uprim, ignore)) {
+			nodep = doit(op, uprim, prim, 0, ignore);
 			unodep = uprim;
 			ok = TRUE;
 		}
@@ -233,7 +243,7 @@ noexp:
 	case DOT:
 	case ARROW:
 		ok = FALSE;
-		error("invalid operation in preprocessor constant expression");
+		error("invalid operator in conditional expression");
 	}
 	
 	if (ok && chkpost()) {
