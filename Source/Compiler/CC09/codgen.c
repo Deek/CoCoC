@@ -58,7 +58,7 @@ register int arg;
     switch(op) {
         case PUSH:
             fprintf(code," pshs %c\n",regname(rtype));
-            if((sp-=INTSIZE) < maxpush) maxpush=sp;
+            if((sp -= 2) < maxpush) maxpush=sp;
             return;
         case JMPEQ:
             gen(COMPARE,XREG,CONST,arg);
@@ -337,14 +337,14 @@ int *arg;
         case ULEQ:
         case UGT:
         case ULT:       lcall("_lcmpr"); break;
-        case NEG:       lcall("_lneg"); sp-=4; break;
-        case COMPL:     lcall("_lcompl"); sp-=4; break;
-        case ITOL:      lcall("_litol"); sp-=4; break;
-        case UTOL:      lcall("_lutol"); sp-=4; break;
+        case NEG:       lcall("_lneg"); sp -= LONGSIZE; break;
+        case COMPL:     lcall("_lcompl"); sp -= LONGSIZE; break;
+        case ITOL:      lcall("_litol"); sp -= LONGSIZE; break;
+        case UTOL:      lcall("_lutol"); sp -= LONGSIZE; break;
         case INCBEF:
-        case INCAFT:    lcall("_linc"); sp-=4; break;
+        case INCAFT:    lcall("_linc"); sp -= LONGSIZE; break;
         case DECBEF:
-        case DECAFT:    lcall("_ldec"); sp-=4; break;
+        case DECAFT:    lcall("_ldec"); sp -= LONGSIZE; break;
         case LCONST:    getcon(arg,LONGSIZE/2,FALSE); break;
 
         default:
@@ -503,7 +503,7 @@ mwsyscall(s)
 {
     ot(lbsr);
     ol(s);
-    sp += INTSIZE;
+    sp += 2;
 }
 
 
@@ -511,7 +511,7 @@ lcall(s)
 {
     ot(lbsr);
     ol(s);
-    sp += LONGSIZE;
+    sp += 4;
 }
 
 
@@ -589,7 +589,7 @@ register expnode *val;
             break;
         case STACK:
             fprintf(code," %sa ,s+\n %sb ,s+\n",s,s);
-            sp+=INTSIZE;
+            sp += 2;	/* s++, explicitly 2 bytes */
             break;
         default:
             error("compiler trouble");
@@ -689,8 +689,7 @@ dooff:
             }
             break;
         case STACK:
-            os(spind);os("++");
-            sp += 2;
+            os(spind); os("++"); sp += 2;	/* ++, explicitly 2 bytes */
             break;
         default:
             error("dereference");
