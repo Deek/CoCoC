@@ -141,6 +141,7 @@ char **argv;
 					dflag=1;
 					break;
 #endif
+				case 'I':
 				case 'V':
 				case 'v':
 					if (*++p == '=') ++p;
@@ -172,7 +173,7 @@ done: ;
 
 /* get the default library name from environment if no -v given*/
 	if (inclcount == 0) {
-#ifdef OSK
+#ifndef _OS9
 		if (p = getenv("CDEF")) {
 			incl[inclcount++] = p;
 		} else
