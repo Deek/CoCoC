@@ -52,6 +52,7 @@
  *	simple flag-based ones OSK/OS-9000 use today.
  */
 #ifdef __unix__
+# include <unistd.h>
 # include <endian.h>
 # if BYTE_ORDER == BIG_ENDIAN
 #  define _BIG_END 1

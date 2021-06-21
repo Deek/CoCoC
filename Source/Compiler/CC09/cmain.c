@@ -31,13 +31,13 @@ char **argv;
         int tidy();
 
 #ifdef __unix__
-        signal(2,tidy);
+        signal(SIGINT,tidy);
 #else
         intercept(tidy);
 #endif
 
         sdummy.type = INT;
-        sdummy.size = 2;
+        sdummy.size = INTSIZE;
         sdummy.dimptr = NULL;
         sdummy.offset = 0;
         sdummy.storage = EXTDEF;
