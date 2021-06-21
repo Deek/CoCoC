@@ -33,7 +33,7 @@ ldxexp(tree)
 register expnode *tree;
 {
     tranxexp(tree);
-    if (tree->op != XREG) {
+    if (tree->op != XREG || tree->val.num) {
         gen(LOAD,XREG,NODE,tree);
 #ifdef  REGCONTS
         setxreg(tree);
