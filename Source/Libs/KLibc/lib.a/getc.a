@@ -4,6 +4,7 @@
  psect getc_a,0,0,1,0,0
 *** getc(fp)
 *    returns next char from fp or EOF
+fgetc: 
 getc: pshs u
  ldu 4,s fp
  beq eofret1 null fp is error

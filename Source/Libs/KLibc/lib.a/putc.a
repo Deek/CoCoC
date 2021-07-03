@@ -24,6 +24,7 @@
 *            }
 *    stack -> u, ret, ch, fp
 
+fputc: 
 putc: pshs u
  ldu 6,s fp
  ldd _flag,u
