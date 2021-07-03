@@ -210,6 +210,7 @@ skipsp(skflag)
 		switch (c = *lptr) {
 			case '\f':
 			case '\t':
+			case '\v':
 			case ' ':
 				if (skflag) {
 					++lptr;
@@ -255,9 +256,17 @@ _inline()
 		else return *p=0;
 	}
 
+#ifndef _OS9
+	while (c != '\n' && c != '\r' && c != EOF && count-- > 0) {
+#else
 	while (c != '\n' && c != EOF && count-- > 0) {
+#endif
 		if (c == '\\') {
-			if((c = getc(in)) == '\n') {
+#ifndef _OS9
+			if ((c = getc(in)) == '\n' || c == '\r') {
+#else
+			if ((c = getc(in)) == '\n') {
+#endif
 				count++;            /* ..skipped a character */
 				setline(++lineno);  /* ..to a new line */
 			} else {
