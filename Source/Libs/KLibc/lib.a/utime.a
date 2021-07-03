@@ -1,4 +1,4 @@
- psect utime_a,0,0,1,0,0
+ psect utime_a,0,0,2,0,0
 * #include <utime.h>
 
 *
@@ -402,7 +402,7 @@ xx  rmb 26
 * asctime(tmp)
 * struct tm *tmp;
 *    {
-*    sprintf(xx, "%s %s %2d %02d:%02d:%02d 19%02d\n",
+*    sprintf(xx, "%s %s %2d %02d:%02d:%02d %4d\n",
 *       days[tmp->tm_wday], months[tmp->tm_mon - 1], tmp->tm_day,
 *       tmp->tm_hr, tmp->tm_min, tmp->tm_sec, tmp->tm_yr);
 *    return (xx);
@@ -412,6 +412,7 @@ asctime:
  pshs u
  ldu 4,S
  ldd 10,U tm_yr
+ addd #1900
  pshs D
  ldd ,U tm_sec
  pshs D
@@ -512,7 +513,7 @@ months fcc "Jan"
  fcc "Dec"
  fcb $0
 
-datfmt fcc "%s %s %2d %02d:%02d:%02d 19%02d"
+datfmt fcc "%s %s %2d %02d:%02d:%02d %4d"
  fcb $d,0
 
  endsect
