@@ -17,7 +17,9 @@ direct char
 	*defdev;			/* default device name from command line */
 
 static direct char
+#if defined(OSK)
 	*devptr,			/* ptr to dev tbl form sysdevice */
+#endif
 	*pedit = "0",		/* default psect edition */
 	*fname;				/* name of file to pre-process */
 
