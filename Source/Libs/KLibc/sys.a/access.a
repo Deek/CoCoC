@@ -20,6 +20,7 @@ access: ldx 2,s
 access10 lbra _sysret
 
 * mknod(name,mode)
+mkdir: 
 mknod: ldx 2,s
  ldb 5,s
  os9 I$MakDir
