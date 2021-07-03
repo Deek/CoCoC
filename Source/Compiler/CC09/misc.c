@@ -150,11 +150,6 @@ char *msg;
 eputs(s)
 char *s;
 {
-	char *tmp;
-	int i=0, len = strlen(s);
-	for (tmp = s; i < len; tmp++, i++) {
-		if (*tmp == '\t') *tmp = ' ';
-	}
     fputs(s,stderr);
     eputchar('\n');
 }
