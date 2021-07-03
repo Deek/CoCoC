@@ -1,5 +1,5 @@
-CFLAGS  = -s -q
-RDIR    = rels
+CFLAGS  = -s
+RDIR    = RELs
 RFILES1 = swab.r pwcryp.r bsearch.r dirutil.r errmsg.r prgname.r \
           datmods.r utime.r devtyp.r skip.r sets.r pflinit.r
 RFILES2 = fopen.r puts.r gets.r mktemp.r fread.r fwrite.r printf.r
@@ -14,15 +14,18 @@ RFILES7 = atof.r scale.r gs1.r gs2.r ss1.r ss2.r ss3.r
 
 main.l: $(RFILES1) $(RFILES2) $(RFILES3) $(RFILES4) \
         $(RFILES5) $(RFILES6) $(RFILES7)
-   del main.l
-   chd rels; cat $(RFILES1)  >../temp1
-   chd rels; cat pffinit_c $(RFILES2)  scanf_c >../temp2
-   chd rels; cat $(RFILES3)  >../temp3
-   chd rels; cat $(RFILES4)  >../temp4
-   chd rels; cat $(RFILES5)  >../temp5
-   cat temp1 temp2 temp3 temp4 temp5 >temp6
-   del temp1 temp2 temp3 temp4 temp5
-   chd rels; cat l3tol_c ltol3_c qsort_c $(RFILES6)  >../temp7
-   chd rels; cat $(RFILES7)  >../temp8
-   cat temp6 temp7 temp8 >main.l
-   del temp6 temp7 temp8
+   -del main.l
+   cd rels; merge $(RFILES1)  >-../temp1
+   cd rels; merge pffinit_c $(RFILES2)  scanf_c >-../temp2
+   cd rels; merge $(RFILES3)  >-../temp3
+   cd rels; merge $(RFILES4)  >-../temp4
+   cd rels; merge $(RFILES5)  >-../temp5
+   merge temp1 temp2 temp3 temp4 temp5 >-temp6
+   -del temp1 temp2 temp3 temp4 temp5
+   cd rels; merge l3tol_c ltol3_c qsort_c $(RFILES6)  >-../temp7
+   cd rels; merge $(RFILES7)  >-../temp8
+   merge temp6 temp7 temp8 >-main.l
+   -del temp6 temp7 temp8
+
+clean:
+	-:del RELs/*.r temp*
