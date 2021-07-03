@@ -149,7 +149,7 @@
 #   define SS_FClr	0x81	/* set to clear FS2 VIRQ */
 #   define SS_FSet	0xc7	/* set FS2+ VIRQ */
 #   define SS_KSet	0xc8	/* set KQ3 VIRQ */
-#   define SS_FSet	0xc9	/* set to clear KQ3 VIRQ */
+#   define SS_KClr	0xc9	/* set to clear KQ3 VIRQ */
 #   define SS_ARAM	0xca	/* set: allocate contiguous RAM blocks */
 #   define SS_DRAM	0xcb	/* set: deallocate (free) allocated RAM blocks */
 /* SDisk 3 get/set calls */
