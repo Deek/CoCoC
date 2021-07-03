@@ -10,7 +10,7 @@
  psect sleep_a,0,0,2,0,0
 
 f$tps set $25
-F$NMLink set $21
+*F$NMLink set $21
  ifp1
  use /dd/defs/os9defs.a
  endc

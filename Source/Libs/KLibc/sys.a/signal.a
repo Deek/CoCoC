@@ -20,7 +20,7 @@
 
 
 MAXENTS equ 20 maximum number of simultaneous signal traps
-Zero equ %00000100
+*Zero equ %00000100
 
 * table entry structure
 * csect 0

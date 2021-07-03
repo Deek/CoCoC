@@ -1,7 +1,7 @@
  psect setbuf_a,0,0,2,0,0
 
  ifp1
- use /dd/defs/stdio.a
+ use ../defs/stdio.a
  endc
 
 

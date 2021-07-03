@@ -1,5 +1,5 @@
  ifp1
- use /dd/defs/stdio.a
+ use ../defs/stdio.a
  endc
  psect getc_a,0,0,1,0,0
 *** getc(fp)

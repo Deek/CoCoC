@@ -1,7 +1,7 @@
  psect iob_data_a,0,0,1,0,0
 
  ifp1
- use /dd/defs/stdio.a
+ use ../defs/stdio.a
  endc
  vsect
 _iob: fdb 0 _ptr

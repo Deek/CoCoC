@@ -1,6 +1,6 @@
 ********** putc_a **********
  ifp1
- use /dd/defs/stdio.a
+ use ../defs/stdio.a
  endc
  psect putc_a,0,0,1,0,0
 

@@ -1,6 +1,6 @@
 
  ifp1
- use /d0/defs/os9defs.a
+ use /dd/defs/os9defs.a
  endc
 
  psect rpterr_a,0,0,0,0,0

@@ -1,10 +1,10 @@
  ifp1
  use /dd/defs/os9defs.a
  endc
-Carry equ %00000001
-Write. equ 2 write access
-FD.Att equ 0 FD offset to attr
-FD.Own equ 1 FD offset to owner
+*Carry equ %00000001
+*Write. equ 2 write access
+*FD.Att equ 0 FD offset to attr
+*FD.Own equ 1 FD offset to owner
 
 Bufsize equ 16 FD info bytes
 

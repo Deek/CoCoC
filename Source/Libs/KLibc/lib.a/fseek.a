@@ -3,7 +3,7 @@
 *  7/27/86 *01* fix a/b confusion in fseek
 
  ifp1
- use /dd/defs/stdio.a
+ use ../defs/stdio.a
  endc
  psect fseek_a,0,0,1,0,0
 
