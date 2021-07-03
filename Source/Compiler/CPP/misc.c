@@ -32,6 +32,13 @@ char	s[];
 }
 
 
+lwarning(s)
+char	s[];
+{
+	doerr(lptr-lbase,s,lineno,WARNLEV);
+}
+
+
 warning(s)
 char	*s;
 {

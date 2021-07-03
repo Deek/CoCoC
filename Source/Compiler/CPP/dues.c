@@ -104,13 +104,14 @@ int func;
 		if (isalpha(cch) || cch == '_') {
 			getword(name, NAMESIZE);
 			if (func == DEFINE) {
+				skipsp(1);
 				/*
 				 * ANSI allows "redefinition" if it's not really different,
 				 * which will take some hacking...for now, we'll leave it
 				 * alone.
 				 */
 				if (findmac(name)) {
-					lerror("redefined macro");
+					lwarning("redefined macro");
 				} else if (strcmp(name, "defined") == 0) {
 					lerror("can't #define defined");
 				} else {

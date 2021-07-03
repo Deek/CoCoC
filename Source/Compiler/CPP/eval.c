@@ -64,7 +64,7 @@ eval(void)
 		error("constant expression expected");
 	} else if (parsexp(&result, &uresult, 0, FALSE)) {
 		if (sym != 0)
-			error("trailing text after constant expression");
+			warning("trailing text after constant expression");
 		else
 			ok = TRUE;
 	}
