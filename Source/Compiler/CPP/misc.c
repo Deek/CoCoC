@@ -71,6 +71,9 @@ char	errstr[];
 putesc(type, arg, arg1)
 char	*arg, *arg1;
 {
+	if (!arg1) arg1 = "";
+	if (!arg) arg = arg1;
+
 	if (!aflag) {
 		switch (type) {
 		case NEWFNAME:
