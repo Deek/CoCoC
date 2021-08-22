@@ -1,0 +1,19 @@
+
+  ** WINDOW COMMANDS **
+
+Select  window select
+  1b 21 >/Wnumber
+DWSet   device window set
+  1b 20 STY CPX CPY SZX SZY
+  PRN1 PRN2 PRN3
+DWProtSW device window protect
+  1b 36 BSW (0=off,1=on)
+DWEnd   device window end
+  1b 24
+CWArea  change working area
+  1b 25 CPX CPY SZX SZY
+OWSet   overlay window set
+  1b 22 SVS CPX CPY SZX SZY
+  PRN1 PRN2
+OWEnd   overlay window set
+  1b 23

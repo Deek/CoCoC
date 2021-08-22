@@ -1,0 +1,39 @@
+  ** PARAMETERS **
+
+HBX     high order byte of x
+LBX     low order byte of x
+HBY     high order byte of y
+LBY     low order byte of y
+  o is relative offset, ie. LBYo
+HBR     high order byte of radius
+LBR     low order bye of radius
+
+HBL     high order byte of length
+LBL     low order bye of length
+
+HSX     high order byte of size in x direction
+LSX     low order byte of size in x direction
+HSY     high order byte of size in y direction
+LSY     low order byte of size in y direction
+
+HBRx    high order byte of radius in x direction
+LBRx    low order byte of radius in x direction
+
+GRP     buffer group number
+BFN     buffer number
+LCD     logic code number
+PRN     palette register number
+CTN     color table number
+FNM     font number
+CPX     character posistion x
+CPY     character posistion y
+STY     screen type
+SVS     save switch (0=nosave, 1=save)
+SZX     size in x (columns)
+SZY     size in y (rows)
+
+XDR     dimension ratio x
+YDR     dimension ratio y
+BWS     binary switch (0=off, 1=on)
+
+

@@ -1,0 +1,13 @@
+Syntax
+   RDump <relocatable file> [-opts]
+
+Options
+   -a = all information
+   -g = add global definition info
+   -o = add reference and local offset info
+   -r = add reference info
+        
+Description
+   RDump gives information about the relocatable modules in the given
+file.  It is particularly useful for checking the contents of library
+files.

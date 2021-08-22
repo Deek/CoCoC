@@ -1,0 +1,4 @@
+Local references are stored as a 2-byte count, followed by that
+number of references.  Each reference has a 1-byte flag value indicating
+the type of reference, followed by the 2-byte offset where that reference
+is found.

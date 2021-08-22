@@ -1,0 +1,51 @@
+  ** GRAHPICS COMMANDS **
+
+Arc3P   draw 3 point arc
+  1b 52 HBRx LBRx HBRy LBRy HX01 LX01
+  HY01 LY01 HX02 LX02 HY02 LY02
+Bar     draw bar
+  1b 4a HBX LBX HBY LBY
+RBar    relative draw bar
+  1b 4b HBXo LBXo HBYo LBYo
+Box     draw box
+  1b 48 HBX LBX HBY LBY
+RBox    relative draw box
+  1b 49 HBXo LBXo HBYo LBYo
+Circle  draw circle
+  1b 50 HBR LBR
+Ellipse draw ellipse
+  1b 51 HBRx LBRx HBRy LBRy
+FFill   flood fill
+  1b 4f
+Line    draw line
+  1b 44 HBX LBX HBY LBY
+RLine   relative line
+  1b 45 HBXo LBXo HBYo LBYo
+LineM   draw line and move
+  1b 46 HBX LBX HBY LBY
+RLineM  relative draw line, move
+  1b 47 HBXo LBXo HBYo LBYo
+Point   draw point
+  1b 42 HBX LBX HBY LBY
+RPoint  relative draw point
+  1b 43 HBXo LBXo HBYo LBYo
+PutGC   put graphics cursor
+  1b 4e HBX LBX HBY LBY
+SetDPtr set draw pointer
+  1b 40 HBX LBX HBY LBY
+RSetDPtr relative set draw pointer
+  1b 41 HBXo LBXo HBYo LBYo
+GCSet   graphics curset set
+  1b 39 GRP BFN
+PSet    pattern set
+  1b 2e GRP BFN
+ScaleSW scale switch
+  1b 35 BSW (0=off,1=on)
+LSet    logic set
+  1b 2f LCN
+   00= new data to screen
+   01= AND new data to screen
+   02= OR new data to screen
+   03= XOR new data to screen
+
+

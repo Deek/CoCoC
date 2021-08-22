@@ -1,0 +1,80 @@
+*
+* This is an example makefile meant to illustrate some of the
+*  features and capabilities of make.   Comments are liberally
+*  used to help explain what's going on.
+*
+
+*
+* First, we define some macros.
+*
+*  ASM and LINK define command names for the implicit commands below.
+*  AFLAGS and LFLAGS define command line switches.
+*
+ASM = rma     # Comments can be added at the ends of lines, too!
+AFLAGS = 
+LINK = rlink
+LFLAGS = -M=10   # This will give us extra memory in the compiled program.
+
+*
+* Now, we define some implicit commands.
+*  By defining these, we simplify the rest of the makefile.
+*
+* Using so many macros is really overkill.  In normal use, we would
+* simply put:
+* .a.r: ; rma $< -o=$*.r
+* .r:; rlink -M=10 $< -o=$*.r
+*
+*  $< is the name that make comes up with.  For .a.r, $< will just be
+*    the old name with .a suffix instead of .r
+*  $* is the prefix
+*
+.a.r: ; $(ASM) $(AFLAGS) $< -o=$*.r    # Make a .a file into a .r file
+.r:  # just like with normal dependencies, we can put commands on the next line
+   $(LINK) $(LFLAGS) $< -o=$*.r
+
+*
+* We want to only look at files with suffixes .a and .r
+*
+.SUFFIXES:  # Since there are no dependents, this will clear out the old list
+.SUFFIXES: .a .r  # This means that implicit files will only have these exts.
+
+*
+* The first target is the default one.
+*
+* The \ at the end of the line means that the two lines should be
+*  treated as one.
+* Since this target has more than one dependent, the implicit
+*  rules won't generate the correct command line.  So you _must_
+*  specify a command line for this.
+*
+bigprogram: main.r subs1.r subs2.r subs3.r subs4.r subs5.r subs6.r subs7.r \
+    subs8.r subs9.r
+     rlink main.r subs1.r subs2.r subs3.r subs4.r subs5.r subs6.r \
+         subs7.r subs8.r subs9.r -o=bigprogram
+
+*
+* Since no commands are specified, the implicit rules will be invoked
+*  to generate a command line.
+main.r: main.a
+
+*
+* The obvious .a dependent will be used, since there is a .a.r rule
+*
+* For this first one, for instance, $* will be equal to "subs1"
+*  when the implicit command is generated, and $< will be "subs1.a".
+*
+subs1.r:
+subs2.r:
+subs3.r:
+subs4.r:
+subs5.r:
+subs6.r:
+subs7.r:
+subs8.r:
+
+*
+* This one needs special attention, so we specify commands for it.
+*
+subs9.r: oldstuff.c
+    cc oldstuff.c -r
+

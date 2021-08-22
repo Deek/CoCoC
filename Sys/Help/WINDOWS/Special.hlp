@@ -1,0 +1,41 @@
+   **      OS-9 SPECIAL     **
+   ** FUCTIONS & CHARACTERS **
+
+CTRL E or BREAK     Stop program execution
+
+CTRL C or           Stop program output to
+SHIFT BREAK         screen, pushes it to
+                    the backgound, shell on.
+
+CTRL BREAK          End-of-file or ESC
+
+CTRL X or           Delete entire line
+SHIFT 
+
+CTRL W              Temproarily halts output
+                    to the screen
+
+CTRL A              Repeats command line
+
+CTRL D              Redisplays command line
+
+CTRL 0              Upper/lower case lock
+
+CTRL 1      |       Vertical bar
+
+CTRL 7      ^       Caret
+
+CRTL 8      [       Left bracket
+
+CRTL 9      ]       Right bracket
+
+CRTL ,      {       Left brace
+
+CRTL .      }       Right brace
+
+CTRL -      _       Underscore
+
+CTRL /      \       Backslash
+
+CTRL 3      ~       Tilde
+

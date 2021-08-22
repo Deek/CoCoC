@@ -1,0 +1,18 @@
+Syntax
+   RLink [opts] <mainline> [<sub1>{<subn>}] [opts]
+
+Options
+   -o=<path> write linker object output to file specified
+   -n=<name> use <name> as object file name
+   -l=<path> use <path> as a library file
+   -e=<n>    <n> is used as the edition number of the module
+   -M=<size> add <size> additional pages fof memory for data
+   -m        print the linkage map
+   -s        print final addresses assigned to symbols
+   -b=<ept>  link C functions to be callable by BASIC09
+   -t        allow static data to appear in BASIC09 callable module
+
+Description
+   RLink uses the ROF data in the mainline and subroutine modules
+given on the command line to create an OS9 executable module.
+The specified libraries are searched to resolve any references.

@@ -1,0 +1,19 @@
+The header contains the following information:
+
+# bytes   description
+-------   ----------------
+  4       Sync value: 0x62cd2387
+  1       Type value
+  1       Language code
+  1       Non-zero means module is valid.
+  5       Date of assembly yy:mm:dd:hh:mm
+  1       Edition number
+  1       ROF format code.
+  2       Size of uninitialized data
+  2       Size of uninitialized direct page data
+  2       Size of initialized data
+  2       Size of initialized direct page data
+  2       Size of object code
+  2       Stack size
+  2       Entry point
+<16       Module name, null terminated, at most 16 bytes.

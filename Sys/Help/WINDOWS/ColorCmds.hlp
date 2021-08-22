@@ -1,0 +1,13 @@
+
+  ** COLOR COMMANDS **
+
+BColor  background color
+  1b 33 PRN
+Border  border color
+  1b 34 PRN
+FColor  forground color
+  1b 32 PRN
+DefColr default colors
+  1b 30
+Palette change palette
+  1b 31 PRN CTN

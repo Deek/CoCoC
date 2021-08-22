@@ -1,0 +1,169 @@
+SED(1)                      General Commands Manual                     SED(1)
+
+
+
+NAME
+       sed - stream editor
+
+SYNOPSIS
+       sed [ -n ] [ -e script ] [ -f sfile ] [ file ] ...
+
+DESCRIPTION
+       Sed  copies  the  named  files (standard input default) to the standard
+       output, edited according to a script of commands.  The -f option causes
+       the  script  to be taken from file sfile; these options accumulate.  If
+       there is just one -e option and no -f's, the flag -e  may  be  omitted.
+       The -n option suppresses the default output.
+
+       A  script  consists of editing commands, one per line, of the following
+       form:
+
+              [address [, address] ] function [arguments]
+
+       In normal operation sed cyclically copies a line of input into  a  pat-
+       tern  space  (unless  there is something left after a `D' command), ap-
+       plies in sequence all commands  whose  addresses  select  that  pattern
+       space,  and  at  the  end of the script copies the pattern space to the
+       standard output (except under -n) and deletes the pattern space.
+
+       An address is either a decimal number that counts input  lines  cumula-
+       tively  across files, a `$' that addresses the last line of input, or a
+       context address, `/regular expression/', in the style of ed(1) modified
+       thus:
+
+              The  escape sequence `\n' matches a newline embedded in the pat-
+              tern space.
+
+       A command line with no addresses selects every pattern space.
+
+       A command line with one address selects each pattern space that matches
+       the address.
+
+       A  command line with two addresses selects the inclusive range from the
+       first pattern space that matches the first  address  through  the  next
+       pattern  space  that  matches  the second.  (If the second address is a
+       number less than or equal to the line number first selected,  only  one
+       line  is  selected.)  Thereafter the process is repeated, looking again
+       for the first address.
+
+       Editing commands can be applied only to non-selected pattern spaces  by
+       use of the negation function `!' (below).
+
+       In  the  following  list of functions the maximum number of permissible
+       addresses for each function is indicated in parentheses.
+
+       An argument denoted text consists of one or more  lines,  all  but  the
+       last  of  which  end with `\' to hide the newline.  Backslashes in text
+       are treated like backslashes in the replacement string of an  `s'  com-
+       mand,  and  may  be used to protect initial blanks and tabs against the
+       stripping that is done on every script line.
+
+       An argument denoted rfile or wfile must terminate the command line  and
+       must  be  preceded  by exactly one blank.  Each wfile is created before
+       processing begins.  There can be at most 10 distinct wfile arguments.
+
+       a\
+       text
+              Append.  Place text on the output before reading the next  input
+              line.
+
+       b label
+              Branch to the `:' command bearing the label.  If label is empty,
+              branch to the end of the script.
+
+       c\
+       text
+              Change.  Delete the pattern space.  With 0 or 1  address  or  at
+              the  end  of a 2-address range, place text on the output.  Start
+              the next cycle.
+
+       d      Delete the pattern space.  Start the next cycle.
+
+       D      Delete the initial segment of  the  pattern  space  through  the
+              first newline.  Start the next cycle.
+
+       g      Replace the contents of the pattern space by the contents of the
+              hold space.
+
+       G      Append the contents of the hold space to the pattern space.
+
+       h      Replace the contents of the hold space by the  contents  of  the
+              pattern space.
+
+       H      Append the contents of the pattern space to the hold space.
+
+       i\
+       text
+              Insert.  Place text on the standard output.
+
+       n      Copy the pattern space to the standard output.  Replace the pat-
+              tern space with the next line of input.
+
+       N      Append the next line of input to the pattern space with  an  em-
+              bedded newline.  (The current line number changes.)
+
+       p      Print.  Copy the pattern space to the standard output.
+
+       P      Copy  the initial segment of the pattern space through the first
+              newline to the standard output.
+
+       q      Quit.  Branch to the end of the script.  Do not start a new  cy-
+              cle.
+
+       r rfile
+              Read  the  contents  of  rfile.  Place them on the output before
+              reading the next input line.
+
+       s/regular expression/replacement/[flags]
+              Substitute the replacement string for instances of  the  regular
+              expression  in the pattern space.  Any character may be used in-
+              stead of `/'.  For a fuller description  see  ed(1).   Flags  is
+              zero or more of
+
+              g      Global.   Substitute  for all nonoverlapping instances of
+                     the regular expression rather than just the first one.
+
+              p      Print the pattern space if a replacement was made.
+
+              w wfile
+                     Write.  Append the pattern space to wfile if  a  replace-
+                     ment was made.
+
+       t label
+              Test.   Branch  to the `:' command bearing the label if any sub-
+              stitutions have been made since the most recent  reading  of  an
+              input  line or execution of a `t'.  If label is empty, branch to
+              the end of the script.
+
+       w wfile
+              Write.  Append the pattern space to wfile.
+
+       x      Exchange the contents of the pattern and hold spaces.
+
+       y/string1/string2/
+              Transform.  Replace all occurrences  of  characters  in  string1
+              with  the  corresponding  character in string2 .  The lengths of
+              string1 and string2 must be equal.
+
+       ! function
+              Don't.  Apply the function (or group, if function is  `{')  only
+              to lines not selected by the address(es).
+
+       : label
+              This command does nothing; it bears a label for `b' and `t' com-
+              mands to branch to.
+
+       =      Place the current line number on the standard output as a line.
+
+       {      Execute the following commands through a matching `}' only  when
+              the pattern space is selected.
+
+
+       An empty command is ignored.
+
+SEE ALSO
+       ed(1), grep(1), awk(1)
+
+
+
+                                                                        SED(1)

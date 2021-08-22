@@ -1,0 +1,49 @@
+Macros are specified with the general form:
+    <macro> = <definition>
+
+In commands or dependency lines, macros can be referenced by enclosing
+the macro name in parentheses or curly braces, and preceding it by a
+dollar sign.  In the special case where the macro name is a single
+character, the parentheses may be omitted.
+
+          EXAMPLES
+
+The following definition defines the macro OBJS to be a list of object
+files.
+
+OBJS = file1.c file2.c file3.c
+
+To specify that all object files depend on the common header file
+header.h, you could specify this as:
+
+$(OBJS): header.h
+
+
+          SPECIAL MACROS
+
+Several macros have special importance to the operation of make.
+
+ODIR   The ODIR macro determines the directory where make expects
+       to find object files (i.e. files with no extension).  By
+       default, make looks in the current execution directory.
+RDIR   The RDIR macro determines where Make looks for files with a
+       .r suffix.  This is for compatibility with Tandy make.
+       This support is partly hard-coded into Make, and partly
+       defined in the default rules.
+*      The * macro contains the root name (i.e. without suffix)
+       of the current target.  This is usually used with implicit
+       rules (see Rules).
+@      The @ macro contains the full name of the current target.
+?      The ? macro contains a list of all files in the dependency
+       list that were found to be newer than the target.
+<      The < macro contains the name of a dependent that was constructed
+       by applying the implicit rules.
+
+The following macros have importance by being defined as part of the
+internal implicit rules used by make.
+
+CC     The name of the C compiler.  By default it is "cc".
+       Used in .c.r .a.r and .o.r rules.
+CFLAGS The command-line arguments to the C compiler.  Defaults to "-dOS9".
+LINK   The name of the Linker.  Used in the .r rule.  Defaults to "cc"
+LFLAGS The command-line arguments to the linker.  Defaults to none.

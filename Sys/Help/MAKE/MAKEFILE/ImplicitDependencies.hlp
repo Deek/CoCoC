@@ -1,0 +1,33 @@
+When attempting to make a target, make will first attempt to construct
+an implicit dependency for that target.  It does so as follows:
+   Make first removes the suffix from the target name, and appends
+to this "prefix" each suffix in the .SUFFIXES list (see SpecialTargets).
+It accepts a name so constructed as the implicit dependency if there
+is an implicit command matching that combination of suffixes.
+
+The best way to explain implicit commands is by example:
+
+.c.r: ; cc -r $<
+
+This line specifies that a target .r file can be made from a corresponding
+.c file by expanding the command line specified.  $< expands to the
+resultant implicit file.  Let's consider an example makefile:
+
+program:
+program.r:
+
+This makefile specifies two targets with no explicit dependencies, and
+no explicit commands.  The second line is easier to explain.  Make
+takes the prefix "program", and the suffix ".r" and considers every
+suffix in the .SUFFIXES list in turn.  The first one with an
+implicit command defined is ".c.r".  So, make sets $< equal to
+"program.c", and expands the command defined for ".c.r".  This is
+defined similarly to the above in make's default rules as:
+   .c.r: ; $(CC) $(CFLAGS) -r $<
+The first dependency line works similarly, except that the suffix
+is null.  The first matching implicit command is defined as:
+   .r: ; $(LINK) $(LFLAGS) $<
+in the default rules.
+
+Study the examples closely to gain a better understanding of how
+this mechanism works.

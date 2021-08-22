@@ -1,0 +1,3 @@
+The object code section of an ROF module contains the assembled object
+code.  All local references or global labels which refer to code
+are specified as offsets within this section.

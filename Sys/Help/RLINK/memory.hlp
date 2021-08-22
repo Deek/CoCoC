@@ -1,0 +1,35 @@
+  Rlink sets up memory in the following manner.  The names are
+labels defined by rlink in the process of performing the link.
+They can be referred to by the program in order to manage data
+memory and take advantage of any additional memory specified
+on the command line, which will show up in the free space area.
+The register names indicate how the registers are set up by the
+"root.a" mainline module.
+
+High memory:
+   +-------------------------+
+   |  Parameters             |
+   +-------------------------+  <- X
+   |  Stack                  |
+   +-------------------------+  <- SP
+   |  Free memory            |  From use of #m modifier
+   +-------------------------+
+   |  Requested memory       |  Additional memory specified by programmer
+   +-------------------------+  <- U, end
+   |  Uninitialized Data     |
+   +-------------------------+  <- edata
+   |  Initialized Data       |
+   +-------------------------+  <- dpsiz
+   |  Uninitialized DP Data  |
+   +-------------------------+
+   |  Initialized DP Data    |
+   +-------------------------+  <- Y, DP
+Low memory
+
+Note: All DP references should use Direct addressing.  If you use
+indexed addressing to refer to DP variables, then you may run into a
+problem with RMA/RLink.  Specifically, RMA will use an 8-bit offset
+for such a reference if it can, and if the reference ends up in the
+second half of the direct page, the linker will resolve it without
+error, but it will not work correctly due to the fact that
+8-bit offset indexing is signed.

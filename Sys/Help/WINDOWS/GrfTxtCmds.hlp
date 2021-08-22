@@ -1,0 +1,11 @@
+
+  ** GRAHICS TEXT COMMANDS **
+
+BoldSw  bold switch
+  1b 3d BSW (0=off,1=on)
+Font    select font
+  1b 3a GRP BFN
+PropSw  proportional switch
+  1b 3f BSW (0=off,1=on)
+TCharSw transparent characters
+  1b 3c BSW (0=off,1=on)

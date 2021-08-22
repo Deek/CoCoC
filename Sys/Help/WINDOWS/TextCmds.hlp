@@ -1,0 +1,27 @@
+  ** TEXT COMMANDS **
+
+Home                    01
+Move cursor to x,y      02 x y
+Erase current line      03
+Erase to end of line    04
+Cursor off              05 20
+Cursor on               05 21
+Cursor right 1 space    06
+Bell                    07
+Cursor left 1 space     08
+Cursor up 1 line        09
+Cursor down 1 line      0a
+Erase to end of screen  0b
+Erase screen and Home   0c
+Carriage return         0d
+Reverse video on        1f 20
+Reverse video off       1f 21
+Underlining on          1f 22
+Underlining off         1f 23
+Blinking on  (1)        1f 24
+Blinking off (1)        1f 25
+Insert line at cursor   1f 30
+Delete line             1f 31
+
+(1) not on graphics screens
+

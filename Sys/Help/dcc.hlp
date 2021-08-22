@@ -1,0 +1,62 @@
+Name
+	dcc - a compiler for the C programming language
+
+Usage
+	dcc [options] FILE...
+
+Description
+	"dcc" is the compiler executive. It comes with the new C compiler, and is responsible for running the various parts, or "phases", of the compiler to translate C source code into executable programs and libraries. It is compatible with older versions of the compiler executive, but has a different name so that it may be installed alongside them.
+
+	The new compiler produces more efficient code than the old one; your programs should run faster and use somewhat less memory.
+
+	If you have a RAM disk on /R or /R0, or if you have a directory /DD/TMP, dcc will use those locations to store temporary files. Note: dcc tries very hard to clean up its temporary files before exiting, but it is possible that forcefully Killing it may cause temporary files to be left behind. Normal keyboard aborts, however, should never leave stuff behind.
+
+	If you wish to change the default compiler used by the Make utility, edit the file /DD/Sys/Make.default and change the line:
+
+	CC = cc
+
+to instead read:
+
+	CC = dcc
+
+	From that point on, Make will now use dcc to compile C code. Enjoy your faster executables!
+
+General options:
+	-2			Generate code only for (Nitr)OS-9 Level 2
+	-a			Stop after generating initial assembly
+	-c			Include C source and comments in assembly
+	-dSYM[=val]	Define a preprocessor symbol
+	-f=<path>	Output to path
+	-k			Pre-process for maximum K&R compatibility
+	-o			Skip running the optimizer
+	-O			Stop after optimizing assembly code
+	-p			Add profiling code
+	-P			Use special debugging profiler and library
+	-r			Stop after assembly (do not link)
+	-s			Disable stack checking (be careful!)
+	-T[=path]	Use alternate temporary directory
+	-q			Quiet (status to 'c.errors' instead of screen)
+	-V			Show version info
+	-w			Waste the compile (do error checking only)
+	-z			Debug mode (do not actually run commands)
+
+Linker options:
+	-b[=path]	Use an alternate "cstart"
+	-e<#>		Set edition of output module
+	-l=<path>	Link with a library file
+	-lg			Link with cgfx.l	(Graphics library)
+	-ll			Link with lexlib.l	(Lex helper library)
+	-ls			Link with sys.l		(System library)
+	-M			Ask linker for linkage map
+	-m<##[K]>	Add additional memory needs for output module
+	-n=<name>	Set name of output module
+	-S			Ask linker for symbol table
+	-t			Link with clibt.l (Transcendental math library)
+	-x			Use the work directory for the main library
+
+Authors
+	Jeff Teunissen <deek@d2dc.net> is responsible for this program. It is based on the program 'cc' written by Carl Kreider, with additional code written by Pete Lyall, Bill Dickhaus, Eddie Kuns, and Boisy Pitre.
+
+	Jeff Teunissen is also responsible for the C preprocessor (dcpp), compiler (dcc68), and assembly optimizer (dco68). I believe that these programs were originally written by James McCosh, with additional code written by Ken Kaplan, Larry Crane, and James Jones.
+
+	David Breeding is responsible for the assembler (r63) this compiler uses to assemble source code. It is a modified version of the original Relocating Macro Assembler (RMA) distributed by Tandy Corporation.

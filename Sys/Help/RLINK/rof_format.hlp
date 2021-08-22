@@ -1,0 +1,11 @@
+A Relocatable Object File (ROF file) contains one or more ROF modules
+linked together.  Each ROF module contains the following sections:
+
+   Header
+   Global definitions
+   Object code
+   Initialized direct page data
+   Initialized data
+   External references
+   Local references
+   Common Block definitions (only in ROF format 1 or higher)

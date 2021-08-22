@@ -1,0 +1,30 @@
+	Adding a new topic simply consists of putting a text file with some extension (typically ".hlp") into the /DD/Sys/Help directory. Since these are normal text files, they can be edited, printed, and created very easily.
+
+	The ideal set-up is for each entry to be somewhat short.  For complex topics, there should be one main entry, with sub-topics to elaborate on specific points.  Creating sub-topics simply involves creating a directory, and adding the subtopics as files within that directory. To illustrate, we'll show how the help files for the "help" command itself are organized:
+
+	/DD/Sys/Help/help.hlp				Primary help file
+	/DD/Sys/Help/HELP					Directory containing sub-topics
+	/DD/Sys/Help/HELP/pager.hlp			Describes pager operation
+	/DD/Sys/Help/HELP/topic.hlp			Describes topic prompt
+	/DD/Sys/Help/HELP/adding-topics.hlp	This help file
+
+When the topic "hel" is specified at the main "Topic:" prompt,
+the help program does the following:
+ -	searches through /DD/Sys/Help to find a filename starting with "hel",
+	with any extension.
+ -	it finds "help.hlp", and displays it to the screen.
+ -	since the matching file name was "help.hlp", Help strips off the
+	extension and tries to open a directory "help".
+ -	when this succeeds, it sets the current topic, and gives
+	a list of the sub-topics available in /DD/Sys/Help/HELP.
+
+Several notes should clarify how this works:
+
+ -	Every text file MUST have an extension. Any extension is currently
+	recognized as a plain text file (the extension is ignored), but that
+	may not always be the case, so it's recommended to use the extension
+	".hlp"
+ -	Subdirectories must NOT have an extension. For speed, this is how the
+	Help program distinguishes between directories and normal text files.
+ -	Each subtopic directory MUST have a corresponding text file. A
+	subdirectory with no associated text file is ignored.

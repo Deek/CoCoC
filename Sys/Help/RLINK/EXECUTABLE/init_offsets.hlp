@@ -1,0 +1,17 @@
+  References in the data section made to other data or to code cannot
+be resolved at link time, since such references must be absolute,
+and the final memory locations of the code and data areas are not
+known.  For this reason, RLink stores offset information in the
+executable file so that such references can be resolved at run-time
+by the start-up code in root.a or cstart.a.  RLink can pre-compute
+these values as offsets against the beginning of text or beginning
+of data, as appropriate.  So the additional data is simply a list
+of offsets which need to have the beginning of text or beginning
+of data address added to them.
+
+Data-text offsets
+   2-byte count
+   List of data offsets to add the base of text address to.
+Data-data offsets
+   2-byte count
+   List of data offsets to add the base of data address to.

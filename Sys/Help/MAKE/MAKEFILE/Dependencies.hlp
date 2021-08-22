@@ -1,0 +1,24 @@
+Dependency specifications have the form:
+   <target>: <dependents>
+and can be followed by any number of command lines which begin with
+one or more spaces or tabs.  Such commands are referred to as
+"explicit commands".
+
+A dependency specification indicates that the commands should be
+executed if the target is found to be older than any of the
+dependents.
+
+If more than one dependency line is specified for a target, then the
+dependency lists accumulate.  Only one such dependency list may specify
+commands.
+
+If a dependent occurs on a dependency line, then future references
+to that dependent implicitly refer to all of the other dependents on
+that earlier dependency line.  This behavior may be overridden by
+specifying the target as a "double-colon" target, with the form:
+    <target> :: <dependents>
+
+For succinctness, if the dependency list is short, commands may be
+specified on the target line by including a separating semicolon as:
+    <target> : <dependents> ; <commands>
+This is especially useful for defining implicit commands.

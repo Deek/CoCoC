@@ -1,0 +1,11 @@
+  The "Topic" prompt allows you to choose what subject you will get
+more information on.  There are several several special commands
+which can help you:
+
+.      Typing a period, and <ENTER> will give you the list of all topics
+       at the current level.
+?      Question mark/<ENTER> will give you a summary of commands
+       available at the "Topic" prompts.
+ENTER  Pressing <ENTER> on a blank line will return you to the previous
+       "Topic" prompt.  Many help topics have sub-topics, 
+BREAK  Pressing BREAK will exit the help program.

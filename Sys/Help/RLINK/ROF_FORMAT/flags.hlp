@@ -1,0 +1,20 @@
+Each reference in the global definitions, external references, or
+local references section is marked by a 1-byte flag value.  This
+value indicates where the reference is located (whether it is
+a code value, or a pointer from an initialized data section), what
+it refers to (code, initialized DP data, uninitialized DP data,
+initialized data, uninitialized data, or constant), and any other
+special properties of the reference.  All such flags are
+bit-mapped as follows:
+
+bit 7: Reference should be stored relative to the location of the reference
+bit 6: Reference should be negated after use (?)
+bit 5: Reference is located in the code section
+bit 4: If data, the reference is located in the direct page
+bit 3: The reference is only 1 byte long
+bit 2: The reference refers to code
+bit 1: The reference refers to direct-page data
+bit 0: The reference refers to initialized data
+
+As a special case, if both bits 1 and 2 are set, then the reference
+is a constant value.

@@ -1,0 +1,9 @@
+The initialized data section of the executable consists of two
+sub-sections for the DP and non-DP data.  The format is:
+
+bytes description
+----- -----------------------
+ 2    Size of Initialized DP data = N
+ N    Initialized DP data  (copied to beginning of data area)
+ 2    Size of Initialized data = M
+ M    Initialized data (copied to data area starting at "dpsiz")

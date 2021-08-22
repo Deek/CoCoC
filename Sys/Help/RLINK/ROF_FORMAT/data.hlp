@@ -1,0 +1,3 @@
+Each of the two initialized data sections is simply a block of data.
+All references to initialized data are specified as offsets within
+the appropriate block of data.  The sizes are specified in the header.

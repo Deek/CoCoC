@@ -1,0 +1,17 @@
+Syntax
+   Touch [<opts>] {<path> [<opts>]}
+
+Options
+     -c = don't create files     -z = get file names from standard input
+     -q = don't quit on error    -z=<file> get list of file names from <file>
+     -x = search execution directory
+
+Description
+   Touch resets the modification time for each specified file to the
+current time.  This is most useful in conjunction with utilities such
+as make which use the modification time of a file.  Unless options
+specify otherwise, touch will create non-existent files, exit at the
+first file to give an error, and look in the current data directory
+unless a full pathname is given.
+   Touch will ignore files for which it does not have write permission
+without generating an error.

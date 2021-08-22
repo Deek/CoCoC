@@ -1,0 +1,16 @@
+The global definitions section contains a 2-byte count of the number of
+global definitions, followed by a list of the global definitions.
+Each one is in the following format:
+
+   bytes  description
+  ------  ---------------
+    <9    Symbol name.  The name is null-terminated, and no more than
+          nine characters long.
+     1    Type of global definition.
+     2    Value.
+
+The type value is bit-mapped in the lower three bits.
+
+bit 2,1: 11 = constant, 10=code, 01=DP data, 00=non-DP data
+bit 0: Set if this is a reference to initialized data
+

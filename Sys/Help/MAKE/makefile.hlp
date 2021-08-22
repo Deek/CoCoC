@@ -1,0 +1,11 @@
+The simplest makefile looks like the following:
+
+program: program.c
+    cc program.c
+
+The first line specifies that the corresponding commands should be
+executed whenever "program" is older than "program.c".  The
+second line is the commands to be executed to make "program" from
+"program.c".
+
+See one of the topics below for more complete details and examples.

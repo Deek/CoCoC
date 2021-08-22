@@ -1,0 +1,15 @@
+
+  ** BUFFER COMMANDS **
+
+DfnGPBuf  define GET/PUT buffer
+  1b 29 GRP BFN HBL LBL
+GPLoad  GET/PUT buffer load
+  1b 2b GRP BFN STY HSX LSX
+  HSY LSY HBL LBL data...
+KilBuf  kill GET/PUT buffer
+  1b 2a GRP BFN
+GetBlk  get block
+  1b 2c GRP BFN HBX LBX HBY LBY
+  HSX LSX HSY LSY
+PutBlk  put block
+  1B 2D GRP BFN HBX LBX HBY LBY

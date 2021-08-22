@@ -1,0 +1,12 @@
+The "More" prompt responds to several single-key commands:
+
+ENTER    will display the next line of text.
+
+SPACE    will scroll the next screenful of text.
+
+q        will "quit" this display, and return you to the topic prompt
+
+BREAK    is the same as 'q'.
+
+?        will give a brief summary of commands available at this prompt
+

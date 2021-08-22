@@ -1,0 +1,7 @@
+USAGE
+	Help <topic>
+
+DESCRIPTION
+	When invoked with a topic on the command line, Help will find and display the help file for that topic. When run without a command line topic, it will display all top-level topics, and prompt for a topic. If a topic has sub-topics, those will then be listed.
+
+	There are basically two levels of operation.  The "pager" controls screen output, and puts up a "More" prompt at the end of each page.  It responds to several commands to control the display of the data.  The "topic" prompts allow you to choose what information you see.  Typing the first few letters of a word will display the help files for each matching topic.

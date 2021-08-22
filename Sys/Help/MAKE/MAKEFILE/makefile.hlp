@@ -1,0 +1,80 @@
+Makefile
+
+     This is the file containing the dependencies and other information
+used by make.  A typical makefile consists of several distinct types of
+entries:
+
+Comments
+     Comments in a makefile are lines beginning with the sharp character
+(#).  For compatibility with Tandy make, lines beginning with star (*)
+are also treated as comments.
+
+Macros
+     Macros are defined in a makefile by lines of the form:
+              <macroname>  =  <val>
+Macros are specified by preceding the name with a $ character, as
+in $(macro)  or ${macro}.  If the name is a single character, the
+braces are optional.
+     This version of make recognizes the following special macros:
+
+       CC    = name of the C compiler (default: "cc")
+       LINK  = name of the linker (default: "cc")
+       CFLAGS = options to the C compiler (default: "-dOS9 -r")
+       LFLAGS = options to the linker (default: none)
+       ODIR  = directory to find all object files (default: current execution)
+
+Dependencies
+     Dependencies are specified by lines of the form:
+             <targets> : <dependents>
+which specify that the given targets rely on the specified dependents.
+A typical example is an executable file "program" which depends on
+the .r file "program.r".  The .r file "program.r" in turn depends on
+the source file "program.c".  These would be specified by the lines:
+        program: program.r
+        program.r: program.c
+Make will attempt to build a target whenever it is older than any
+of it's dependents.
+     Any dependency specification can be followed by one or more command
+lines.  A command line is specified by having one or more leading spaces
+or tabs.  The command is used to build the target whenever it is out-of-date.
+
+Implicit Commands
+     Whenever a dependency has no commands specified (i.e. it has no
+"explicit" commands), make will attempt to infer a command based on the
+extensions of the target and dependents, using the current dependents
+of ".SUFFIXES", and the current implicit rules (see below).  As an
+example,  the makefile
+
+       program: program.r
+              cc program.r
+       program.r: program.c
+              cc -dOS9 -r program.c
+
+can be more succinctly written as
+
+       program: program.r
+       program.r: program.c
+
+since make will infer the command from the extensions.  If make cannot
+infer a command based on the specified dependents, it will attempt
+to find implicit dependents to generate a command.
+
+Implicit dependents
+     If a command cannot be found by examining the extensions of the
+specified dependents, make will substitute the current extension of
+the target with the suffixes specified by ".SUFFIXES" in turn until
+it finds both a suffix combination with an implicit rule defined, and
+either an existing file or a file specified as a target elsewhere
+in the makefile.  Using this, the above makefile can be specified:
+
+      program:
+      program.r:
+
+Make will infer that program depends on program.r (since it is specified
+as a target) and that program.r depends on program.c (since, supposedly,
+the file program.c exists in the current data directory).  From these
+implicit dependents, make will infer implicit commands as above.
+
+
+Special targets
+     Several special targets give make specific information.

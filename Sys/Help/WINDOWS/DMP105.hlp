@@ -1,0 +1,28 @@
+  ** DMP-105 CTRL CODES **
+
+0a          Executive Line Feed
+0d          Carriage Return (Line Feed)
+0e          End Underline
+0f          Start Underline
+12          Select Graphics Mode
+1b 0e       Start Elongation
+1b 0f       End Elongation
+1b 10 n1 n2 Head posistioning
+1b 13       Standard character size
+1b 14       Condensed character
+1b 15       Set CR=CR
+1b 16       Set CR=CR + LF
+1b 17       Elite character
+1b 1c       Set Half Forward Line Feed
+1b 1f       Start Bold
+1b 20       End Bold
+1b 36       Set Full Forward Line Feed
+1b 38       Set 3/4 Forward Line Feed
+1b 55 00    Select Bidirectional Printing
+1b 55 01    Select Unidirectional Printing
+1b 5a n     n/72" Forward Line Feed (Executive)
+1b 5b n     n/72" Forward Line Feed (no motion)
+1c n1 n2    Repeat Data
+1e          End Graphics Mode
+
+
