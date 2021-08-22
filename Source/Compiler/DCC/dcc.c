@@ -18,10 +18,12 @@
 #include <sys/stat.h>
 #include <string.h>
 
-cleanup ()
+cleanup (cptr)
 {
-	if (childid)
+	if (childid) {
 		kill (childid, 2);
+		wait(cptr);
+	}
 
 	if (newopath) {
 		close (1);
@@ -39,7 +41,7 @@ cleanup ()
 trap (code)
 int code;
 {
-	cleanup ();
+	cleanup (&code);
 	exit (code);
 }
 

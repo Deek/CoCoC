@@ -1,7 +1,7 @@
 #	makefile for 6809 C compiler
 RDIR    =
 ODIR    = ...../Source/Compiler/DCC
-CFLAGS  = -s
+CFLAGS  = -s2
 LFLAGS  = -e1 -n=$(PROG) -ls
 PROG    = dcc
 FILES   = dcc.c
