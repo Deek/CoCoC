@@ -1,2 +1,3 @@
 *.[or]
 !/Lib/*.r
+core
