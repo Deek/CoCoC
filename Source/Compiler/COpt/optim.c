@@ -217,7 +217,7 @@ register instruction *i;
     register instruction *i2;
     action *a;
     instr *ap, *mp;
-    int found,c,fallback = FALSE;
+    char labc, c, found, fallback = FALSE;
 
     i = i->pred;
     for (;;) {
@@ -258,9 +258,16 @@ restart:
             debug("  matching action %p.\n",a);
 #endif
             i = i2;
-            c = 0;
-            for (ap = a->actp; ap; ap = ap->nxtins) {
-                if (i == &ilist) break; /* || i->llist -- i has labels */
+            labc = c = 0;
+            for (ap = a->actp; ap; i = i->pred, ap = ap->nxtins, ++c) {
+                if (i == &ilist) break;
+                if (!labc && i->llist) labc = c; /* has label(s) at pos c */
+                if (labc && labc < c) {
+#ifdef DEBUG
+                    debug("    inside label prevents match.\n");
+#endif
+                    break;
+                }
                 if (ap->mnp && match(i->mnem,ap->mnp) == 0) break;
                 if (ap->opp) {
                     if ((int)ap->opp == 1) {
@@ -272,8 +279,6 @@ restart:
                 debug("    matched: %s %s <=> %s %s\n",i->mnem,i->args,
                                strinst(ap->mnp), strinst(ap->opp));
 #endif
-                i = i->pred;
-                ++c;
             }
             if (ap == NULL) {
                 found = TRUE;
@@ -292,6 +297,7 @@ restart:
 #ifdef DEBUG
         debug("  all matched action %p.\n",a);
 #endif
+
         /* all matched - replace */
 		i = i2;
 		for (ap = a->repp, mp = a->actp; ap; ap = ap->nxtins,mp = mp->nxtins) {
@@ -327,14 +333,16 @@ restart:
             i = i->pred;
             --c;
         }
-		/* FIXME: may need to dig until we get to &ilist */
-        while (c > 0) {
-            if (i->llist) movlab(i,i2); // move any labels in i to i2
-            i2 = i->pred;
-            remins(i);
+
+        /*
+         * delete the instructions we don't need any more, moving any labels
+         * we find to the new first instruction
+         */
+        for (i2 = i, i = i->succ; c; --c) {
+            if (i2->llist) movlab(i2,i);
+            i2 = i2->pred;
+            remins(i2->succ);
             ++opsdone;
-            i = i2;
-            --c;
         }
         return;
     }
