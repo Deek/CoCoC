@@ -42,7 +42,7 @@ static char *
 mcpy (dp, pp, source)
 char *dp, *pp, *source;
 {
-	register char *sp;
+	register char *sp = source;
 	int skip, count;
 
 	skip = count = 0;
