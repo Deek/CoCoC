@@ -814,6 +814,7 @@ qstr()
 #ifdef  SPLIT
         putc('s',sfile);
 #endif
+fillstr:
         while(cc!='"') {
                 if ((lptr-line)==0) {
                         error("unterminated string");
@@ -827,6 +828,16 @@ qstr()
                         getch();
                 }
         }
+
+        getch();
+
+        /* catch strings bumping against each other by concatenating */
+        blanks();
+        if (cc == '"') { /* got another string, keep grabbing */
+                getch();
+                goto fillstr;
+        }
+
 #ifdef  SPLIT
         putc('\0',sfile);
         ++stringlen;
@@ -835,8 +846,6 @@ qstr()
         putc('\n',sfile);
         scount = 0;
 #endif
-        getch();
-
 }
 
 
