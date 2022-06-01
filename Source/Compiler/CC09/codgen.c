@@ -121,7 +121,7 @@ register int arg;
             nl();
             return;
         case CTOI:      ol("sex");return;
-        case UTOI:      ol("clra");return;
+        case UTOI:      ol(clra);return;
         case LTOI:      ot("ld"); doref('d',rtype,arg,2); return;
         case IDOUBLE:   ol("aslb\n rola"); return;
         case HALVE:     ol("asra\n rorb"); return;
@@ -152,18 +152,21 @@ dooff:
     }
 
     reg=regname(rtype);
-    if (arg==NODE) {
-        if (val->op==CTOI || val->op==UTOI) {
-            gen(op,DREG,NODE,val->left);
-            if (val->op==UTOI)
-                ol("clra");
-            else switch (op) {
+    if (arg == NODE) {
+        if (val->op == UTOI) { /* uchar, clear A and then get value */
+            ol (clra);
+            gen (op, DREG, NODE, val->left);
+            val->op = DREG;
+            return;
+        } else if (val->op == CTOI) { /* signed char, get int value */
+            gen (op, DREG, NODE, val->left);
+            switch (op) {
                 case LOAD: ol("sex");break;
                 case RSUB:
                 case PLUS: ol("adca #0");break;
                 case MINUS:ol("sbca #0");break;
             }
-            val->op=DREG;
+            val->op = DREG;
             return;
         }
 
