@@ -1,0 +1,30 @@
+*
+* Make pointers within initial memory allocation
+*
+ use /dd/defs/os9defs.a
+ psect ibrk,0,0,6,0,0
+
+* ibrk(size)   get memory within data allocation
+ibrk: ldd 2,s get the size required
+ addd _mtop,y add in the current top
+ bcs ibrk20 if it wraps round - error
+ cmpd _stbot,y overlap stack?
+ bhs ibrk20 yes - error
+ pshs d no - save top
+ ldx _mtop,y reset to bottom
+
+ clra
+sbloop cmpx 0,s reached the end?
+ bhs ibrk10 yes - done
+ sta ,x+ no - clear and bump
+ bra sbloop
+
+ibrk10 ldd _mtop,y return value
+ puls x restore new top
+ stx _mtop,y and save for next time
+ rts
+
+ibrk20 ldb #$ED E$NoRAM memory full
+ lbra _os9err
+
+ endsect

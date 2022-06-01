@@ -1,0 +1,23 @@
+*
+* Adjust memory allocation
+*
+ use /dd/defs/os9defs.a
+ psect brk,0,0,6,0,0
+
+*   brk(pnt)  set memory size to pnt, allocating or deallocating
+brk:
+unbrk: ldd 2,s get new end
+ pshs y
+ os9 F$Mem set new end
+ bcc _2
+ puls y
+ lbra _os9err
+
+_2 tfr y,d copy new top
+ puls y recover base
+ std memend,y
+ subd 2,s subtract what we asked for
+ std _spare,y save the difference
+ rts
+
+ endsect
