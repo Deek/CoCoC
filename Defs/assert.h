@@ -1,8 +1,10 @@
-#ifndef _ASSERT_H_
-#define _ASSERT_H_
+#undef assert	/* ensure it's not defined */
 #ifndef NDEBUG
-# define assert(ex) {if(!(ex)){fprintf(stderr,"Assertion 'ex' failed: file %s, line %d\n", __FILE__, __LINE__);abort();}}
+# if defined(__STDC__) || defined(__DCC__)
+#  define assert(ex) {if(!(ex)){fprintf(stderr,"%s:%d: Assertion '%s' failed\n", __FILE__, __LINE__, #ex);abort();}}
+# else
+#  define assert(ex) {if(!(ex)){fprintf(stderr,"%s:%d: Assertion 'ex' failed\n", __FILE__, __LINE__);abort();}}
+# endif
 #else
-# define assert(ex) ;
+# define assert(ex) (0)
 #endif
-#endif	/* _ASSERT_H_ */
