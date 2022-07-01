@@ -148,6 +148,7 @@
 #define I_CLOSE		0x8f	/* I$Close:	Close Path */
 #define I_CREATE	0x83	/* I$Create:Create New File */
 #define I_DELETE	0x87	/* I$Delete:Delete File */
+#define I_DELETX	0x90	/* I$DeletX:Delete from current exec dir */
 #define I_DETACH	0x81	/* I$Detach:Detach I/O Device */
 #define I_DUP		0x82	/* I$Dup:	Duplicate Path */
 #define I_GETSTT	0x8d	/* I$GetStt:Get Path Status */
@@ -160,7 +161,6 @@
 #define I_WRITE		0x8a	/* I$Write:	Write Data */
 #define I_WRITLN	0x8c	/* I$WritLn:Write Line of ASCII Data */
 #if defined(_OS9) && (defined (_COCO_) || defined (_NITROS9))
-# define I_DELETX	0x90	/* I$DeletX:Delete from current exec dir */
 # if defined (_NITROS9) && defined (_EOU)
 #  define I_MODDSC	0x91	/* I$ModDsc:Modify a device descriptor */
 # endif
