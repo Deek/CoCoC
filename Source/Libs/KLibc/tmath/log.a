@@ -14,6 +14,7 @@ exp:
  lbsr _exp
  lbra _mret
 
+exp10:
 antilg:
  lbsr _dprep
  lbsr ANTILG
