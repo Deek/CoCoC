@@ -1,6 +1,6 @@
 RDIR	= rels
 RFILES1 = abort.r signal.r chown.r chmod.r stat.r access.r create.r
-RFILES2 = open.r read.r write.r lseek.r misc.r mod.r dir.r mem.r brk.r ibrk.r sbrk.r
+RFILES2 = open.r read.r write.r lseek.r misc.r mod.r dir.r brk.r ibrk.r sbrk.r mem.r
 RFILES3 = time.r process.r id.r intercept.r syscall.r syscommon.r
 RFILES4 = cfinish.r profdummy.r tidyup.r
 
