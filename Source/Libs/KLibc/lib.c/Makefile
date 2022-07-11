@@ -14,3 +14,9 @@ dbg.l: $(DFILES) /dd/defs/dbg.h
 
 clean:
 	-del cstuff.l dbg.l RELs/*.r
+
+.c.r:
+	-del $(RDIR/)asm.tmp
+	$(CC) $(CFLAGS) -Of=$(RDIR/)asm.tmp $<
+	$(RMA) $(RFLAGS) -o=$(RDIR/)$@ $(RDIR/)asm.tmp
+	-del $(RDIR/)asm.tmp

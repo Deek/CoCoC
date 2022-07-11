@@ -4,6 +4,18 @@
 # include <ansi.h>
 #endif
 
+typedef double float_t;
+typedef double double_t;
+
+/* Same as in <float.h> */
+#ifndef FLT_EVAL_METHOD
+# define FLT_EVAL_METHOD	1	/* operations and constants evaluate as double */
+#endif
+
+/* These may change if we can use 'undefined' numbers */
+#define HUGE_VAL	1.7014118346046923e+38
+#define HUGE_VALF	1.7014117331926443e+38
+
 /* Useful math constants */
 #define M_E			2.7182818284590452	/* e */
 #define M_LOG2E		1.4426950408889634	/* log base 2 of e */
@@ -81,5 +93,14 @@ double tanh _OP((double x));
 double asinh _OP((double x));
 double acosh _OP((double x));
 double atanh _OP((double x));
+
+/* convert X into fraction and inegral components */
+double frexp _OP((double x, int *exp));
+
+/* Multiply X by integral power of 2 */
+double ldexp _OP((double x, int exp));
+
+/* Multiply X by integral power of radix */
+double scalbn _OP((double x, int exp));
 
 #endif /* _MATH_H_ */
