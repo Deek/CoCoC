@@ -5,16 +5,17 @@ CFLAGS	= -g -mx32 -fsigned-char -DFUNCNAME -DUNIX -DPTREE -DPROF -DREGCONTS \
 	-Wno-return-type -Wno-char-subscripts \
 	-DCKEYSFILE=\"$(DCCDIR)/ckeys\"
 
-LDFLAGS = -mx32
+LDFLAGS = -mx32 -lm
 
 BINARY	= dcc68
 CKEYS	= ckeys
 OBJS	= bool.o build.o cmain.o codgen.o declare.o floats.o get.o inits.o \
 	lex.o local.o longs.o misc.o optim.o prtree.o regscont.o stats.o tb.o \
-	tranexp.o fltconv.o
+	tranexp.o fltconv.o \
+	scale.c
 
 $(BINARY):	$(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o $@
+	$(CC) -o $@ $(OBJS) $(LDFLAGS) 
 
 .PHONY: clean install uninstall
 

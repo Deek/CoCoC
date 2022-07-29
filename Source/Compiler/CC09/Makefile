@@ -7,7 +7,7 @@ LFLAGS  = -M=8 -e=13 -l=/dd/lib/sys.l -l=/dd/lib/clib.l
 PROG    = dcc68
 FILES   = cmain.r misc.r build.r optim.r stats.r longs.r floats.r\
         inits.r get.r codgen.r local.r lex.r tranexp.r regscont.r\
-        declare.r bool.r #printf.r
+        declare.r bool.r scale.r #printf.r
 
 $(PROG): $(FILES)
     chd $(RDIR); rlink /dd/lib/cstart.r $(FILES) $(LFLAGS) -n=$(PROG) -o=$(ODIR/)$(PROG)
