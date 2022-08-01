@@ -1,5 +1,5 @@
- psect utime_a,0,0,2,0,0
-* #include <utime.h>
+ psect utime_a,0,0,3,0,0
+* #include <time.h>
 
 *
 * struct tm {
@@ -242,11 +242,12 @@ u2otime:
  ldx 4,S *otime
  leax 6,X get to end
  lda #6 byte to copy
-u2o1 ldb ,U+ dummy
- ldb ,U+ get data
+u2o1 ldb 1,U get data
  stb ,-X stash away
+ leau 2,U skip ahead
  deca
  bne u2o1
+ inc 1,x increment the month
  puls U,PC
  pag
 * /*page*/
