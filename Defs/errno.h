@@ -80,13 +80,14 @@ extern int errno;
 #define EBUSY	E_DEVBSY	/* "Device or resource busy" */
 #define ECHILD	E_NOCHLD	/* "No child process" */
 #define EDEADLK	E_DEADLK	/* "Resource deadlock avoided" */
+#define EDOM	EILLARG		/* "Domain error" */
 #define EEXIST	E_CEF		/* "File exists" */
 #define EFAULT	E_BPADDR	/* "Bad address" */
 #define EIO		E_READ		/* "I/O error" */
 #define ENOENT	E_PNNF		/* "No such file or directory" */
 #define ENOEXEC	E_BMID		/* "Exec format error" */
 #define ENOMEDIUM E_SEEK	/* "No medium found" */
-#define ENOMEM	E_NORAM		/* "Not enough space/cannot allocate memory" */
+#define ENOMEM	E_MEMFUL	/* "Not enough space/cannot allocate memory" */
 #define ENOSPC	E_FULL		/* "No space left on device" */
 #define ENOSYS	E_UNKSVC	/* "Function not implemented" */
 #define ENOTSUP	E_UNKSVC	/* "Operation not supported" */
