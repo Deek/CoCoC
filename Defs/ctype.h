@@ -1,3 +1,6 @@
+#ifndef _CTYPE_H_
+#define _CTYPE_H_
+
 extern  char    _chcodes[];      /* in chcodes.r */
 
 #define _CONTROL       0x01
@@ -23,3 +26,5 @@ extern  char    _chcodes[];      /* in chcodes.r */
 #define _toupper(c)     ((c)&0xdf)
 #define _tolower(c)     ((c)|0x20)
 #define toascii(c)      ((c)&0x7f)
+
+#endif /* _CTYPE_H_ */

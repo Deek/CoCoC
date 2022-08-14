@@ -8,47 +8,18 @@
 	unsigned types (K&R C only has one, "unsigned"). Unfortunately, there
 	isn't much we can do about that short of a new type system (someday...)
 */
-
-typedef char		int8_t;
-typedef short		int16_t;
-typedef long		int32_t;
-typedef unsigned	uint16_t;
-
-#if 0
-/*
-	Fastest minimum width integer types
-*/
-typedef int			int_fast8_t;
-typedef int			int_fast16_t;
-typedef long		int_fast32_t;
-typedef unsigned	uint_fast8_t;
-typedef unsigned	uint_fast16_t;
-
-/*
-	Minimum width integer types
-*/
-typedef char		int_least8_t;
-typedef int			int_least16_t;
-typedef long		int_least32_t;
-typedef unsigned	uint_least8_t;
-typedef unsigned	uint_least16_t;
-
-#define	UINT_FAST16_MAX	UINT16_MAX
-#define	UINT_LEAST8_MAX	UINT16_MAX
-#define	UINT_LEAST16_MAX UINT16_MAX
-
-#define	INT_FAST8_MIN	INT16_MIN
-#define	INT_FAST16_MIN	INT16_MIN
-#define	INT_FAST32_MIN	INT32_MIN
-
-#define	INT_FAST8_MAX	INT16_MAX
-#define	INT_FAST16_MAX	INT16_MAX
-#define	INT_FAST32_MAX	INT32_MAX
-
-#define	INT_LEAST16_MAX	(INT16_MAX)
-#define	INT_LEAST16_MIN	(INT16_MIN)
-#define	INT_LEAST8_MAX	(INT8_MAX)
-#define	INT_LEAST8_MIN	(INT8_MIN)
+#if defined(__STDC__) || defined(__DCC__)
+typedef signed char		int8_t;
+typedef signed int		int16_t;
+typedef signed long		int32_t;
+typedef unsigned char	uint8_t;
+typedef unsigned int	uint16_t;
+typedef unsigned long	uint32_t;
+#else
+typedef char			int8_t;
+typedef short int		int16_t;
+typedef long			int32_t;
+typedef unsigned int	uint16_t;
 #endif
 
 /*
@@ -61,7 +32,11 @@ typedef unsigned	uintptr_t;
 	Maximum sized integer types
 */
 typedef long		intmax_t;
+#if defined(__STDC__) || defined(__DCC__)
+typedef unsigned long	uintmax_t;
+#else
 typedef unsigned	uintmax_t;
+#endif
 
 /*
 	Macros for integral type limits
@@ -74,7 +49,11 @@ typedef unsigned	uintmax_t;
 #define	INT16_MAX		(32767)
 #define	INT32_MAX		(2147483647L)
 
+#define	UINT8_MAX		(255)
 #define	UINT16_MAX		(65535)
+#if defined(__STDC__) || defined(__DCC__)
+#define	UINT32_MAX		(4294967295L)
+#endif
 
 /*
 	Macros for dealing with integers

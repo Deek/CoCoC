@@ -13,17 +13,16 @@ typedef int			ssize_t;
 /* maximum number of open files */
 #define _NFILE	16
 
-typedef struct _iobuf {
-	char	*_ptr,		/* buffer pointer */
-			*_base,		/* buffer base address */
-			*_end;		/* buffer end address */
+#define FILE	struct _iobuf
+extern struct _iobuf {
+	char	*_ptr;		/* buffer pointer */
+	char	*_base;		/* buffer base address */
+	char	*_end;		/* buffer end address */
 	int		_flag;		/* file status */
 	int		_fd;		/* file path number */
 	char	_save;		/* for 'ungetc' when unbuffered */
 	int		_bufsiz;	/* size of data buffer */
-} FILE;
-
-extern FILE _iob[_NFILE];
+} _iob[_NFILE];
 
 #define _READ		0x01
 #define _WRITE		0x02
@@ -39,7 +38,9 @@ extern FILE _iob[_NFILE];
 
 #define EOF		(-1)
 #define EOL		'\n'	/* ASCII 13 CR */
-#define NULL	0
+#ifndef NULL
+# define NULL	0
+#endif
 
 #define stdin	(&_iob[0])
 #define stdout	(&_iob[1])
@@ -58,7 +59,6 @@ extern FILE _iob[_NFILE];
 #define _IOMYBUF	_BIGBUF	/* stream has a user buffer */
 #define _IOEOF		_EOF	/* stream has EOF condition */
 #define _IOERR		_ERR	/* stream has an error */
-#define _IOSTRG		_SCF
 
 #define STDIN_FILENO	(0)
 #define STDOUT_FILENO	(1)
@@ -129,6 +129,8 @@ _VOID rewind _OP((FILE *stream));
 #define clearerr(p)	((p)->_flag&=~(_ERR|_EOF))
 #define feof(p)		((p)->_flag&_EOF)
 #define ferror(p)	((p)->_flag&_ERR)
+
+_VOID perror _OP((const char *s));
 
 #define fileno(p)	((p)->_fd)
 

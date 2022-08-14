@@ -8,7 +8,10 @@
 /*
  *	clock_t is a C standard representing a count of clock ticks.
  */
+#ifndef _CLOCK_T_
+# define _CLOCK_T_
 typedef unsigned clock_t;
+#endif
 
 /*
  *	time_t is a C standard, but C doesn't require any particular
@@ -50,7 +53,6 @@ clock_t _stps _OP((void));
 #  define __NIMPL__(__FUNCNAME__) (0=#__FUNCNAME__ "() missing")
 # endif
 # define gmtime(t) __NIMPL__(gmtime)
-# define mktime(t) __NIMPL__(mktime)
 # define strftime(d,m,f,t) __NIMPL__(strftime)
 # define strptime(b,f,t)   __NIMPL__(strptime)
 #endif	/* MISSING_CHECK */
@@ -114,9 +116,13 @@ char *asctime _OP((const struct tm *tp));
 
 /* Equivalent to asctime (localtime (timep)) */
 char *ctime _OP((const time_t *timep));
+# define ctime(t) asctime(localtime((t)))
 
 /* Converts a setime/getime buffer to 'time_t' */
 time_t o2utime _OP((struct sgtbuf *));
+
+/* Converts a 'struct tm' to 'time_t' */
+time_t mktime _OP((struct tm *));
 
 /* Converts a C broken-down time to OS-9 setime/getime format */
 _VOID u2otime _OP((struct sgtbuf *, struct tm *));
