@@ -8,6 +8,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 
 #define	CBRA	1
@@ -59,8 +60,6 @@ char	bittab[] = {
 main(argc, argv)
 char **argv;
 {
-	pflinit();
-
 	while (--argc > 0 && (++argv)[0][0]=='-')
 		switch (argv[0][1]) {
 
@@ -142,6 +141,10 @@ out:
 		execute(*argv);
 	}
 	exit(nsucc == 0);
+
+#ifdef _OS9
+	pflinit();
+#endif
 }
 
 compile(astr)

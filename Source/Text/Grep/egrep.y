@@ -14,6 +14,8 @@
 
 %{
 #include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
 #define MAXLIN 350
 #define MAXPOS 4000
@@ -60,7 +62,7 @@ long	tln;
 int	nsucc;
 
 int	f;
-int	fname;
+char	*fname;
 %}
 
 %%
@@ -419,8 +421,6 @@ follow(v) int v; {
 main(argc, argv)
 char **argv;
 {
-	pflinit();
-
 	while (--argc > 0 && (++argv)[0][0]=='-')
 		switch (argv[0][1]) {
 
@@ -492,6 +492,10 @@ out:
 		argv++;
 	}
 	exit(nsucc == 0);
+
+#ifdef _OS9
+	pflinit();
+#endif
 }
 
 execute(file)
@@ -504,11 +508,7 @@ char *file;
 	char *nlp;
 	int istat;
 	if (file) {
-#ifdef _OS9
-		if ((f = open(file, _READ)) < 0) {
-#else
 		if ((f = open(file, O_RDONLY)) < 0) {
-#endif
 			fprintf(stderr, "egrep: can't open %s\n", file);
 			exit(2);
 		}

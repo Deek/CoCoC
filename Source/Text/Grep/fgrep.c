@@ -8,6 +8,8 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
 #ifdef _OS9
 # define BLOCKSIZE 256
@@ -40,8 +42,6 @@ char	*argptr;
 main(argc, argv)
 char **argv;
 {
-	pflinit();
-
 	while (--argc > 0 && (++argv)[0][0]=='-')
 		switch (argv[0][1]) {
 
@@ -116,6 +116,10 @@ out:
 		argv++;
 	}
 	exit(nsucc == 0);
+
+#ifdef _OS9
+	pflinit();
+#endif
 }
 
 execute(file)
@@ -129,11 +133,7 @@ char *file;
 	int failed, ecnt;
 	char *nlp;
 	if (file) {
-#ifdef _OS9
-		if ((f = open(file, _READ)) < 0) {
-#else
 		if ((f = open(file, O_RDONLY)) < 0) {
-#endif
 			fprintf(stderr, "fgrep: can't open %s\n", file);
 			exit(2);
 		}
