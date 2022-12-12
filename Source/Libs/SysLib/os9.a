@@ -1,0 +1,7 @@
+ psect os9,0,0,0,0,os9
+
+os9
+ use os9.p
+ ends * converted def files end without ends
+
+ ends

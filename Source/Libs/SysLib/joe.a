@@ -1,0 +1,5 @@
+ psect joe,0,0,0,0,joe
+Level set 2
+
+ use /DD/Defs/os9defs.a
+ ends

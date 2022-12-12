@@ -1,0 +1,10 @@
+ psect scf,0,0,0,0,scf
+
+scf
+ use nopublic.a
+ ends
+
+ use scf.p
+ ends
+
+ ends

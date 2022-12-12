@@ -1,0 +1,10 @@
+ psect rbf,0,0,0,0,rbf
+
+rbf
+ use nopublic.a
+ ends
+
+ use rbf.p
+ ends
+
+ ends

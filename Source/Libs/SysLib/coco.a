@@ -1,0 +1,10 @@
+ psect coco,0,0,0,0,coco
+
+coco
+ use nopublic.a
+ ends
+
+ use coco.p
+ ends
+
+ ends
