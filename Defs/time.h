@@ -5,6 +5,10 @@
 # include <ansi.h>
 #endif
 
+#ifndef NULL
+# define NULL	0
+#endif
+
 /*
  *	clock_t is a C standard representing a count of clock ticks.
  */
