@@ -1,6 +1,7 @@
 Cmds/* binary
 Defs/** filter=crtext
-Lib/* binary
+Lib/*.patterns filter=crtext
+Lib/*.[rl] binary
 Sys/** filter=crtext
 
 *.ipc binary
@@ -13,6 +14,7 @@ Sys/** filter=crtext
 *.lsp filter=crtext
 *.man filter=crtext
 *.patterns filter=crtext
+*.sed filter=crtext
 *.txt filter=crtext
 *.README filter=crtext
 comp.* filter=crtext
@@ -21,5 +23,6 @@ Source/**/[Mm]ake* filter=crtext
 Source/**/yacc* filter=crtext
 
 COPYING	filter=crtext
+README filter=crtext
 README.* filter=crtext
 MANUAL filter=crtext

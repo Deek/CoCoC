@@ -1,6 +1,7 @@
 *.[or]
 !/Lib/*.r
 core
+Source/Text/Grep/egrep.c
 Source/Libs/KLibc/clib.l
 Source/Libs/KLibc/clibt.l
 Source/Libs/KLibc/fmath/cfloats.l
