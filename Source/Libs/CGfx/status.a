@@ -116,6 +116,18 @@ noerr2 clra
  clrb
  rts
 
+* _ss_gip2 (path, options)
+_ss_gip2:
+ ldx 4,s
+ lda 3,s
+ ldb #$99
+ pshs y,u
+ ldy #0
+ ldu #0
+ os9 I$SetStt
+ puls u,y
+ bra os9err1
+
 _ss_dfpl:
  ldx 4,s
  lda 3,s
