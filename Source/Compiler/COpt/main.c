@@ -135,7 +135,7 @@ optimise()
     while (fgets(line,LINESIZE,in) != NULL) {
         {
             register char *lp = line;
-            while (*lp != '\n') ++lp;
+            while (*lp && *lp != '\n') ++lp;
             *lp = '\0';
         }
         ++inlcnt;
