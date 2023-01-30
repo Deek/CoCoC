@@ -10,7 +10,11 @@
 #include "cj.h"
 #define  MPOINT 1
 
-#define MAXREG  1
+#ifdef USE_YREG
+# define MAXREG	1	// maybe 2
+#else
+# define MAXREG	1
+#endif
 
 /**********************************
  *                                *
@@ -322,7 +326,11 @@ chkreg(sclass,type)
                 case INT:
                 case UNSIGN:
                     /* he can have one! */
+#ifdef USE_YREG
                     return ++reguse == 1 ? UREG : YREG;
+#else
+                    ++reguse; return UREG;
+#endif
             }
         /* otherwise make it auto - this is only called
          * inside a function or its argument declaration
@@ -383,7 +391,9 @@ symnode *fptr;
             default:
                 switch (p1->storage) {
                     case UREG:
+#ifdef USE_YREG
                     case YREG:
+#endif
 # ifdef PROF
                         startfunc(cp,(sclass != STATIC),p1->storage,prlab);
 # else
@@ -448,7 +458,9 @@ symnode *fptr;
         }
         switch (stemp = p1->storage) {
             case UREG:
+#ifdef USE_YREG
             case YREG:
+#endif
                 gen(stemp,offset-sp);
                 break;
             case ARG:
@@ -958,8 +970,10 @@ symnode **list;
         }
 
         switch (this->storage) {
-            case UREG:
-            case YREG: --reguse;
+#ifdef USE_YREG
+            case YREG:
+#endif
+            case UREG: --reguse;
         }
 
         pp = (symnode **) this->downptr;

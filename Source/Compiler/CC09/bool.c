@@ -126,7 +126,9 @@ labstruc *tlab,*flab;
                 rhs->op = DREG;
 #endif
             case XREG:
+#ifdef USE_YREG
             case YREG:
+#endif
             case UREG:
             case DREG:
 ok:
@@ -244,7 +246,9 @@ register expnode *node;
         case ASSOR:
         case ASSXOR:
             if(!isreg(node->left->op)) break;
+#ifdef USE_YREG
         case YREG:
+#endif
         case UREG:
         case OR:
         case XOR:
@@ -260,7 +264,9 @@ register expnode *node;
     switch(node->op) {
         case XREG:
         case DREG:
+#ifdef USE_YREG
         case YREG:
+#endif
         case UREG:
             if (flag || shiftflag) gen(COMPARE,node->op,CONST,0);
             break;

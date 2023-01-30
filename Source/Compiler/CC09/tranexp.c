@@ -113,7 +113,9 @@ register expnode *tree;
         case XREG:
         case DREG:
         case UREG:
+#ifdef USE_YREG
         case YREG:
+#endif
             ;
     }
 }
@@ -153,7 +155,9 @@ register expnode *tree;
     else switch(op) {
             case STRING:
             case NAME:
+#ifdef USE_YREG
             case YREG:
+#endif
             case UREG:
             case AMPER:
             case CONST:
@@ -496,7 +500,9 @@ expnode *node;
                 case DREG:
                 case XREG:
                 case UREG:
+#ifdef USE_YREG
                 case YREG:
+#endif
                     ;
             }
             gen(PUSH,lhs->op);
@@ -539,7 +545,9 @@ register expnode *node;
             switch ((p = node->left)->op) {
                 case CONST:
                 case NAME:
+#ifdef USE_YREG
                 case YREG:
+#endif
                 case UREG:
                     return 1;
                 default:
@@ -686,7 +694,9 @@ register expnode *tree;
         case NAME:
         case STRING:
         case UREG:
+#ifdef USE_YREG
         case YREG:
+#endif
             break;
     }
     return tree;
@@ -883,9 +893,11 @@ register expnode *node;
             case UREG:
                 op = UIND;
                 goto fix;
+#ifdef USE_YREG
             case YREG:
                 op = YIND;
                 goto fix;
+#endif
             case XREG:
                 op = XIND;
                 goto fix;
@@ -1055,7 +1067,9 @@ expnode *node;
         case STAR:
             dostar(node);
         case NAME:
+#ifdef USE_YREG
         case YREG:
+#endif
         case UREG:
         case CONST:
         case STRING:
@@ -1139,7 +1153,9 @@ expnode *node;
                             lhsval = 0;
                         case XREG:
                             break;
+#ifdef USE_YREG
                         case YREG:
+#endif
                         case UREG:
                             newop = lhs->op;
                             break;
@@ -1181,6 +1197,10 @@ cant:       tranexp(node);
 
 isreg(r)
 {
+#ifdef USE_YREG
     return (r==UREG || r==YREG);
+#else
+    return (r==UREG);
+#endif
 }
 

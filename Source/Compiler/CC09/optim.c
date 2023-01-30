@@ -224,7 +224,9 @@ register expnode *node;
 {
     if (node)
         switch (node->op) {
+#ifdef USE_YREG
             case YREG:
+#endif
             case UREG:
             case CONST:
             case LCONST:
@@ -302,7 +304,9 @@ expnode *node;
                 lhs->sux = 1;
             } else
                 switch (tl = sptr->storage) {
+#ifdef USE_YREG
                     case YREG:
+#endif
                     case UREG:
                         node->op = tl;
                         node->val.num = 0;
@@ -344,7 +348,11 @@ expnode *node;
 
         case AMPER:
             needlval(lhs,1);
+#ifdef USE_YREG
             if (lhs->op == YREG || lhs->op == UREG) {
+#else
+            if (lhs->op == UREG) {
+#endif
                 terror(node,"can't take address");
                 makedummy(lhs);
             }
@@ -950,7 +958,9 @@ register expnode *node;
     int op;
 
     switch (op=node->op) {
+#ifdef USE_YREG
         case YREG:
+#endif
         case UREG:
         case STAR:
             return;

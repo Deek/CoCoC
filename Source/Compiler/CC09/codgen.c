@@ -126,9 +126,11 @@ register int arg;
         case IDOUBLE:   ol("aslb\n rola"); return;
         case HALVE:     ol("asra\n rorb"); return;
         case UHALVE:    ol("lsra\n rorb"); return;
+#ifdef USE_YREG
         case YREG:
             ot("ldy ");
             goto dooff;
+#endif
         case UREG:
             ot("ldu ");
 dooff:
@@ -187,7 +189,9 @@ dooff:
                 value = val->val.num;
                 switch (temp=val->op) {
                     case XREG:
+#ifdef USE_YREG
                     case YREG:
+#endif
                     case UREG:
                         if (rtype!=DREG) {
                             outlea(reg);
@@ -293,7 +297,9 @@ regname(r)
     switch (r) {
         case DREG:  return 'd';
         case XREG:  return 'x';
+#ifdef USE_YREG
         case YREG:  return 'y';
+#endif
         case UREG:  return 'u';
         default:    return ' ';
     }

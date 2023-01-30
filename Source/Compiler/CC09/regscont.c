@@ -150,7 +150,9 @@ register expnode *tree;
     if (t = tree) {
         if ((tree->op & INDIRECT) == 0) {
             switch (tree->op) {
+#ifdef USE_YREG
                 case YREG:
+#endif
                 case UREG:
                     if (t->val.num || t->left || t->right) break;
                 default:
