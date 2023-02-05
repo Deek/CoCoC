@@ -108,8 +108,15 @@ int paramreg;
     if (paramreg == DREG) ol("pshs d,u");
     else ol("pshs u");
     if (paramreg == UREG) ol("tfr d,u");
+# ifdef USE_YREG
+#  error "USE_YREG not compatible with REGPARMS at this time."
+# endif
 #else
+# ifdef USE_YREG
+    ol("pshs y,u");
+# else
     ol("pshs u");
+# endif
 #endif
 
     if (!sflag)

@@ -11,7 +11,7 @@
 #define  MPOINT 1
 
 #ifdef USE_YREG
-# define MAXREG	1	// maybe 2
+# define MAXREG	2
 #else
 # define MAXREG	1
 #endif

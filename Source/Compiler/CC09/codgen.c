@@ -70,7 +70,11 @@ register int arg;
             label(arg);
             return;
         case RETURN:
+#ifdef USE_YREG
+            ol("puls u,y,pc\n");
+#else
             ol("puls u,pc\n");
+#endif
             return;
         case AND:
         case OR:
@@ -256,7 +260,9 @@ simple:
                         if (temp == STATICD) olbl(val->val.sp->offset);
                         else on(val->val.sp->sname);
                         addoff(val->modifier);
+#ifndef USE_YREG
                         os(yind);
+#endif
                         nl();
                         return;
                 }
@@ -652,7 +658,9 @@ deref(arg,val,offset)
         case FREG:
             os("_flacc");
             addoff(offset);
+#ifndef USE_YREG
             os(yind);
+#endif
             break;
         case NAME:
             if (sn = (symnode *)val)
@@ -677,7 +685,9 @@ dooff:
                         if(arg & INDIRECT || (!datflag && (sc != DIRECT
                                     && sc != EXTERND && sc != STATICD))) {
                             if(isftn(sn->type)) os(",pcr");
+#ifndef USE_YREG
                             else os(yind);
+#endif
                         }
                         break;
                     default:
