@@ -188,8 +188,6 @@ register int	skflag;
 supergch(skflag)
 register int	skflag;
 {
-	register int	result;
-
 	for (;;) {
 		gch(skflag);
 		if (cch != 0 || !newline())

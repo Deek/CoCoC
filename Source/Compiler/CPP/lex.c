@@ -280,11 +280,9 @@ number(np)
 long *np;
 {
 	auto long		n;
-	register char	*cp;
 	register short	nunsigned = FALSE, nlong = FALSE;
 
 	n = 0;
-	cp = (char*) &n;
 
 	if (cch == '0') {
 		gch(1);
