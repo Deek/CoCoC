@@ -284,7 +284,8 @@ isop()
 
 static long
 doit(op, isunsigned, lhs, rhs)
-int		op, isunsigned;
+int		op;
+register int	isunsigned;
 long	lhs, rhs;
 {
 	switch (op) {

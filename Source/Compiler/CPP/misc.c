@@ -125,8 +125,8 @@ unsigned	size;
 
 char *
 copystr(p, s, n, e)
-char	*p, *s;
-int		n, e;
+register char	*p, *s;
+int				n, e;
 {
 	/*
 		if e is nonzero, we have been told to stringify s. Add quotes, and

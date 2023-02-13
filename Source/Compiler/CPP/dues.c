@@ -39,7 +39,7 @@ char delimiter;
 
 doinclude()
 {
-	register char c, *nameptr;
+	register char *nameptr, c;
 	char fname[64], *last;
 	register FILE *fp;
 	int lasterr;
@@ -249,8 +249,8 @@ doliner()
 
 dowarning()
 {
-	char lin[LINESIZE];
-	char *sptr;
+	char			lin[LINESIZE];
+	register char	*sptr;
 
 	if (process) {
 		skipsp(1);
@@ -268,7 +268,8 @@ dowarning()
 
 doerror()
 {
-	char lin[LINESIZE], *sptr;
+	char			lin[LINESIZE];
+	register char	*sptr;
 	if (process) {
 		skipsp(1);
 		gch(1);

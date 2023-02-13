@@ -23,11 +23,11 @@ register macdef	*p;
 
 macro *
 addmac(name,string)
-register char	*name,*string;
+char	*name,*string;
 {
+	register char *cptr;
 	register int n;
 	register macro *mptr,*nptr;
-	register char *cptr;
 	register macdef *mlist;
 	register int argc;
 	auto char *argv[MAXARGS];
