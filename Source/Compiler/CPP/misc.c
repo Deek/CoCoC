@@ -161,7 +161,19 @@ int		n, e;
 
 char *
 savestr(s)
-char	*s;
+register char	*s;
 {
-    return (char *)strcpy(grab(strlen(s) + 1), s);
+	char		*nstr, *x = s;	/* save starting pos */
+	unsigned	count;
+
+	if (s) {
+		while (*s) ++s;			/* find end of string */
+		while (s > x && isspace (*(s-1))) --s;	/* skip trailing spaces */
+	}
+	count = (s - x);
+	nstr = grab (count + 1);
+	strncpy (nstr, x, count);
+	*(nstr+count) = '\0';
+
+	return nstr;
 }
