@@ -1,5 +1,5 @@
 RDIR	= rels
-RFILES1 = abs.r minmax.r uminmax.r clmul.r cldiv.r claddsub.r clcompare.r
+RFILES1 = abs.r minmax.r uminmax.r clmul.r cldiv.r cludiv.r claddsub.r clcompare.r
 RFILES2 = clbits.r clnegcompl.r clconvert.r clmove.r clincdec.r clshifts.r
 RFILES3 = clcommon.r ccmult.r ccmod.r ccdiv.r cshifts.r rpterr.r
 

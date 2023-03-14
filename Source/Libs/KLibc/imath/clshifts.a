@@ -33,4 +33,19 @@ lshr2 puls b,a
  std ,s
  rts
 
+
+_lushr: ldx 2,s
+ pshs b
+ lbsr _ltoacc
+ puls b
+ tstb
+ beq lshr2
+lushr1 lsr ,x
+ ror 1,x
+ ror 2,x
+ ror 3,x
+ decb
+ bne lshr1
+ bra lshr2
+
  endsect

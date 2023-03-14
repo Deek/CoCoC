@@ -1,0 +1,123 @@
+ psect cludiv_a,0,0,0,0,0
+
+EDIVERR equ 45
+Carry equ %00000001
+
+* entry	*x = divisor
+*	*(2,s) = dividend
+*
+* exit	_flacc = quotient
+*	*x = remainder
+*
+*   working stack	8-12  quotient
+*		6-7  return addr
+*		2-5  divisor
+*		0  shift count
+*	d = dividend
+
+_ludiv: 
+ bsr _div1
+ leas 8,s
+ lbra _lbexit
+
+_lumod: 
+ lda 0,x
+ ora 1,x
+ ora 2,x
+ ora 3,x
+ bne _lumod1
+* zero divisor -- return dividend
+ ldd 0,x
+ std _flacc,y
+ ldd 2,x
+ leax _flacc,y
+ std 2,x
+ lbra _lbexit
+
+_lumod1 
+ bsr div2
+ ldd 10,s
+ leax _flacc,y
+ std 0,x
+ ldd 12,s
+ std 2,x
+ leas 8,s
+ lbra _lbexit
+
+* check for zero divisor
+_div1 
+ lda 0,x
+ ora 1,x
+ ora 2,x
+ ora 3,x
+ bne div2
+* divide by zero error
+ ldd 2,s
+ std 6,s
+ leas 6,s
+ ldd #EDIVERR
+ lbra _rpterr
+
+* set up our stack
+div2 
+ ldd 0,x
+ ldx 2,x
+ pshs d,x divisor now at 0,s
+ ldd #0
+ pshs d divisor now at 2,s, two empty bytes at 0,s
+ std _flacc,y clear the first 4 bytes of the accumulator
+ std _flacc+2,y
+ leax _flacc,y
+
+* shift the divisor left
+ clra * unlike signed, the leftmost bit _can_ be set here
+ tst 2,s
+ bmi div51
+div5 
+ inca
+ asl 5,s
+ rol 4,s
+ rol 3,s
+ rol 2,s
+ bpl div5 keep going until the leftmost bit is set
+div51 
+ sta 0,s save the count
+ bra check
+
+* subtract the divisor from the dividend
+div6 
+ ldd 12,s
+ subd 4,s
+ std 12,s
+ ldd 10,s
+ sbcb 3,s
+ sbca 2,s
+ std 10,s
+ bcc div7 if we didn't borrow
+ ldd 12,s
+ addd 4,s
+ std 12,s
+ ldd 10,s
+ adcb 3,s
+ adca 2,s
+ std 10,s
+ andcc #^Carry clear carry
+ bra div8
+
+* rotate quotient and dividend
+div7 
+ orcc #Carry set carry
+div8 
+ rol 3,x
+ rol 2,x
+ rol 1,x
+ rol 0,x
+ lsr 2,s
+ ror 3,s
+ ror 4,s
+ ror 5,s
+ dec 0,s finished?
+check bpl div6
+ jmp [6,s]
+
+ endsect
