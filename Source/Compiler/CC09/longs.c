@@ -112,7 +112,10 @@ register expnode *node;
             node->op=FREG;
             break;
         case TIMES:
+            /* turn <const> * var into var * <const> */
             if (node->left->op == LCONST) swap(node->left,node->right);
+        case DIV:
+        case UDIV: /* Check if we can replace with a shift */
             if (node->right->op == LCONST) {
                 l = *node->right->val.lp;
                 if (l > 0 && l < 65536 && (s = isashift((int) l))){
@@ -121,12 +124,12 @@ register expnode *node;
                     p->val.num = s;
                     p->op = CONST;
                     p->type = INT;
-                    op = (op == TIMES) ? SHL : SHR;
+                    if (op == TIMES) op = SHL;
+                    else if (node->left->type == ULONG) op = USHR;
+                    else op = SHR;
                     goto shifts;
                 }
             }
-        case DIV:
-        case UDIV:
         case EQ:
         case NEQ:
         case GEQ:
