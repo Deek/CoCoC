@@ -328,9 +328,14 @@ typedef struct initstruct {
 #ifdef DOFLOATS
 #define FCONST      92  /* float constant */
 #endif
-#define UMOD        93  /* % modulus (unsigned) */
-#define USHR        94  /* >> (unsigned) */
-#define UDIV        95  /* unsigned integer division */
+/* HACK ALERT
+    These token numbers must be in the same order as the DIV/MOD/SHR numbers.
+    When processing division and shifts, the compiler sometimes subtracts the
+    relation DIV-UDIV to get the unsigned operation.
+*/
+#define UDIV        93  /* unsigned integer division */
+#define UMOD        94  /* % modulus (unsigned) */
+#define USHR        95  /* >> (unsigned) */
 #define RSUB        96
 /* HACK ALERT
     These token numbers must be in the same order as the ASSPLUS numbers, or

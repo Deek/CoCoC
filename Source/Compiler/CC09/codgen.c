@@ -340,8 +340,11 @@ int *arg;
         case AND:       lcall("_land"); break;
         case OR :       lcall("_lor"); break;
         case XOR:       lcall("_lxor"); break;
+        case UDIV:      lcall("_ludiv"); break;
+        case UMOD:      lcall("_lumod"); break;
         case SHL:       lcall("_lshl"); sp -= 2; break;
         case SHR:       lcall("_lshr"); sp -= 2; break;
+        case USHR:      lcall("_lushr"); sp -= 2; break;
         case EQ:
         case NEQ:
         case GEQ:

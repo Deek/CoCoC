@@ -29,7 +29,18 @@ register expnode *node;
     register int op,s;
     long l;
 
-    switch (op = node->op) {
+    /*
+        Make shifts and divisions between unsigned longs use unsigned ops.
+
+        DIV, MOD, and SHR are each related to UDIV, UMOD, and USHR to make
+        this work.
+    */
+    if (((op = node->op) >= DIV && op <= SHR)
+        && (node->left->type == ULONG || node->right->type == ULONG)) {
+        op -= (DIV-UDIV);
+    }
+
+    switch (op) {
         case STAR:
             dostar(node);
             getinx(node);
@@ -115,6 +126,7 @@ register expnode *node;
                 }
             }
         case DIV:
+        case UDIV:
         case EQ:
         case NEQ:
         case GEQ:
@@ -128,6 +140,7 @@ register expnode *node;
         case PLUS:
         case MINUS:
         case MOD:
+        case UMOD:
         case AND:
         case OR:
         case XOR:
@@ -145,6 +158,7 @@ register expnode *node;
 shifts:
         case SHL:
         case SHR:
+        case USHR:
             lload(node->left);
             gen(PUSH,XREG);
             lddexp(node->right);
