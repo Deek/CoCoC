@@ -238,17 +238,8 @@ expnode *node;
     lhs = node->left;
     rhs = node->right;
 
-    if (isuint(lhs))
-        switch(op) {
-            case DIV:
-                op = UDIV;
-                break;
-            case MOD:
-                op = UMOD;
-                break;
-            case SHR:
-                op = USHR;
-        }
+    if (isuint(lhs) && op >= DIV && op <= SHR)
+		op -= (DIV-UDIV);
     else switch(op) {
             case PLUS:
             case MINUS:
@@ -346,15 +337,18 @@ doshift:        if ((unsigned)s <= 4) {
 
         case TIMES:
             if (lhs->op == CONST) swap(lhs,rhs);
+        case DIV:
         case UDIV:
             if (rhs->op == CONST && (s = isashift(rhs->val.num))) {
                 /* quicker by shifting for a power of two */
                 rhs->val.num = s;
                 /* fiddle operator for shifting */
-                op = (op == TIMES) ? SHL : USHR;
+                if (op == TIMES) op = SHL;
+                else if (op == UDIV) op = USHR;
+                else op = SHR;
+
                 goto doshift;
             }
-        case DIV:
         case UMOD:
         case MOD:
 rest:       loadexp(lhs);
@@ -723,17 +717,9 @@ expnode *node;
     tranexp(lhs);
 
     op += (PLUS - ASSPLUS);
-    if (isuint(lhs))
-        switch(op) {
-            case DIV:
-                op = UDIV;
-                break;
-            case SHR:
-                op = USHR;
-                break;
-            case MOD:
-                op = UMOD;
-        }
+
+    if (isuint (lhs) && op >= DIV && op <= SHR)
+        op -= (DIV - UDIV);
 
     if (isreg(lhs->op)) {
         switch (op) {

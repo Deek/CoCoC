@@ -125,7 +125,7 @@ register expnode *node;
                     p->op = CONST;
                     p->type = INT;
                     if (op == TIMES) op = SHL;
-                    else if (node->left->type == ULONG) op = USHR;
+                    else if (op == UDIV) op = USHR;
                     else op = SHR;
                     goto shifts;
                 }
