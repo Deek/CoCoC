@@ -430,8 +430,10 @@ typedef struct initstruct {
 #define HALVE       167 /* division by two */
 #define UHALVE      168 /* same (unsigned) */
 #define IDOUBLE     169 /* multiplication by two */
+#define CHALVE      170 /* char division by two */
+#define UCHALVE     171 /* uchar division by two */
 
-/* 170..189 reserved for expansion */
+/* 172..189 reserved for expansion */
 
 #define ASSPLUS     190 /* += */
 #define ASSMIN      191 /* -= */

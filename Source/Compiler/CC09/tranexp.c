@@ -324,10 +324,10 @@ doshift:        if ((unsigned)s <= 4) {
                                 gen(IDOUBLE);
                                 break;
                             case SHR:
-                                gen(HALVE);
+                                gen ((lhs->size == 1) ? CHALVE : HALVE);
                                 break;
                             case USHR:
-                                gen(UHALVE);
+                                gen ((lhs->size == 1) ? UCHALVE : UHALVE);
                         }
                     shiftflag = 1;
                     goto out1;

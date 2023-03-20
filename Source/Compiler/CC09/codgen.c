@@ -130,6 +130,9 @@ register int arg;
         case IDOUBLE:   ol("aslb\n rola"); return;
         case HALVE:     ol("asra\n rorb"); return;
         case UHALVE:    ol("lsra\n rorb"); return;
+        case CHALVE:    ol("asrb"); return;
+        case UCHALVE:   ol("lsrb"); return;
+
 #ifdef USE_YREG
         case YREG:
             ot("ldy ");
