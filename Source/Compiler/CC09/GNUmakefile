@@ -1,14 +1,20 @@
-DCCDIR	= $(HOME)/.dcc
-CFLAGS	= -g -mx32 -fsigned-char -DFUNCNAME -DUNIX -DPTREE -DPROF -DREGCONTS \
+-include local.make
+
+DCCDIR	?= $(HOME)/.dcc
+ARCH	?= -m32
+
+CFLAGS	= -g $(ARCH) -fsigned-char -DFUNCNAME -DUNIX -DPTREE -DPROF -DREGCONTS \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type -Wno-char-subscripts \
 	-DCKEYSFILE=\"$(DCCDIR)/ckeys\"
 
-LDFLAGS = -mx32 -lm
+LDFLAGS = $(ARCH) -g -lm
 
 BINARY	= dcc68
 CKEYS	= ckeys
+# This is a nifty hack, 'wildcard' expands to files that exist...
+DEPS	= cj.h GNUmakefile $(wildcard local.make)
 OBJS	= bool.o build.o cmain.o codgen.o declare.o floats.o get.o inits.o \
 	lex.o local.o longs.o misc.o optim.o prtree.o regscont.o stats.o tb.o \
 	tranexp.o fltconv.o \
@@ -17,7 +23,6 @@ OBJS	= bool.o build.o cmain.o codgen.o declare.o floats.o get.o inits.o \
 $(BINARY):	$(OBJS)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS) 
 
-.PHONY: clean install uninstall
 
 clean:
 	rm -f $(BINARY) *.o
@@ -30,6 +35,7 @@ install: $(BINARY) $(CKEYS)
 uninstall:
 	-rm $(HOME)/bin/$(BINARY)
 	-rm $(DCCDIR)/ckeys
-	-rm $(HOME)/.ckeys
 
-$(OBJS) : cj.h GNUmakefile
+$(OBJS) : $(DEPS)
+
+.PHONY: clean install uninstall
