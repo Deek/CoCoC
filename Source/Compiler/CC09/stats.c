@@ -79,9 +79,8 @@ contin:
         case LBRACE:
             block(0);
             getsym();
+        case EOF:
             return;
-        case 0xFFFF:
-            return;   /* EOF */
         case NAME:
             blanks();
             if (cc==':') {
