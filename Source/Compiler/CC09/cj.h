@@ -108,7 +108,6 @@
 #endif
 
 #ifdef __unix__
-# include <errno.h>
 # include <string.h>
 # include <fcntl.h>
 

@@ -11,6 +11,7 @@
           18-Aug-83      Add conditional to dump function names to stdout
           01-Sep-83      Put "fail" directive in asmb output for errors
 */
+#include <errno.h>
 
 #include "cj.h"
 
@@ -19,9 +20,6 @@
 
 static direct unsigned stklab;       /* label for stack check equ value */
 
-#ifndef __unix__
-extern int errno;
-#endif
 
 
 epilogue()
