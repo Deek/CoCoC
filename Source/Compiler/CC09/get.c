@@ -156,15 +156,16 @@ getlin()
 }
 
 
-#ifndef __unix__
+/* this atoi is smaller than the library version */
+#ifdef _OS9
 atoi(s)
 register char *s;
 {
-        int c;
         int n = 0;
 
-        while(isdigit(c = *s++))
-                n = n * 10 + (c - '0');
+        while (isdigit (*s))
+                n = n * 10 + (*s++ - '0');
+
         return n;
 }
 #endif
