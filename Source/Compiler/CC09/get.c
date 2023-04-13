@@ -82,8 +82,9 @@ getlin()
                                 fprintf(code,"%s\n",line);
                                 continue;
                         case NEWFNAME:
-                                strcpy(filename,line);
-#ifdef  SPLIT
+                                strncpy (filename, line, sizeof (filename) - 1);
+                                filename[sizeof (filename) - 1] = '\0';
+#ifdef SPLIT
                                 p2file(filename);
 #endif
                                 if(cgets() == NULL)
