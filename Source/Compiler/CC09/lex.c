@@ -368,21 +368,28 @@ lexinit()
 }
 
 
-getword(name)
-register char name[];
+getword (name)
+char *name;
 {
-    int count;
+    char            str[NAMESIZE];
+    int             count;
+    register char   *p = str;
 
-    for (count=1; an(cc) && count<=NAMESIZE ; ++count) {
-        *name++=cc;
-        getch();
+    for (count = 1; an (cc) && count <= NAMESIZE; ++count) {
+        *p++ = cc;
+        getch ();
     }
+    *p = '\0';
 
-    if(count == 2) *name++ = UNIQUE;
-    *name='\0';
+    if (!str[1]) {  /* name is 1 char */
+        *name++ = UNIQUE;   /* prepend __ if it could be a register name */
+        *name++ = UNIQUE;
+    }
+    strcpy (name, str);
 
-    while(an(cc)) getch();
+    while (an (cc)) getch ();
 }
+
 
 an(c)
 int c;
