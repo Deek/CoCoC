@@ -313,8 +313,6 @@ char valtab[] = {
 
 lexinit()
 {
-     register symnode *ptr;
-
 #ifdef  DOFLOATS
      install("double",DOUBLE);
      install("float",FLOAT);
@@ -357,14 +355,6 @@ lexinit()
      install("union",UNION);
      install("signed", SIGN);
      install("unsigned",UNSIGN);
-     ptr=lookup("errno");
-     ptr->type=INT;
-     ptr->storage=EXTERN;
-     ptr->size=2;
-     ptr=lookup("lseek");
-     ptr->type=LONG | FUNCTION;
-     ptr->storage=EXTDEF;
-     ptr->size=4;
 }
 
 
