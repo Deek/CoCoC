@@ -1,4 +1,18 @@
 #include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <endian.h>
+
+#if !(defined(_OS9) || defined(_OSK))
+# define direct
+# define register
+#endif
+
+#ifdef __GCC__
+# define packed __attribute__((__packed__))
+#else
+# define packed
+#endif
 
 /* rdump:  prints formatted dump of .r and .l files
 
@@ -31,36 +45,40 @@
 #define RELATIVE    0x80        /* relative reference */
 
 /* misc. constants */
-#define ROFSYNC     0x62CD2387
+#if BYTE_ORDER == LITTLE_ENDIAN
+# define ROFSYNC	0x8723CD62
+#else
+# define ROFSYNC	0x62CD2387
+#endif
 #define SYMLEN      9         /* Length of symbols */
 #define MAXNAME     16        /* length of module name */
 
 /* definition/reference */
 typedef struct {
      char r_flag; /* type/location */
-     unsigned r_offset;
+     uint16_t r_offset;
 } def_ref;
 
 /* rof header structure */
-typedef struct {
-     long h_sync;
-     unsigned h_tylan;
+typedef packed struct {
+     uint32_t h_sync;
+     uint16_t h_tylan;
      char h_valid;
      char h_date[5];
      char h_edit;
      char h_vers;
-     unsigned h_glbl;
-     unsigned h_dglbl;
-     unsigned h_data;
-     unsigned h_ddata;
-     unsigned h_ocode;
-     unsigned h_stack;
-     unsigned h_entry;
+     uint16_t h_glbl;
+     uint16_t h_dglbl;
+     uint16_t h_data;
+     uint16_t h_ddata;
+     uint16_t h_ocode;
+     uint16_t h_stack;
+     uint16_t h_entry;
 } binhead;
 
 #define MAXSOURCE 20
 #define puts(s) fputs(s,stdout)
-#define mc(c) ((c)&0xff)
+#define mc(c) ((unsigned char) (c))
 
 #define DEF 1
 #define REF 2
@@ -72,11 +90,64 @@ direct int gflag,rflag,oflag;
 binhead hd;
 FILE *in;
 
+#ifdef _OS9
+# define mgw getw
+#else
+int16_t
+mgw (inf)
+FILE *inf;
+{
+	unsigned char high = getc (inf);
+	unsigned char low = getc (inf);
+	return (high << 8) + low;
+}
+#endif
+
+getref (out)
+def_ref *out;
+{
+#ifdef _OS9
+	fread (out, sizeof (def_ref), 1, in);
+#else
+	out->r_flag = getc (in);
+	out->r_offset = mgw (in);
+
+	if (ferror (in)) ferr (fname);
+#endif
+}
+
+int
+gethead (out)
+binhead *out;
+{
+#ifdef _OS9
+	return fread (out, sizeof (binhead), 1, in);
+#else
+	if (fread (out, 4, 1, in) == 0)
+		return 0;
+
+	out->h_tylan = mgw (in);
+	out->h_valid = getc (in);
+	fread (out->h_date, 5, 1, in);
+	out->h_edit = getc (in);
+	out->h_vers = getc (in);
+	out->h_glbl = mgw (in);
+	out->h_dglbl = mgw (in);
+	out->h_data = mgw (in);
+	out->h_ddata = mgw (in);
+	out->h_ocode = mgw (in);
+	out->h_stack = mgw (in);
+	out->h_entry = mgw (in);
+
+	return 1;
+#endif
+}
+
+int
 main(argc,argv)
 int argc;
 char **argv;
 {
-
      register char *p;
 
      while (--argc>0) {
@@ -98,6 +169,7 @@ char **argv;
      pass1();
 }
 
+char *
 plural(num)
 {
      static char *yes = "s";
@@ -116,16 +188,15 @@ pass1()
      for(count=0; count<scount; ++count) {
           fname = snames[count];
           if((in = fopen(fname,"r")) == NULL) {
-               printf("can't open '%s'",fname);
+               error ("can't open '%s'", fname);
                continue;
           }
 
           for(;;) {
-               if(fread(&hd,sizeof(hd),1,in) == 0)
-                    break;
+               if (!gethead (&hd)) break;
 
-               if(hd.h_sync != ROFSYNC) {
-                    printf("'%s' is not a relocatable module",fname);
+               if (hd.h_sync != ROFSYNC) {
+                    error ("'%s' is not a relocatable module", fname);
                     break;
                }
 
@@ -133,7 +204,7 @@ pass1()
                showglobs();
 
 /* skip code and initialized data */
-               fseek(in,(long)(hd.h_ocode + hd.h_ddata + hd.h_data),1);
+               fseek(in, (long) (hd.h_ocode + hd.h_ddata + hd.h_data), SEEK_CUR);
 
                showrefs();
                showlcls();
@@ -166,7 +237,7 @@ showhead()
           &("JanFebMarAprMayJunJulAugSepOctNovDec"[(mc(hd.h_date[1])-1)*3]),
           mc(hd.h_date[2]),1900+mc(hd.h_date[0]),
           mc(hd.h_date[3]),mc(hd.h_date[4]));
-     printf("Edition/ROF: %0.3d/%0.3d\n",hd.h_edit,hd.h_vers);
+     printf("Edition/ROF: %d/%d\n", hd.h_edit, hd.h_vers);
        puts("  Section    Init Uninit\n");
      printf("   Code:     %04x\n",hd.h_ocode);
      printf("     DP:       %02x   %02x\n",hd.h_ddata,hd.h_dglbl);
@@ -177,17 +248,17 @@ showhead()
 
 showglobs()
 {
-     register unsigned count,offset;
+     register uint16_t count, offset;
      char sym[SYMLEN+1],flag;
 
-     count=getw(in);          /* global def count */
+     count = mgw (in);        /* global def count */
      if(gflag)
           printf("\n%u global symbol%s defined:\n",count,plural(count));
 
      while(count--) {
           getname(sym);
           flag=getc(in);
-          offset=getw(in);
+          offset = mgw (in);
           if(gflag) {
                printf(" %9s %04x ",sym,offset);
                ftext(flag,DEF);
@@ -235,26 +306,27 @@ int ref;
 
 showrefs()
 {
-     register unsigned count,rcount;
+     register uint16_t count, rcount;
      def_ref ref;
      char sym[SYMLEN+1];
      int fflag;
 
-     count=getw(in);
+     count = mgw (in);
      if(rflag)
           printf("\n%u external reference%s:\n",count, plural(count));
 
      while(count--) {
           getname(sym);
-          rcount=getw(in);
+          rcount = mgw (in);
+
           if(rflag)
                printf(" %9s ",sym);
           fflag=0;
           while(rcount--) {
-               fread(&ref,sizeof(ref),1,in);
-               if(ferror(in)) ferr(fname);
+               getref (&ref);
+
                if(rflag && oflag) {
-                    if(fflag)
+                    if (fflag)
                          puts("           ");
                     else fflag=1;
                     printf("%04x ",ref.r_offset);
@@ -271,13 +343,13 @@ showlcls()
      register unsigned count;
      def_ref ref;
 
-     count=getw(in);
+     count = mgw (in);
      if(oflag)
           printf("\n%u local reference%s:\n",count, plural(count));
 
      while(count--) {
-          fread(&ref,sizeof(ref),1,in);
-          if(ferror(in)) ferr(fname);
+          getref (&ref);
+
           if(oflag) {
                printf("   %04x ",ref.r_offset);
                ftext(ref.r_flag,DEF | REF);
@@ -292,20 +364,20 @@ showcomm()
      char sym[SYMLEN+1];
      int fflag;
 
-     count=getw(in);
+     count = mgw (in);
      if(rflag)
           printf("\n%u common block%s:\n",count, plural(count));
 
      while(count--) {
           getname(sym);
-          rsize=getw(in);
-          rcount=getw(in);
+          rsize = mgw (in);
+          rcount = mgw (in);
           if(rflag)
                printf(" %9s, size %u, %u reference%s:\n",sym,rsize,rcount,plural(rcount));
           fflag=1;
           while(rcount--) {
-               fread(&ref,sizeof(ref),1,in);
-               if(ferror(in)) ferr(fname);
+               getref (&ref);
+
                if(rflag && oflag) {
                     puts("           ");
                     printf("%04x ",ref.r_offset);
