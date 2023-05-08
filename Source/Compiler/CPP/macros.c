@@ -43,6 +43,7 @@ char	*name,*string;
 	/* save macro name */
 	/*    strcpy(nptr->macname,name); */
 	nptr->macname = savestr(name);
+	nptr->macvar = FALSE;		/* Assume we are not variadic */
 	nptr->expanding = FALSE;	/* we are not now expanding this macro! */
 
 	/* save pre-defined string (no args possible) */
@@ -74,10 +75,25 @@ char	*name,*string;
 				nxtch();
 				if(cch == ',')
 					gch(KEEPSP);
+			} else if (cch == '.') {	/* variadic detection */
+				char	*s = "__VA_ARGS__";
+
+				gch(KEEPSP); if (cch != '.') goto derror;
+				gch(KEEPSP); if (cch != '.') goto derror;
+
+				/* no args allowed afterward */
+				gch(SKIPSP); if (cch != ')') goto derror;
+
+				nptr->macvar = TRUE;	/* we're variadic */
+				while (*cptr++ = *s++) ;
+				++argc;
+
+				break;
 			} else {
-				lerror("macro definition error");
-				do gch(SKIPSP);
-				while (cch != '\0') ;
+derror:			lerror ("macro definition error");
+				do {
+					gch(SKIPSP);
+				} while (cch);
 				break;
 			}
 		}

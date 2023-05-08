@@ -136,7 +136,7 @@ int				n, e;
 	*/
 	if (e) {
 		int	instr = 0;
-		*p++ = '"';
+		if (e == 1) *p++ = '"';
 		while (n-- > 0) switch (*s) {
 			case '\\':	/* only escape backslash inside strings */
 				if (instr) *p++ = '\\';
@@ -150,7 +150,7 @@ int				n, e;
 			default:
 				*p++ = *s++;
 		}
-		*p++ = '"';
+		if (e == 1) *p++ = '"';
 	} else while (n-- > 0) {
 		*p++ = *s++;
 	}

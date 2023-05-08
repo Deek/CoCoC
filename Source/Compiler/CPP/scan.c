@@ -106,10 +106,17 @@ int		(*arggch)();
 				
 				flag = isspace(cch) ? cch : 0; /* white space following? */
 				nxtch();
-				if (nptr->macargs == 0 && cch != '(')
-					lerror("macro arguments required");
-				if (nptr->macargs >= 0) {
-					if (cch == '(') {   /* arguments to process? */
+				/*
+				 * the macro is simple, just copy out the text.
+				 */
+				if (nptr->macargs < 0)
+					cptr = strcpy(templine, nptr->macdef->md_elem);
+				else if (nptr->macargs >= 0) {
+					cptr = templine;
+					if (cch != '(') {
+						lwarning("no arguments");
+						strcpy (templine, nptr->macname);
+					} else {	/* have to process arguments */
 						register int	nargc = 0;
 						register char	*sscan;
 						char			*nargv[MAXARGS];  /* -> actual args */
@@ -166,37 +173,57 @@ int		(*arggch)();
 							}
 loopend:					narglen[nargc++] = count;
 						}
+
+						/*
+						 * Now we know how many arguments are used
+						 * and needed, we can complain about the
+						 * user's life choices.
+						 */
+						if ((nargc > nptr->macargs) && !(nptr->macvar)) {
+							lerror ("too many macro arguments");
+						} else if (nargc < nptr->macargs) {
+							lerror ("too few macro arguments");
+						}
+
 						/* 
 						 * Now copy out the macro definition
 						 * text,  replacing the dummy arguments
 						 * with the actual ones.
 						 */
-						if ((nptr->macargs == 0 && nargc) || nargc > nptr->macargs)
-							lerror("too many macro arguments");
 						gch(1);
 						mptr = templine;
 						for (mac = nptr->macdef; mac; mac = mac->next) {
 							if (n = mac->md_type) {	/* do we need to stringify? */
 								int stringify = (n < 0) ? 1 : 0;
 								if (stringify) n = -n;
-								if (--n < nargc)
-									mptr = copystr(mptr, nargv[n], narglen[n], stringify);
-								else
-									lerror("too few macro arguments");
+								if (nptr->macvar && nptr->macargs == n) { /* var */
+									int m = --n;
+
+									if (stringify) {
+										*mptr++ = '"';
+										++stringify;
+									}
+									while (m < nargc) {
+										mptr = copystr (mptr, nargv[m], narglen[m], stringify);
+										if (++m < nargc) {
+											*mptr++ = ',';
+											*mptr++ = ' ';
+										}
+									}
+									if (stringify) {
+										*mptr++ = '"';
+									}
+								} else {
+									if (--n < nargc)
+										mptr = copystr(mptr, nargv[n], narglen[n], stringify);
+								}
 							} else
 								mptr = copystr(mptr, mac->md_elem, strlen(mac->md_elem), 0);
 						}
 						*mptr = '\0';
-						cptr = templine;
-					} else if (nptr->macargs)
-						lerror("macro arguments required");
+					}
 				}
-				/*
-				 * else the macro has no parameters, just copy out
-				 * the macro text.
-				 */
-				if (nptr->macargs <= 0)
-					cptr = strcpy(templine, nptr->macdef->md_elem);
+
 				/*
 				 * Now, recursively expand the macro just expanded.
 				 * (Hope the stack don't overflow...)

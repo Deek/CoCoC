@@ -79,7 +79,7 @@ char **argv;
 #ifdef DCC
 	kflag = 0;
 
-	addmac("__DCC__", "202011L");	/* DCC name and version */
+	addmac("__DCC__", "202305L");	/* DCC name and version */
 
 	addmac("mc6809","1");			/* target cpu */
 	addmac("__mc6809__","1");		/* target cpu */

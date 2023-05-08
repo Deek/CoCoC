@@ -96,10 +96,11 @@ typedef struct macdefst {
 typedef struct macstr {
     struct macstr	*next;		/* next macro name in hash list */
     char			*macname;	/* macro name */
-    short			macargs;	/* number of arguments in macro def */
+	macdef			*macdef;	/* ptr to macro definition string */
+	char			expanding;	/* expanding flag to support X3J11 3.8.3.4 */
+	char			macvar;		/* has variable number of arguments */
+	char			macargs;	/* number of arguments in macro def */
 								/* -1=none, 0=null '()', n=number of args */
-    macdef			*macdef;	/* ptr to macro definition string */
-    short			expanding;	/* expanding flag to support X3J11 3.8.3.4 */
 } macro;
 
 typedef struct{
