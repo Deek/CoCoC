@@ -123,8 +123,7 @@ derror:			lerror ("macro definition error");
 					lerror("missing end of string or character literal");
 				*cptr++ = cch; gch(KEEPSP);
 				continue;
-			} else
-tryagain:	if (cch == '#') { /* stringify or concatenation */
+			} else if (cch == '#') { /* stringify or concatenation */
 				gch(KEEPSP);
 				if (cch == '#') { /* concatenation */
 					gch(KEEPSP);
@@ -134,15 +133,11 @@ tryagain:	if (cch == '#') { /* stringify or concatenation */
 						*--cptr = '\0';
 					}
 					continue;
-				} else if (argc > 0) {
-					if (isspace(cch)) {
+				} else if (argc > 0) {	/* function macro, can stringify */
+					if (isspace (cch))
 						nxtch();
-						if (!(isalpha(cch) || cch == '_')) {
-							goto badhash;
-						} else {
-							goto tryagain;
-						}
-					} else if (isalpha(cch) || cch == '_') { /* stringify */
+
+					if (isalpha (cch) || cch == '_') { /* stringify */
 						register char *s = hold1buf;
 
 						getword(s, LINESIZE);
