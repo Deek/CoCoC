@@ -239,7 +239,8 @@ done: ;
 
 #ifdef DEBUG
 	if (dflag) {
-		dumpmac();
+		fflush (stdout);	/* Flush output before outputting macro dump */
+		dumpmac ();
 	}
 #endif
 #ifdef MSTATS
@@ -267,21 +268,13 @@ char *str;
 dumpmac()
 {
 	int		n;
-	macro	*p;
-	macdef	*m;
+	register macro	*p;
 
 	for (n = 0; n < 127; ++n) {
 		if ((p = mactab[n]) != NULL) {
-			printf("slot %5d ", n);
 			for (; p != NULL; p = p->next) {
-				printf("  %9s %d ->", p->macname, p->macargs);
-				for (m = p->macdef; m; m = m->next) {
-					if (m->md_type)
-						printf("<#%d>",m->md_type);
-					else
-						printf("%s",m->md_elem);
-				}
-				printf("<-\n");
+				fprintf(stderr, "slot %3d ", n);
+				printmac(p);
 			}
 		}
 	}

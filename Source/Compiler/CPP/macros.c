@@ -49,7 +49,7 @@ char	*name,*string;
 	/* save pre-defined string (no args possible) */
 	if (string) {
 #ifdef DEBUG
-		if (dflag) fprintf(stderr, "new macro: %s=%s\n", name, string);
+		if (dflag) fprintf(stderr, "new macro: \"%s=%s\"\n", name, string);
 #endif
 		(nptr->macdef = (macdef *)grab(sizeof(macdef)))->md_elem = savestr(string);
 		nptr->macargs = -1;
@@ -263,23 +263,33 @@ badhash:					*cptr = '\0';
 
 #ifdef DEBUG
 	if (dflag) {
-		macdef	*temp = nptr->macdef;
-
-		fprintf(stderr, "new macro: %s=", name);
-		while (temp) {
-			if (temp->md_type)
-				fprintf(stderr, "<arg%d>", temp->md_type);
-			else
-				fprintf(stderr, "%s", temp->md_elem);
-			temp = temp->next;
-		}
-		fputs("\n", stderr);
+		fflush (stdout);
+		fputs ("new macro: ", stderr);
+		printmac (nptr);
 	}
 #endif
 
 	return nptr;
 }
 
+#ifdef DEBUG
+printmac (m)
+macro	*m;
+{
+	register macdef	*p;
+	int ch = ' ';
+
+	if (m->macvar) ch = '+';
+
+	fprintf (stderr, "%10s %2d%c->", m->macname, m->macargs, ch);
+	for (p = m->macdef; p; p = p->next) {
+		if (p->md_type) {	/* got an argument */
+			fprintf (stderr, "<#%d>", p->md_type);
+		} else fprintf (stderr, "%s", p->md_elem);
+	}
+	fputs ("<-\n", stderr);
+}
+#endif
 
 macro *
 findmac(name)
