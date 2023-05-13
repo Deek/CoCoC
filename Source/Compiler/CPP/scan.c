@@ -59,7 +59,7 @@ int		(*arggch)();
 	gch(1);
 
 	while (cch) {
-		if (cch == '\t' || cch == '\v' || cch == '\f') cch = ' ';	/* eat tabs, form feeds */
+		if (isspace (cch)) cch = ' ';	/* eat tabs, form feeds, etc. */
 		if (cch == '"' || cch == '\'') {
 			char delim = cch;
 			do {
