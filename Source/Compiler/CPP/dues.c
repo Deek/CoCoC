@@ -10,10 +10,6 @@
 
 #define MAXIFS 32
 
-#if defined(OS9) || defined(OSK)
-extern char *defdev;
-#endif
-
 static short nextncnt;
 
 
@@ -24,15 +20,14 @@ char delimiter;
 {
 	static char nambuf[100];
 
-	if (delimiter == '"' && nextncnt == -1) {
+	if (delimiter == '"' && nextncnt < 0) {
 		nextncnt = 0;
 		return strcpy(nambuf, fname);
 	}
 
-	if (nextncnt++ < inclcount) {
-		strcpy(nambuf, incl[nextncnt-1]);
-		strcat(nambuf, "/");
-		return strcat(nambuf, fname);
+	if (nextncnt < inclcount) {
+		sprintf (nambuf, "%s/%s", incl[nextncnt++], fname);
+		return nambuf;
 	} else return NULL;
 }
 
@@ -84,10 +79,8 @@ doinclude()
 					return;
 				} else lasterr = errno;
 			}
-			strcpy(fname, "can't open ");
-			strcat(fname, last);
-			sprintf(fname+strlen(fname), " (err=%d)", lasterr);
-			fatal(fname);
+			sprintf (fname, "can't open %s (err=%d)", last, lasterr);
+			fatal (fname);
 		} else fatal("incorrect include file syntax");
 	}
 }

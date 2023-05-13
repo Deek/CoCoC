@@ -134,8 +134,7 @@ derror:			lerror ("macro definition error");
 					}
 					continue;
 				} else if (argc > 0) {	/* function macro, can stringify */
-					if (isspace (cch))
-						nxtch();
+					nxtch();
 
 					if (isalpha (cch) || cch == '_') { /* stringify */
 						register char *s = hold1buf;

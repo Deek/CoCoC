@@ -80,17 +80,17 @@ extern int errno;
 #define WARNING		14
 
 typedef struct filstr {
-    struct filstr	*next;				/* next file in include list */
-    FILE			*fp;				/* file pointer */
-    char			fname[FNAMSIZE];	/* file name string pointer */
-    short			lno;				/* line number of include */
-    char			modname[FNAMSIZE];	/* C module name */
+	struct filstr	*next;				/* next file in include list */
+	FILE			*fp;				/* file pointer */
+	short			lno;				/* line number of include */
+	char			fname[FNAMSIZE];	/* file name string pointer */
+	char			modname[FNAMSIZE];	/* C module name */
 } include;
 
 typedef struct macdefst {
-    struct macdefst	*next;			/* next element of macro definition */
-    short			md_type;		/* element type 0=text, n=replace arg n*/
-    char			*md_elem;		/* ptr to element string */
+	struct macdefst	*next;			/* next element of macro definition */
+	char			*md_elem;		/* ptr to element string */
+	char			md_type;		/* element type 0=text, n=replace arg n*/
 } macdef;
 
 typedef struct macstr {
