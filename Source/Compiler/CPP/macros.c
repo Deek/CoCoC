@@ -287,31 +287,26 @@ macro	*m;
 #endif
 
 macro *
-findmac(name)
-register char	*name;
+findmac (name)
+char	*name;
 {
 	register macro	*ptr;
-	register int	c;
 
-	c = name[NAMESIZE-1];
-	name[NAMESIZE-1] = '\0';
 	for (ptr = mactab[hash(name)]; ptr; ptr = ptr->next) {
-		if(strcmp(name,ptr->macname) == 0) return ptr;
+		if (strncmp (name, ptr->macname, NAMESIZE) == 0)
+			return ptr;
 	}
-	name[NAMESIZE-1] = c;
 
-	return 0;
+	return NULL;
 }
 
-delmac(name)
+delmac (name)
 char	*name;
 {
 	register macro	*p;
-	char			nameb[NAMESIZE];
 
 	/* forget the macro name */
-	strcpy(nameb, name);         /* (because of the way findmac works...) */
-	while (p = findmac(nameb)) p->macname[0] = 0;
+	while (p = findmac (name)) p->macname[0] = '\0';
 }
 
 
