@@ -1,11 +1,17 @@
-CFLAGS	= -g -mx32 -fsigned-char -Dunix -DUNIX -DDCC \
+-include local.make
+
+ARCH	?= -m32
+
+CFLAGS	= -g $(ARCH) -fsigned-char -Dunix -DUNIX -DDCC -DDEBUG \
 	-Wall -Wno-incompatible-pointer-types -Wno-implicit-int \
 	-Wno-implicit-function-declaration -Wno-parentheses \
 	-Wno-return-type
 
-LDFLAGS = -mx32
+LDFLAGS = $(ARCH) -g
 
 BINARY	= dcpp
+DEPS	= prep.h GNUmakefile $(wildcard local.make)
+
 OBJS	= scan.o dues.o eval.o history.o lex.o macros.o main.o misc.o parse.o
 
 $(BINARY): $(OBJS)
@@ -22,4 +28,4 @@ install: $(BINARY)
 uninstall:	
 	-rm $(HOME)/bin/$(BINARY)
 
-$(OBJS): prep.h GNUmakefile
+$(OBJS): $(DEPS)
