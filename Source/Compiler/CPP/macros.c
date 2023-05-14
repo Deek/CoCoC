@@ -41,8 +41,8 @@ char	*name,*string;
 	nptr->next = mptr;
 
 	/* save macro name */
-	/*    strcpy(nptr->macname,name); */
-	nptr->macname = savestr(name);
+/*	strcpy(nptr->macname,name); */
+	nptr->macname = savestr (name, FALSE);
 	nptr->macvar = FALSE;		/* Assume we are not variadic */
 	nptr->expanding = FALSE;	/* we are not now expanding this macro! */
 
@@ -51,7 +51,8 @@ char	*name,*string;
 #ifdef DEBUG
 		if (dflag) fprintf(stderr, "new macro: \"%s=%s\"\n", name, string);
 #endif
-		(nptr->macdef = (macdef *)grab(sizeof(macdef)))->md_elem = savestr(string);
+		nptr->macdef = (macdef *)grab (sizeof (macdef));
+		nptr->macdef->md_elem = savestr (string, FALSE);
 		nptr->macargs = -1;
 		return nptr;
 	}
@@ -145,7 +146,7 @@ derror:			lerror ("macro definition error");
 								register macdef *m;
 
 								*cptr = '\0';
-								mlist->md_elem = savestr(holdbuf);
+								mlist->md_elem = savestr (holdbuf, TRUE);
 								mlist->md_type = 0;
 								cptr = holdbuf;
 
@@ -192,7 +193,7 @@ badhash:					*cptr = '\0';
 						/* save the text processed so far */
 						*cptr = '\0';
 						if (cptr > holdbuf) {
-							mlist->md_elem = savestr(holdbuf);
+							mlist->md_elem = savestr (holdbuf, TRUE);
 							mlist->md_type = 0;
 							cptr = holdbuf;
 
@@ -243,7 +244,7 @@ badhash:					*cptr = '\0';
 
 		/* finally, mark end of string and stash it (safely) */
 		*cptr = '\0';
-		mlist->md_elem = savestr(holdbuf);
+		mlist->md_elem = savestr (holdbuf, FALSE);
 
 		/* reverse order of macdef list and save the pointer */
 		nptr->macdef = revlist(mlist);

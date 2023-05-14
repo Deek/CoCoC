@@ -124,9 +124,9 @@ unsigned	size;
 
 
 char *
-copystr(p, s, n, e)
+copystr(p, s, e)
 register char	*p, *s;
-int				n, e;
+int				e;
 {
 	/*
 		if e is nonzero, we have been told to stringify s. Add quotes, and
@@ -136,13 +136,14 @@ int				n, e;
 	*/
 	if (e) {
 		int	instr = 0;
+
 		if (e == 1) *p++ = '"';
-		while (n-- > 0) switch (*s) {
+		while (s && *s) switch (*s) {
 			case '\\':	/* only escape backslash inside strings */
 				if (instr) *p++ = '\\';
 				*p++ = *s++;
 				if (instr && *s == '"') *p++ = '\\';
-				*p++ = *s++; n--;	/* eat the next char too */
+				*p++ = *s++;	/* eat the next char too */
 				break;
 			case '"':	/* just entered or exited a string */
 				instr = ~instr;
@@ -151,7 +152,7 @@ int				n, e;
 				*p++ = *s++;
 		}
 		if (e == 1) *p++ = '"';
-	} else while (n-- > 0) {
+	} else while (s && *s) {
 		*p++ = *s++;
 	}
 

@@ -94,84 +94,78 @@ int		(*arggch)();
 					gch(1);
 				}
 			} else if ((nptr = findmac(savem)) == NULL || nptr->expanding) {
-				pptr = copystr(pptr, savem, strlen(savem), 0);
+				pptr = copystr(pptr, savem, FALSE);
 			} else {
 				/* it's a macro and it's not already expanding -- expand it */
-				register char	*mptr, savec;
-				register int	count, n, flag;
-				register macdef	*mac;
-				auto char		templine[LINESIZE];
-				
+				char	*mptr, savec;
+				int		n, flag;
+				macdef	*mac;
+				char	templine[LINESIZE];
+
 				nptr->expanding = TRUE;	/* flag it to avoid re-expansion */
-				
-				flag = isspace(cch) ? cch : 0; /* white space following? */
-				nxtch();
+				flag = isspace(cch) ? ' ' : '\0';	/* whitespace following? */
+				nxtch(); /* find first non-whitespace char */
+
 				/*
 				 * the macro is simple, just copy out the text.
 				 */
-				if (nptr->macargs < 0)
-					cptr = strcpy(templine, nptr->macdef->md_elem);
-				else if (nptr->macargs >= 0) {
+				if (nptr->macargs < 0) {
+					cptr = strcpy (templine, nptr->macdef->md_elem);
+				} else if (nptr->macargs >= 0) {
 					cptr = templine;
-					if (cch != '(') {
-						lwarning("no arguments");
+					if (cch != '(') { /* no arg list, expand to macro name */
 						strcpy (templine, nptr->macname);
 					} else {	/* have to process arguments */
-						register int	nargc = 0;
-						register char	*sscan;
-						char			*nargv[MAXARGS];  /* -> actual args */
-						int				narglen[MAXARGS]; /* and their lengths */
+						int		nargc = 0, plevel = 0;
+						char	*sscan;
+						char	*nargv[MAXARGS];	/* -> actual args */
 
 						/* 
 						 * Now buzz thru the actual arguments
-						 * to determine the number and length of each.
+						 * to count and find their contents
 						 */
-						sscan = savem;
-						(*arggch)(1);
-						*sscan++ = cch;
-						while (cch && cch != ')') {
-							register int	bcount, a;
-
-							/*  actual arg starts here */
-							nargv[nargc] = sscan - 1;
-							bcount = count = 0;
-							while (cch) {
-								switch(cch) {
-								case ',':
-									if (bcount == 0) {
-										(*arggch)(1);
-										*sscan++ = cch;
-										goto loopend;
-									}
-									break;
-								case ')':
-									if (bcount) {
-										--bcount;
-										break;
-									}
-									goto loopend;
-								case '(':
-									++bcount;
-									break;
-								case '\'':
-								case '"':
-									a = cch;
-									do {
-										if (cch == '\\') {
-											(*arggch)(0);
-											*sscan++ = cch;
-											++count;
-										}
-										(*arggch)(0);
-										*sscan++ = cch;
-										++count;
-									} while (cch && cch != a);
+						nargv[0] = sscan = savem;
+						while ((*arggch) (KEEPSP), cch) {
+top:						if (cch == ')') {	/* Decrease depth, or end */
+								if (plevel--) {
+									*sscan++ = cch;
+									continue;
 								}
-								++count;
-								(*arggch)(1);
+								*sscan++ = '\0';
+								nargv[++nargc] = sscan;
+								break;
+							} else if (cch == '(') {	/* Increase depth */
+								*sscan++ = cch;
+								++plevel;
+								continue;
+							} else if (cch == ',') {	/* end arg */
+								if (plevel) {
+									*sscan++ = cch;
+									continue;
+								}
+								*sscan++ = '\0';
+								nargv[++nargc] = sscan;
+
+								(*arggch) (SKIPSP); /* skip spaces after */
+								while (isspace (cch))
+									(*arggch) (SKIPSP);
+								goto top;
+							} else if (cch == '\'' || cch == '"') {	/* str/chr */
+								int a = cch;
+
+								*sscan++ = cch;
+								do {
+									if (cch == '\\') {
+										(*arggch) (SKIPSP);
+										*sscan++ = cch;
+									}
+									(*arggch) (SKIPSP);
+									*sscan++ = cch;
+								} while (cch && cch != a);
+								continue;
+							} else {
 								*sscan++ = cch;
 							}
-loopend:					narglen[nargc++] = count;
 						}
 
 						/*
@@ -180,7 +174,9 @@ loopend:					narglen[nargc++] = count;
 						 * user's life choices.
 						 */
 						if ((nargc > nptr->macargs) && !(nptr->macvar)) {
-							lerror ("too many macro arguments");
+							/* empty args exempted */
+							if (nptr->macargs != 0 && *(nargv[0]))
+								lerror ("too many macro arguments");
 						} else if (nargc < nptr->macargs) {
 							lerror ("too few macro arguments");
 						}
@@ -204,7 +200,7 @@ loopend:					narglen[nargc++] = count;
 										++stringify;
 									}
 									while (m < nargc) {
-										mptr = copystr (mptr, nargv[m], narglen[m], stringify);
+										mptr = copystr (mptr, nargv[m], stringify);
 										if (++m < nargc) {
 											*mptr++ = ',';
 											*mptr++ = ' ';
@@ -215,10 +211,10 @@ loopend:					narglen[nargc++] = count;
 									}
 								} else {
 									if (--n < nargc)
-										mptr = copystr(mptr, nargv[n], narglen[n], stringify);
+										mptr = copystr (mptr, nargv[n], stringify);
 								}
 							} else
-								mptr = copystr(mptr, mac->md_elem, strlen(mac->md_elem), 0);
+								mptr = copystr (mptr, mac->md_elem, FALSE);
 						}
 						*mptr = '\0';
 					}
