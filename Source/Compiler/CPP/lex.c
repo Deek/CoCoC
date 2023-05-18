@@ -101,9 +101,7 @@ getsym()
 	register int	numtype;
 	auto long		n;
 
-	while (isspace(cch)) {
-		gch(1);
-	}
+	nxtch();
 	if (cch == 0) {
 		sym = 0; return;
 	}

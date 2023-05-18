@@ -175,6 +175,14 @@ newline()
 	}
 }
 
+
+nxtch()
+{
+	while (isspace (cch))
+		gch (KEEPSP);
+}
+
+
 gch(skflag)
 register int	skflag;
 {

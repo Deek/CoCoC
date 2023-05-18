@@ -308,10 +308,3 @@ char	*name;
 	/* forget the macro name */
 	while (p = findmac (name)) p->macname[0] = '\0';
 }
-
-
-nxtch()
-{
-	while (isspace(cch))
-		gch(KEEPSP);
-}

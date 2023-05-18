@@ -157,3 +157,8 @@ extern long primary();
 
 extern macro *addmac();
 extern char *savestr(), *setfile(), *makename();
+
+extern gch();
+extern nxtch();
+extern supergch();
+extern scan();
