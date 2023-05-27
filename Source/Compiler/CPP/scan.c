@@ -56,7 +56,7 @@ int		(*arggch)();
 	savep = lptr;
 	saveb = lbase;
 	lbase = lptr = lp;
-	gch(1);
+	gch (KEEPSP);
 
 	while (cch) {
 		if (isspace (cch)) cch = ' ';	/* eat tabs, form feeds, etc. */
@@ -65,13 +65,13 @@ int		(*arggch)();
 			do {
 				*pptr++ = cch;
 				if (cch == '\\') {
-					gch(0);
+					gch (SKIPSP);
 					*pptr++ = cch;
 				}
-				gch(0);
+				gch (SKIPSP);
 			} while (cch && cch != delim);
 			*pptr++ = cch;
-			gch(1);
+			gch (KEEPSP);
 		} else if (isalpha(cch) || cch == '_') {    /* possible macro name? */
 			getword(savem, LINESIZE);
 			if (dodef && strcmp(savem, "defined") == 0) {
@@ -80,7 +80,7 @@ int		(*arggch)();
 				nxtch();
 				if (cch == '(') {
 					paren = TRUE;
-					gch(1);
+					gch (KEEPSP);
 				} else paren = FALSE;
 
 				if (isalpha(cch) || cch == '_') {
@@ -90,8 +90,8 @@ int		(*arggch)();
 
 				if (paren) {
 					if (cch != ')')
-						gch(1);
-					gch(1);
+						gch (KEEPSP);
+					gch (KEEPSP);
 				}
 			} else if ((nptr = findmac(savem)) == NULL || nptr->expanding) {
 				pptr = copystr(pptr, savem, FALSE);
@@ -186,7 +186,7 @@ top:						if (cch == ')') {	/* Decrease depth, or end */
 						 * text,  replacing the dummy arguments
 						 * with the actual ones.
 						 */
-						gch(1);
+						gch (KEEPSP);
 						mptr = templine;
 						for (mac = nptr->macdef; mac; mac = mac->next) {
 							if (n = mac->md_type) {	/* do we need to stringify? */
@@ -230,23 +230,23 @@ top:						if (cch == ')') {	/* Decrease depth, or end */
 				if (flag)
 					*pptr++ = flag;	/* put white space on output */
 				if (cch == '(' && nptr->macargs == 0) { /* null argument list? */
-					gch(1);                 /* eat the ) */
-					gch(1);                 /* ..and prime up */
+					gch (KEEPSP);	/* eat the ) */
+					gch (KEEPSP);	/* ..and prime up */
 				}
 				nptr->expanding = FALSE;
 			}
 		} else if (cch == '0') {       /* beware o' them hex constants */
 			*pptr++ = cch;
-			gch(1);
+			gch (KEEPSP);
 			if (cch == 'x' || cch == 'X') {
 				do {
 					*pptr++ = cch;
-					gch(1);
+					gch (KEEPSP);
 				} while (isxdigit(cch));
 			}
 		} else {
 			*pptr++ = cch;
-			gch(1);
+			gch (KEEPSP);
 		}
 	}
 

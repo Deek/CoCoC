@@ -109,7 +109,7 @@ getsym()
 	symptr = lptr - 1;
 	while (!(sym = chartab[cch])) {
 		error("invalid character in constant expression");
-		gch(1);
+		gch (KEEPSP);
 		symptr = lptr;
 	}
 	symval = (long) valtab[cch];		/* operator character's priority */
@@ -142,52 +142,52 @@ donum:	switch(numtype) {
 	case PRIME: pstr(); sym = CONST; break;
 	case QUOTE: qstr(); sym = STRING; break;
 	default :
-		gch(1);
+		gch (KEEPSP);
 		switch(sym) {
 		case AMPER :
 			switch(cch) {
 			case '&':
 				sym = DBLAND;
-				gch(1);
+				gch (KEEPSP);
 				symval = LEV_5; 			/* boolean "and" level */
 				break;
 			case '=':
 				sym = ASSAND;
 				symval = LEV_2; 			/* assignment operator level */
-				gch(1);
+				gch (KEEPSP);
 			}
 			break;
 		case ASSIGN:
 			if (cch == '=') {
 				sym = EQ;
 				symval = LEV_9;			/* boolean "equality" level */
-				gch(1);
+				gch (KEEPSP);
 			}
 			break;
 		case OR :
 			switch (cch) {
 			case '|':
 				sym = DBLOR;
-				gch(1);
+				gch (KEEPSP);
 				symval = LEV_4; 			/* boolean "or" level */
 				break;
 			case '=':
 				sym = ASSOR;
-				gch(1);
+				gch (KEEPSP);
 				symval = LEV_2;			/* assignment operator level */
 			}
 			break;
 		case NOT:
 			if (cch == '=') {
 				sym = NEQ;
-				gch(1);
+				gch (KEEPSP);
 				symval = LEV_9;			/* boolean "equality" level */
 			}
 			break;
 		case STAR:
 			if (cch == '=') {
 				sym = ASSMUL;
-				gch(1);
+				gch (KEEPSP);
 				symval = LEV_2;			/* assignment operator level */
 			}
 			break;
@@ -196,7 +196,7 @@ donum:	switch(numtype) {
 		case XOR:
 			if (cch == '=') {
 				sym = sym + (ASSPLUS - PLUS);
-				gch(1);
+				gch (KEEPSP);
 				symval = LEV_2;			/* assignment operator level */
 			}
 			break;
@@ -205,17 +205,17 @@ donum:	switch(numtype) {
 			case '<':
 				sym = SHL;
 				symval = LEV_11;			/* shift operator level */
-				gch(1);
+				gch (KEEPSP);
 				if (cch == '=') {
 					sym = ASSSHL;
 					symval = LEV_2;
-					gch(1);
+					gch (KEEPSP);
 				}
 				break;
 			case '=':
 				sym = LEQ;
 				symval = LEV_10;			/* boolean "relational" level */
-				gch(1);
+				gch (KEEPSP);
 			}
 			break;
 		case GT:
@@ -223,17 +223,17 @@ donum:	switch(numtype) {
 			case '>':
 				sym = SHR;
 				symval = LEV_11;			/* shift operator level */
-				gch(1);
+				gch (KEEPSP);
 				if (cch == '=') {
 					sym = ASSSHR;
 					symval = LEV_2;			/* assignment operator level */
-					gch(1);
+					gch (KEEPSP);
 				}
 				break;
 			case '=':
 				sym = GEQ;
 				symval = LEV_10;			/* boolean "relational" level */
-				gch(1);
+				gch (KEEPSP);
 			}
 			break;
 		case PLUS :
@@ -241,12 +241,12 @@ donum:	switch(numtype) {
 			case '+':
 				sym = INCBEF;
 				symval = LEV_14; 			/* high level unary operator */
-				gch(1);
+				gch (KEEPSP);
 				break;
 			case '=':
 				sym = ASSPLUS;
 				symval = LEV_2; 			/* assignment operator level */
-				gch(1);
+				gch (KEEPSP);
 			}
 			break;
 		case NEG :
@@ -254,17 +254,17 @@ donum:	switch(numtype) {
 			case '-':
 				sym = DECBEF;
 				symval = LEV_14; 			/* high level unary operator */
-				gch(1);
+				gch (KEEPSP);
 				break;
 			case '=':
 				sym = ASSMIN;
 				symval = LEV_2; 			/* assignment operator level */
-				gch(1);
+				gch (KEEPSP);
 				break;
 			case '>':
 				sym = ARROW;
 				symval = LEV_15; 			/* top level binding */
-				gch(1);
+				gch (KEEPSP);
 			}
 			break;
 		}
@@ -283,18 +283,18 @@ long *np;
 	n = 0;
 
 	if (cch == '0') {
-		gch(1);
+		gch (KEEPSP);
 		if (cch == 'x' || cch == 'X') {
 			int c;
-			gch(1);
+			gch (KEEPSP);
 			while (c = ishex(cch)) {
 				n = (n << 4) + (c - (c >= 'A' ? 'A' - 10 : '0'));
-				gch(1);
+				gch (KEEPSP);
 			}
 		} else {
 			while (isoct(cch)) {
 				n = (n << 3) + (cch - '0');
-				gch(1);
+				gch (KEEPSP);
 			}
 		}
 		goto intsuffix;
@@ -303,11 +303,11 @@ long *np;
 	/* here all types still possible; collect in 4 byte integer */
 	while (ISDIGIT(cch)) {
 		n = (n * 10) + (cch - '0');
-		gch(1);
+		gch (KEEPSP);
 	}
 
 intsuffix:
-	for (; ; gch(1)) {
+	for (; ; gch (KEEPSP)) {
 		switch (cch) {
 		case 'l':
 		case 'L':
@@ -339,15 +339,15 @@ direct int			stringlen;           /* for inits */
 
 pstr()
 {
-	gch(0);
+	gch (SKIPSP);
 	if (cch != '\\') {
 		symval = cch;
-		gch(0);
+		gch (SKIPSP);
 	} else
 		symval = dobslash();
 
 	if (cch == '\'')
-		gch(1);
+		gch (KEEPSP);
 	else
 		error("bad character constant");
 }
@@ -360,7 +360,8 @@ qstr()
 #endif
 
 	stringlen = 0;
-	gch(0);
+
+	gch (SKIPSP);
 
 	while (cch != '"') {
 		if ((lptr - lbase) == 0) {
@@ -382,7 +383,7 @@ qstr()
 		}
 #endif
 	}
-	gch(1);
+	gch (KEEPSP);
 }
 
 
@@ -391,9 +392,9 @@ dobslash()
 {
 	register int	c, n;
 
-	gch(1);
+	gch (KEEPSP);
 	c = cch;
-	gch(1);
+	gch (KEEPSP);
 
 	switch (c) {
 	case 'n':   return NEWLINE;
@@ -411,20 +412,20 @@ dobslash()
 		c = n = 0;
 		while ((c1 = ishex(cch)) && n++ < 2) {
 			c = (c << 4) + (c1 < 'A' ? c1 - '0' : c1 - 'A' + 10);
-			gch(1);
+			gch (KEEPSP);
 		}
 	} else if (c == 'd') {
 		c = n = 0;
 		while (ISDIGIT(cch) && n++ < 3) {
 			c= c * 10 + cch - '0';
-			gch(1);
+			gch (KEEPSP);
 		}
 	} else if (isoct(c)) {
 		c -= '0';
 		n = 0;
 		while (isoct(cch) && n++ < 2) {
 			c = (c << 3) + (cch - '0');
-			gch(1);
+			gch (KEEPSP);
 		}
 	}
 	return c;

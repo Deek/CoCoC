@@ -37,7 +37,6 @@ static char	needexpr[]	= "missing operand";
 static char	div0[]		= "division by zero";
 static long	doit();		/* evaluate constant expressions */
 
-int			gch();		/* snarfs text -- explicitly passed to scan() now */
 
 
 int

@@ -29,7 +29,7 @@ restart:
 	if(newline()) {
 		int	nkr = kflag ? 0 : 1;
 
-		gch(0);
+		gch (SKIPSP);
 		while(cch == '#') {
 			/* if in K&R mode, don't skip comments */
 			gch(nkr);
@@ -65,7 +65,7 @@ restart:
 badhash:		error("illegal '#'");
 			}
 			if(newline() == 0) return EOF;
-			else gch(0);
+			else gch (SKIPSP);
 		}
 
 		if(cch == '@') {		/* special asmline indicator for OS9 */

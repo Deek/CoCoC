@@ -222,13 +222,13 @@ doliner()
 
 	if (process) {
 		skipsp(1);
-		gch(1);
+		gch (KEEPSP);
 		getword(name, NAMESIZE);
 		if (i = atoi(name)) {
 			setline(lineno = i);
 		}
 		skipsp(1);
-		gch(1);
+		gch (KEEPSP);
 		getfile(name, NAMESIZE);
 		if (*name)
 		{
@@ -247,11 +247,11 @@ dowarning()
 
 	if (process) {
 		skipsp(1);
-		gch(1);
+		gch (KEEPSP);
 		sptr = lin;
 		while (cch && cch != '\n') {
 			*sptr++ = cch;
-			gch(1);
+			gch (KEEPSP);
 		}
 		*sptr = '\0';
 		warning(lin);
@@ -265,11 +265,11 @@ doerror()
 	register char	*sptr;
 	if (process) {
 		skipsp(1);
-		gch(1);
+		gch (KEEPSP);
 		sptr = lin;
 		while (cch && cch != '\n') {
 			*sptr++ = cch;
-			gch(1);
+			gch (KEEPSP);
 		}
 		*sptr = '\0';
 		lerror(lin);
