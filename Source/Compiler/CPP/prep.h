@@ -34,7 +34,7 @@ extern int errno;
 #define FALSE		0
 
 #define FNAMSIZE    128     /* length of file names */
-#define NAMESIZE    256     /* length of macro names */
+#define NAMESIZE	64		/* length of macro names */
 #define HOLDSIZE    512     /* size of string hold buffer */
 #define LINESIZE    512     /* size of line buffer */
 
