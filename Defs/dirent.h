@@ -43,14 +43,15 @@ typedef struct _dirstm {
 #define _D_EXACT_NAMLEN(d) (strlen ((d)->d_name))
 #define _D_ALLOC_NAMLEN(d) (sizeof ((d)->d_name) > 1 ? sizeof ((d)->d_name) : _D_EXACT_NAMLEN(d) + 1)
 
-#define rewinddir(a)	seekdir(a, 0L)
-
 extern DIR *opendir _OP((const char *name));
 
 extern struct dirent *readdir _OP((DIR *dirp));
 
 extern long telldir _OP((DIR *dirp));
-extern VOID seekdir _OP((DIR *dirp));
+extern VOID rewinddir _OP((DIR *dirp));
+extern VOID seekdir _OP((DIR *dirp, long loc));
 extern int closedir _OP((DIR *dirp));
+
+#define rewinddir(a)	seekdir((a), 0L)
 
 #endif /* _DIRENT_H_ */
