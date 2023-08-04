@@ -1,6 +1,6 @@
 #ifndef _ANSI_H_
 #define _ANSI_H_
-#if defined(__STDC__)
+#if defined(__STDC__) || defined(_CMOC_VERSION_)
 # ifndef _OP
 #  define _OP(x) x
 # endif
