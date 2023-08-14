@@ -34,6 +34,16 @@ typedef long time_t;
 # endif
 #endif
 
+#define EPOCH_YEAR		1970	/* The Unix epoch started 1/1/1970 00:00:00 */
+#define EPOCH_DOW		4		/* It was a Thursday */
+#define SECS_PER_DAY	86400L
+#define SECS_PER_HOUR	3600
+#define SECS_PER_MIN	60
+
+#define TM_YEAR_BASE	1900
+#define FIRST_GOOD_YEAR	EPOCH_YEAR	/* First full year we can represent */
+#define LAST_GOOD_YEAR	EPOCH_YEAR+135	/* Last full year in our time_t */
+
 /*
  *	This calls a fast internal function that determines and returns the
  *	number of clock ticks per second.
@@ -56,7 +66,6 @@ clock_t _stps _OP((void));
 # ifndef __NIMPL__
 #  define __NIMPL__(__FUNCNAME__) (0=#__FUNCNAME__ "() missing")
 # endif
-# define gmtime(t) __NIMPL__(gmtime)
 # define strftime(d,m,f,t) __NIMPL__(strftime)
 # define strptime(b,f,t)   __NIMPL__(strptime)
 #endif	/* MISSING_CHECK */
@@ -97,12 +106,12 @@ struct tm {
 	int	tm_year;	/* years since 1900 */
 	int	tm_wday;	/* day of week (Sunday = 0) */
 	int	tm_yday;	/* day of year (0 - 365) */
-	int	tm_isdst;	/* daylight saving time active (not used) */
+	int	tm_isdst;	/* daylight saving time active */
 };
 #endif
 
-extern const int daylight;	/* nonzero if DST is ever in use  (always zero) */
-extern const long int timezone; /* offset from UTC (always zero) */
+extern int daylight;		/* nonzero if DST is ever in use */
+extern long int timezone;	/* signed offset from GMT in seconds */
 
 /* Return the current time and put it in timer if !NULL */
 time_t time _OP((time_t *timer));
@@ -114,6 +123,9 @@ long difftime _OP((time_t time1, time_t time0));
 /* Return the 'struct tm' rep of *timer in "the local time zone" */
 struct tm *localtime _OP((const time_t *timer));
 
+/* Return the 'struct tm' rep of *timer in GMT */
+struct tm *gmtime _OP((const time_t *timer));
+
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
 	equivalent to tp */
 char *asctime _OP((const struct tm *tp));
@@ -122,13 +134,13 @@ char *asctime _OP((const struct tm *tp));
 char *ctime _OP((const time_t *timep));
 # define ctime(t) asctime(localtime((t)))
 
-/* Converts a setime/getime buffer to 'time_t' */
-time_t o2utime _OP((struct sgtbuf *));
-
 /* Converts a 'struct tm' to 'time_t' */
 time_t mktime _OP((struct tm *));
 
+/* Converts a setime/getime buffer to 'time_t' */
+time_t cvtime _OP((struct sgtbuf *));
+
 /* Converts a C broken-down time to OS-9 setime/getime format */
-_VOID u2otime _OP((struct sgtbuf *, struct tm *));
+_VOID systime _OP((struct sgtbuf *, struct tm *));
 
 #endif /* ! _TIME_H_ */

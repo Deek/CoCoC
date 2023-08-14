@@ -1,7 +1,7 @@
 CFLAGS  = -s
 RDIR    = RELs
 RFILES1 = swab.r pwcryp.r bsearch.r dirutil.r errmsg.r prgname.r \
-          datmods.r utime.r devtyp.r skip.r sets.r pflinit.r
+          datmods.r devtyp.r skip.r sets.r pflinit.r
 RFILES2 = fopen.r puts.r gets.r mktemp.r fread.r fwrite.r printf.r
 RFILES3 = setbuf.r fseek.r putc.r ftelldummy.r getc.r flshdummy.r setbase.r \
           findstr.r pfldummy.r pffdummy.r htoi.r htol.r ltoa.r xtoa.r

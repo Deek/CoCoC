@@ -1,6 +1,7 @@
-CFLAGS	= -s
+CFLAGS	= -s -DASMOPT
 RDIR	= rels
-RFILES	= prof.r pwent.r getopt.r adump.r defdrive.r popen.r
+RFILES	= prof.r pwent.r getopt.r adump.r defdrive.r popen.r \
+ asctime.r ctime.r systime.r time.c localtime.r mktime.r isleap.r timevars.r
 DFILES	= dbg.r getsp.r
 
 cstuff.l: $(RFILES)
