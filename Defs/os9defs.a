@@ -10,6 +10,15 @@
 *
 *     System Service Request Code Definitions
 *
+ IFGE LWASM
+csect MACRO
+ SECTION _constants
+ IFNE \L1
+ ORG \1
+ ENDC
+ ENDM
+ ENDC
+
  csect 0
 F$Link: rmb 1 Link to Module
 F$Load: rmb 1 Load Module from File
@@ -45,7 +54,7 @@ F$Alarm: rmb 1 Alarm handling
  rmb 2    reserved
 F$NMLink: rmb 1 Link to Module without adding to address space
 F$NMLoad: rmb 1 Load Module without adding to address space
- ends
+ endsect
  csect $27 Beginning of System Reserved Calls
 F$VIRQ: rmb 1 virtual IRQ handling
 F$SRqMem: rmb 1 System Memory Request
@@ -116,7 +125,7 @@ I$GetStt: rmb 1 Get Path Status
 I$SetStt: rmb 1 Set Path Status
 I$Close: rmb 1 Close Path
 I$DeletX: rmb 1 Delete from current exec dir
- ends
+ endsect
 
 ************************************************************
 *
@@ -254,7 +263,7 @@ M$Mem: rmb 2 Stack Requirement
 *   Device Driver, Device Descriptor Module
 *
 M$Mode: rmb 1 Device Driver Mode Capabilities
- ends
+ endsect
 *
 *   Device Descriptor Module
 *
@@ -265,7 +274,7 @@ M$PDev: rmb 2 Device Driver Name Offset
 M$Port: rmb 3 Port Address
 M$Opt: rmb 1 Device Default Options
 M$DTyp: rmb 1 Device Type
- ends
+ endsect
 
 
  page
@@ -318,7 +327,7 @@ E$TblFul: rmb 1 Screen or window table is full
 E$BadBuf: rmb 1 Bad/Undefined buffer number
 E$IWDef: rmb 1 Illegal window definition
 E$WUndef: rmb 1 Window undefined
- ends
+ endsect
 *
 * Standard OS-9 Error Codes
 *
@@ -364,7 +373,7 @@ E$BMHP: rmb 1 (bad module header parity)
 E$NoRam: rmb 1 No Ram Available
 E$BPrcID: rmb 1 Bad Process ID
 E$NoTask: rmb 1 No available Task number
- ends
+ endsect
 
  csect $F0
 E$Unit: rmb 1 Illegal Unit (drive)
@@ -382,5 +391,8 @@ E$DIDC: rmb 1 Disk ID Change
 E$Lock: rmb 1 Record is busy (locked out)
 E$Share: rmb 1 Non-sharable file busy
 E$DeadLk: rmb 1 I/O Deadlock error
- ends
+ endsect
 
+ ifge LWASM
+ SECTION code
+ endc

@@ -3,12 +3,7 @@
 core
 local.make
 Source/Text/Grep/egrep.c
-Source/Libs/KLibc/clib.l
-Source/Libs/KLibc/clibt.l
-Source/Libs/KLibc/fmath/cfloats.l
-Source/Libs/KLibc/imath/math.l
-Source/Libs/KLibc/lib.a/main.l
-Source/Libs/KLibc/lib.c/cstuff.l
-Source/Libs/KLibc/lib.c/dbg.l
-Source/Libs/KLibc/sys.a/syslib.l
-Source/Libs/KLibc/tmath/trans.l
+Source/Libs/KLibc/**/*.as
+#!Source/Libs/KLibc/**/*.r
+Source/Libs/KLibc/**/*.l
+Source/Libs/KLibc/**/*.lib

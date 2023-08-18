@@ -1,4 +1,8 @@
+ ifge LWASM
+ SECTION _constants
+ else
  csect
+ endc
 _ptr rmb 2 buffer pionter
 _base rmb 2 buffer base
 _end rmb 2 buffer end
@@ -8,6 +12,9 @@ _save rmb 1 pushback char
 _bufsiz rmb 2 buffer size
 _iobsiz equ *
  endsect
+ ifge LWASM
+ SECTION code
+ endc
 
 * flags for _flag
 _READ set 1
