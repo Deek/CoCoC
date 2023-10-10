@@ -7,7 +7,6 @@ all: libc.a libct.a
 
 before-libc:
 	cd lib.c; $(MAKE) $(MAKEFLAGS)
-	cd lib.c; $(MAKE) $(MAKEFLAGS) dbg.l
 	cd lib.a; $(MAKE) $(MAKEFLAGS)
 	cd fmath; $(MAKE) $(MAKEFLAGS)
 	cd imath; $(MAKE) $(MAKEFLAGS)

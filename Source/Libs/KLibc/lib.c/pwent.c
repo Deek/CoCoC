@@ -1,9 +1,13 @@
-
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <password.h>
+#include <modes.h>
 
 static int     pwpn = 0;
 char           _pwdelim = 'a';
-static char    tmpbuf[PWSIZ+1], *index();
+static char    tmpbuf[PWSIZ+1];
 static PWENT   pwent, *parse();
 
 

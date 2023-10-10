@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <time.h>
 
 static char	xx[26];
@@ -49,11 +50,11 @@ datfmt fcc "%s %s %2d %02d:%02d:%02d %4d"
 
 #endasm
 #else	/* ! ASMOPT */
-static char	*days[] = {
+static const char	*days[] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
 
-static char	*months[] = {
+static const char	*months[] = {
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
@@ -61,7 +62,7 @@ static char	*months[] = {
 
 char *
 asctime(tmp)
-struct tm	*tmp;
+const struct tm	*tmp;
 {
 #ifdef ASMOPT
 #asm

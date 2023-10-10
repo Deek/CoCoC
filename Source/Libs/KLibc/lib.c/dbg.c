@@ -123,10 +123,8 @@ int   n;
 _dumprof(){}
 
 /*page*/
-char  *h1 =
-{"addr   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  0 2 4 6 8 a c e \n"};
-char *h2 =
-{"----  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  ----------------\n"};
+static const char *h1 = "addr   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  0 2 4 6 8 a c e \n";
+static const char *h2 = "----  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  ----------------\n";
 
 /*
 ** full screen display of 256 bytes from the prom
@@ -252,7 +250,8 @@ char  *s;
 ** converts integer 'n' into 'd' digits in string 's'.
 */
 
-static itoh(n, d, s)
+static char *
+itoh (n, d, s)
 int   n, d;
 char *s;
    {
@@ -278,7 +277,7 @@ char *s;
 */
 
 static gethex(s)
-char  *s;
+const char  *s;
    {
    char  ch;
    int   x = 0;
@@ -297,12 +296,13 @@ char  *s;
    }
 
 
-static skipspace(s)
+static char *
+skipspace (s)
 char  *s;
    {
    while (*s == ' ')
       s++;
-   return(s);
+   return (s);
    }
 
 

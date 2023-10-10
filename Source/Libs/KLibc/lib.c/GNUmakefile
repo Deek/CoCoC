@@ -1,14 +1,18 @@
 OFILES	= prof.o pwent.o getopt.o adump.o defdrive.o popen.o \
- asctime.o ctime.o localtime.o mktime.o omktime.o u2otime.o isleap.o timevars.o
+ asctime.o ctime.o systime.o time.o localtime.o mktime.o isleap.o timevars.o
 
-DFILES	= dbg.r getsp.r
+DFILES	= dbg.o getsp.o
+
+all: cstuff.lib dbg.lib
 
 include ../cmoc.make
+
+CFLAGS += -I../defs
 
 cstuff.lib: $(OFILES)
 	lwar -c $@ $^
 
-dbg.lib: $(DFILES) /dd/defs/dbg.h
+dbg.lib: $(DFILES)
 	lwar -c $@ $^
 
 clean:
