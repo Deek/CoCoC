@@ -1,4 +1,3 @@
- use /dd/defs/os9defs.a
 * signal system call
 *
 * The main objective here is to maintain a table of

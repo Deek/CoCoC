@@ -2,10 +2,6 @@
 * handler for _gs_rdy, _gs_opt, _gs_opt, _gs_devnm
 *
 
- ifp1
- use /dd/defs/os9defs.a
- endc
-
  psect gs2,0,0,1,0,0
 
 _gs_rdy:

@@ -2,11 +2,6 @@
 * handler for _ss_attr, _ss_size, _ss_lock
 *
 
- ifp1
- use /dd/defs/os9defs.a
- endc
-
-
  psect ss2,0,0,1,0,0
 
 _ss_lock: pshs U

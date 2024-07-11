@@ -1,7 +1,5 @@
  psect dsqrt_a,0,0,0,0,0
 
- use mdefs.a
-
 trunc: lbsr _dprep
  bsr _dints
  lbra _mret

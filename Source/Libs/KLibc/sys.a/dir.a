@@ -2,7 +2,6 @@
 * Directory change system calls
 *
 
- use /dd/defs/os9defs.a
  psect dir_a,0,0,1,0,0
 
 * chdir(dirname)

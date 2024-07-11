@@ -1,12 +1,11 @@
  psect dser_a,0,0,0,0,0
- ifp1
- use mdefs.a
- endc
 
+ use mdefs.a
+ 
  vsect
 _deg: rmb 1
  rmb WBC*8
-_mthtop: rmb 0
+_mthtop: equ .
  endsect
 
 * aprep  preps x,s for +,-,*,/ operators

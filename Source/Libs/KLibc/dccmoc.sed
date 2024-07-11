@@ -1,2 +1,2 @@
-s:^#[\t ]*asm:asm { /* #asm */:
-s:^#[\t ]*endasm:} /* #endasm */:
+s:^#[[:space:]]*asm:asm { /* #asm */:
+s:^#[[:space:]]*endasm:} /* #endasm */:

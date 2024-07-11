@@ -3,10 +3,6 @@
 *  remember to declare the returns as long!!!
 *
 
- ifp1
- use /dd/defs/os9defs.a
- endc
-
  psect gs1,0,0,1,0,0
 
 _gs_size:

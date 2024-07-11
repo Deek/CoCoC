@@ -1,9 +1,6 @@
 *
 * Identity system calls
 *
- ifp1
- use /dd/defs/os9defs.a
- endc
 *
 * Equates for level one pointers (sorry!)
 D.Proc equ $4b

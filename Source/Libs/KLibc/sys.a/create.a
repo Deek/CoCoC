@@ -1,9 +1,6 @@
 * file creation calls
 *
 pmode equ $0b r/w for owner, r for others
- ifp1
- use /dd/defs/os9defs.a
- endc
  psect create_a,0,0,1,0,0
 * creat(fname,mode)
 creat: ldx 2,s

@@ -1,10 +1,5 @@
  psect daddsub_a,0,0,0,0,0
 
- ifp1
- use mdefs.a
- endc
-
-
 * dneg negate double x points to
 * on return
 _dneg: ldb #7 double byte index

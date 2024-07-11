@@ -11,9 +11,6 @@
 
 f$tps set $25
 *F$NMLink set $21
- ifp1
- use /dd/defs/os9defs.a
- endc
 
  vsect
 _tps: rmb 2

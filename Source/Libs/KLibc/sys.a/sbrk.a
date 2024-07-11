@@ -1,7 +1,6 @@
 *
 * Request memory from OS
 *
- use /dd/defs/os9defs.a
  psect sbrk,0,0,6,0,0
 
 * sbrk(size)   get memory from system

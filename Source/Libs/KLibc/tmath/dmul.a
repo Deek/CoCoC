@@ -1,9 +1,5 @@
  psect dmul_a,0,0,0,0,0
 
- ifp1
- use mdefs.a
- endc
-
 * multiply number on stack by one X->
 
 _dmul: lbsr _aprep

@@ -1,10 +1,5 @@
  psect hyp_a,0,0,0,0,0
 
- ifp1
- use mdefs.a
- endc
-
-
 sinh:
  lbsr _dprep
  lbsr SINH

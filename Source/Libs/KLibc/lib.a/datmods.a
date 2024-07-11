@@ -41,9 +41,6 @@
 * In all cases, 'datptr' points to the lock byte.
 *  User space starts at 'datptr' + 1
 
- ifp1
- use /dd/defs/os9defs.a
- endc
  pag
  psect datmods_a,0,0,1,0,0
 

@@ -1,5 +1,3 @@
- use /dd/defs/os9defs.a
-
  psect abort,0,0,1,0,0
 abort: pshs d,x,y,u
  leax core,pcr
