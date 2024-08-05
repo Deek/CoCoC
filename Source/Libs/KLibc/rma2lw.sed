@@ -3,7 +3,7 @@
 s/^\([a-zA-Z_][a-zA-Z0-9$_]\+\)/_\1 EXPORT\n\1 EXPORT\n_\1\n\1/
 # for macOS:
 s/^\([a-zA-Z_][a-zA-Z0-9$_]*\):/\1 EXPORT\
-\1/
+_\1 EXPORT\n_\1\n\1/
 # translate sections
 s/^\([[:space:]]*\)psect.*/ SECTION code/
 s/^\([[:space:]]*\)vsect.*/ SECTION bss/
