@@ -7,7 +7,7 @@ pow:
 
 exp:
  lbsr _dprep
- lbsr _exp
+ lbsr llexp
  lbra _mret
 
 exp10:
@@ -23,7 +23,7 @@ log10:
 
 log:
  lbsr _dprep
- lbsr _log
+ lbsr lllog
  lbra _mret
 
  pag
@@ -31,11 +31,11 @@ log:
 * 2  LEVELS ON MATH STACK
 
 YTOX lbsr _dexg
- lbsr _log
+ lbsr lllog
  bcs YTOX2
  lbsr _dmuls
  bcs YTOX1
- bsr _exp
+ bsr llexp
 YTOX1 rts
 
 YTOX2 leax WBC,x
@@ -53,7 +53,7 @@ ANTILG
  lbsr _denter
  lbsr _dmuls
  puls y
- bcc _exp
+ bcc llexp
  rts
 
 
@@ -63,7 +63,7 @@ ANTILG
 
 LOG10
  pshs y
- lbsr _log
+ lbsr lllog
  bcs LOG11
  leay LN10,pcr
  lbsr _denter
@@ -86,7 +86,7 @@ SHANG set ESHANG
 QUAD set EQUAD
 ITER set EITER
 
-_exp:
+llexp:
  pshs y
  leas -TRSP,s trans var
  leay LN2,pcr remove factors LN(2)
@@ -212,7 +212,7 @@ SHANG set ESHANG
 QUAD set EQUAD
 ITER set EITER
 
-_log:
+lllog:
  pshs y
  leas -TRSP,s trans var
  lda ,x check for zero

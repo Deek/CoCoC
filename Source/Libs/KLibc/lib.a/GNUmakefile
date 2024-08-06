@@ -17,10 +17,10 @@ NFILES = atof.o scale.o ldexp.o frexp.o
 
 include ../cmoc.make
 
-main.lib: $(OFILES)
+main.l: $(OFILES)
 	lwar -c $@ $^
 
 clean:
-	-rm *.o *.s *.cp
+	-rm *.o *.s *.cp *.list *.map
 
 $(OFILES): GNUmakefile $(DCCMOC) $(RMA2LW)

@@ -1,6 +1,6 @@
  psect syscommon_a,0,0,1,0,0
 _os9err: clra
- std errno,y indicate in system error indicator
+ std _errno,y indicate in system error indicator
  ldd #-1 return error status
  rts
 

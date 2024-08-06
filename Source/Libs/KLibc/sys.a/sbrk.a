@@ -4,7 +4,7 @@
  psect sbrk,0,0,6,0,0
 
 * sbrk(size)   get memory from system
-sbrk: ldd memend,y get hi bound
+sbrk: ldd _memend,y get hi bound
  pshs d save it
  ldd 4,s get the size required
  cmpd _spare,y any spare left?
@@ -24,7 +24,7 @@ sbrk: ldd memend,y get hi bound
  ldb #E$MemFul out of memory
  lbra _os9err return error
 
-sbrk10 std memend,y save new memory address
+sbrk10 std _memend,y save new memory address
  addd _spare,y add in spare bytes
  subd 0,s less old base
  std _spare,y is new spare value
@@ -35,14 +35,14 @@ sbrk20 leas 2,s junk scratch
  pshs d
  subd 4,s less size
  std _spare,y updated value
- ldd memend,y get hi bound
+ ldd _memend,y get hi bound
  subd ,s++ base of free memory
  pshs d save
 
  clra
  ldx 0,s
 sbrk30 sta ,x+ clear out the new memory
- cmpx memend,y
+ cmpx _memend,y
  blo sbrk30
 
  puls d,pc

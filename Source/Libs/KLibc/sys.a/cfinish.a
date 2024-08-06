@@ -6,6 +6,6 @@ exit: lbsr _dumprof profile dump (if necessary)
 * abnormal exit - no buffer flushing
 * the argument to either exit entry is taken to be the
 * F$EXIT status
-_exit: ldd 2,s get the exit status
+aexit: ldd 2,s get the exit status
  os9 F$Exit and bye-bye!
  endsect

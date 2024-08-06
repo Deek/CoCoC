@@ -369,7 +369,7 @@ blanks ldd fldsiz+6,s
 getdec clr ,-s
  clr ,-s
  leau -1,u back up to char
- leax _chcodes,y
+ leax __chcodes,y
  bra getdec2
 
 getdec1 ldd ,s
