@@ -38,4 +38,14 @@ libct.a: before-libct $(RFILES1) $(RFILE_T) $(RFILES2) before-libct
 install: clib.l clibt.l
 	copy -rw=$(LIB) clib.l clibt.l
 
+# Package up libraries for testing
+cmoc_kreider: libct.a
+	rm -rf $@/lib $@/defs
+	mkdir $@/lib
+	cp libct.a $@/lib
+	mkdir $@/defs
+	cp -r ../../../Defs/* $@/defs
+	cp $(NITROS9DIR)/lib/libnos96809l1.a $@/lib
+	tar cvzf $@.tgz $@
+		
 .PHONY: dummy before-libc before-libct
