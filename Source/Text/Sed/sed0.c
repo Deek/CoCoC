@@ -124,7 +124,7 @@ fcomp()
 
 	op = lastre;
 
-	if(rline(linebuf) < 0)	return;
+	if(rline(linebuf) < 0)	return 0;
 	if(*linebuf == '#') {
 		if(linebuf[1] == 'n')
 			nflag = 1;
