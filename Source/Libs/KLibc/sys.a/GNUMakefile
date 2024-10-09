@@ -1,0 +1,22 @@
+include ../cmoc.make
+
+OFILES = abort.o signal.o chown.o chmod.o stat.o access.o create.o \
+	open.o read.o write.o lseek.o misc.o mod.o dir.o brk.o ibrk.o sbrk.o mem.o \
+	time.o process.o id.o intercept.o syscall.o syscommon.o \
+	profdummy.o tidyup.o cfinish.o cfinish2.o
+
+syslib.l: $(OFILES)
+	lwar -c $@ $^
+
+#cstart.o: cstart.a
+#	$(LWLINK) -o=rels/cstart.o cstart.a
+#	copy -rw=/DD/Lib rels/cstart.o
+
+#root.o: root.a
+#	$(LWLINK) -o=rels/root.o root.a
+#	copy -rw=/DD/Lib rels/root.o
+
+clean:
+	-rm *.l *.o *.list *.map
+
+$(OFILES): GNUmakefile $(DCCMOC) $(RMA2LW)
