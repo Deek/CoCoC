@@ -74,14 +74,14 @@ fillbuf ldd _flag,u
  pshs u stack fp
  lbsr _setbase init iob
  leas 2,s
-fillbu2 leax _iob,y
+fillbu2 leax __iob,y
  pshs x
  cmpu ,s++
  bne fillbu3 if not stdin
  ldb _flag+1,u
  andb #_SCF
  beq fillbu3 if rbf
- leax _iob+13,y
+ leax __iob+13,y
  pshs x
  lbsr fflush flush std out if scf on std in
  leas 2,s

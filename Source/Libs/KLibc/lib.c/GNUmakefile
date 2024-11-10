@@ -1,19 +1,19 @@
 OFILES	= prof.o pwent.o getopt.o adump.o defdrive.o popen.o \
  asctime.o ctime.o localtime.o mktime.o isleap.o timevars.o
- 
+
 MISSING = omktime.o u2otime.o
 
-DFILES	= dbg.r getsp.r
+DFILES	= dbg.o getsp.o
 
 include ../cmoc.make
 
-cstuff.lib: $(OFILES)
+cstuff.l: $(OFILES)
 	lwar -c $@ $^
 
-dbg.lib: $(DFILES) ../defs/dbg.h
+dbg.l: $(DFILES) ../defs/dbg.h
 	lwar -c $@ $^
 
 clean:
-	-rm *.o *.s *.cp
+	-rm *.o *.s *.cp *.l
 
 $(OFILES): GNUmakefile $(DCCMOC) $(RMA2LW)
