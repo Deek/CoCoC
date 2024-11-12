@@ -18,7 +18,7 @@ dectbl fdb 10000,1000,100,10
 
 printf: pshs u
  leau 6,s *expr
- leax _iob+13,y
+ leax __iob+13,y
  ldd 4,s *format
  bra printf1
 

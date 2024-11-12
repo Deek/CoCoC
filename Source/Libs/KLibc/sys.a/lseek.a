@@ -20,7 +20,7 @@ lseek10 cmpd #1 from here?
  ldb #E$Seek
 
 lserr clra
- std errno,y
+ std _errno,y
  ldd #-1
  leax _flacc,y
  std 0,x

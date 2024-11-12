@@ -118,7 +118,7 @@ _errz pshs b save error code
  clra
  cmpb #43 underflow?
  lbne _rpterr
- std errno,y
+ std _errno,y
  rts
 
 _mzer

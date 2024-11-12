@@ -12,7 +12,7 @@
 *        ->  *s (or c)
 
 puts: pshs u
- leax _iob+13,y stdout fp
+ leax __iob+13,y stdout fp
  ldd 4,s *s
  pshs d,x stack *s,fp
  bsr fputs

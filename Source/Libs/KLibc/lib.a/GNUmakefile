@@ -8,7 +8,7 @@ OFILES4 = system.o reverse.o strings.o strcmp.o strlen.o strncpy.o strncat.o \
 OFILES5 = stringsu.o strucmp.o strnucmp.o case.o strclr.o memccpy.o memchr.o \
           memcmp.o memcpy.o memset.o atol.o atoi.o iob_data.o chcodes.o
 OFILES6 = sleep.o setjmp.o strass.o realloc.o calloc.o memory.o rand.o
-OFILES7 = gs1.o gs2.o ss1.o ss2.o ss3.o
+OFILES7 = gs1.o gs2.o ss1.o ss2.o ss3.o MUL168.o
 
 OFILES = $(OFILES1) $(OFILES2) $(OFILES3) $(OFILES4) $(OFILES5) \
 	$(OFILES6) $(OFILES7)

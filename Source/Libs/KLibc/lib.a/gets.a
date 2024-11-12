@@ -14,7 +14,7 @@ gets: pshs u
  bra gets2
 
 gets1 stb ,u+
-gets2 leax _iob,y
+gets2 leax __iob,y
  pshs x
  lbsr getc
  leas 2,s

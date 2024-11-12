@@ -1,10 +1,13 @@
- psect iob_data_a,0,0,1,0,0
-
  ifp1
  use ../defs/stdio.a
  endc
- vsect
-_iob: fdb 0 _ptr
+
+__iob EXPORT
+
+ SECTION rwdata
+
+__iob EQU *
+ fdb 0 _ptr
  fdb 0 _base
  fdb 0 _end
  fdb _READ _flag

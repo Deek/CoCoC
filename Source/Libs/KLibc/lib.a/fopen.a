@@ -5,17 +5,17 @@
 
 *  input:   d = pn
 *           x = *mode
-*           u = *_iob = fp
-*  output:  _iob allocated of necessary, iniz _flag in any case
+*           u = *__iob = fp
+*  output:  __iob allocated of necessary, iniz _flag in any case
 *            to _READ or _WRITE or both.  Stash path num in _fd.
-*            setbase will fill in the rest since _iob is static
+*            setbase will fill in the rest since __iob is static
 *            and all zeros
 
 setiob
  pshs d save path number
  stu -2,s check for fp
  bne setiob3 if already have one
- leau _iob,y
+ leau __iob,y
  lda #_NFILE
 setiob1 ldb _flag+1,u
  andb #_READ+_WRITE
@@ -24,7 +24,7 @@ setiob1 ldb _flag+1,u
  deca
  bne setiob1
  ldd #$c8 e$pthful
- std errno,y
+ std _errno,y
  clra
  clrb
  puls x,pc
@@ -127,7 +127,7 @@ openit7 ldd ,s
 openit8 cmpb #'d
  beq openit10
 openit9 ldd #$cb E$BMode
-erret std errno,y
+erret std _errno,y
  ldd #-1
  bra openit13
 
