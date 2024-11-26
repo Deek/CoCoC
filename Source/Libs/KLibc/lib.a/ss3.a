@@ -2,11 +2,6 @@
 * handler for _ss_wtrk
 *
 
- ifp1
- use /dd/defs/os9defs.a
- endc
-
-
  psect ss3,0,0,1,0,0
 
 _ss_wtrk: pshs Y,U

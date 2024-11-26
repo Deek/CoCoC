@@ -1,4 +1,4 @@
-CFLAGS=-g -m32 -Wno-implicit-int -Wno-implicit-function-declaration
+CFLAGS=-g -Wno-implicit-int -Wno-implicit-function-declaration
 
 sed:	sed0.o sed1.o
 	cc $(CFLAGS) -o sed *.o

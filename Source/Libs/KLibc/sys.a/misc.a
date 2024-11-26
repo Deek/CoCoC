@@ -2,7 +2,6 @@
 * Miscellaneous system calls
 *
 
- use /dd/defs/os9defs.a
  psect misc_a,0,0,1,0,0
 
 * lock(flag)

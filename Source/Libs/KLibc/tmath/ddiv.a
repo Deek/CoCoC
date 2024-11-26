@@ -1,9 +1,5 @@
  psect ddiv_a,0,0,0,0,0
 
- ifp1
- use mdefs.a
- endc
-
 * divide double on stack by one X->
 
 _ddiv: lbsr _aprep

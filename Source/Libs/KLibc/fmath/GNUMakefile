@@ -1,0 +1,9 @@
+include ../cmoc.make
+
+OFILES = cfloats.o
+
+cfloats.l: $(OFILES)
+	lwar -c $@ $^
+
+clean:
+	-rm *.l *.o *.list *.map

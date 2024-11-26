@@ -1,5 +1,3 @@
- use /dd/defs/os9defs.a
-
  psect cfinish_a,0,0,1,0,0
 * normal exit - buffers flushed if there are any
 exit: lbsr _dumprof profile dump (if necessary)
@@ -8,6 +6,6 @@ exit: lbsr _dumprof profile dump (if necessary)
 * abnormal exit - no buffer flushing
 * the argument to either exit entry is taken to be the
 * F$EXIT status
-_exit: ldd 2,s get the exit status
+aexit: ldd 2,s get the exit status
  os9 F$Exit and bye-bye!
  endsect

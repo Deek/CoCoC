@@ -6,7 +6,7 @@ _errmsg:
  lbsr _prgname
  pshs d
  leau _2,pcr
- leax _iob+26,y
+ leax __iob+26,y
  pshs x,u
  lbsr fprintf
  leas 6,s
@@ -15,7 +15,7 @@ _errmsg:
  ldd 8,s
  pshs d,x,u
  ldu 12,s
- leax _iob+26,y
+ leax __iob+26,y
  pshs x,u
  lbsr fprintf
  leas 10,s

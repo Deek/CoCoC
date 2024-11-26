@@ -1,7 +1,6 @@
 *
 * Process system calls
 *
- use /dd/defs/os9defs.a
  psect process_a,0,0,2,0,0
 
 * kill(pid,signal)

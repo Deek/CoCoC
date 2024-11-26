@@ -28,7 +28,7 @@ char	*file;
 	for(;;) {
 		if((execp = gline(linebuf)) == badp) {
 			close(f);
-			return;
+			return 0;
 		}
 		spend = execp;
 
@@ -411,7 +411,7 @@ reptr	*ipc;
 			while(*p1 != '\n') {
 				if(*p1++ == 0) {
 					delflag++;
-					return;
+					return 0;
 				}
 			}
 

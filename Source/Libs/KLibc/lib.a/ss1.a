@@ -3,10 +3,6 @@
 *  _ss_pfd, _ss_ssig, _ss_tiks
 *
 
- ifp1
- use /dd/defs/os9defs.a
- endc
-
  psect ss1,0,0,1,0,0
 
 _ss_rel:

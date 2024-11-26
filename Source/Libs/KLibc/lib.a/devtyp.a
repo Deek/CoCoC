@@ -3,10 +3,6 @@
 
  psect devtyp_a,0,0,0,0,0
 
- ifp1
- use /dd/defs/os9defs.a
- endc
-
 isatty: ldd 2,s get pn
  pshs d
  bsr devtyp check it out

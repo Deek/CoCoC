@@ -5,7 +5,6 @@
 * an 'entry name clash' error in the loader if an attempt is made
 * to use both.
 
- use /dd/defs/os9defs.a
  psect intercept_a,0,0,1,0,0
 
  vsect

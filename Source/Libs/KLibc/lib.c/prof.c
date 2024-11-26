@@ -7,6 +7,7 @@
 */
 
 #include <stdio.h>
+#include <stddef.h>
 
 #define MAXFUNC 63             /* maximum number of unique functions */
 

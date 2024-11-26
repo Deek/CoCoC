@@ -1,4 +1,4 @@
-/*#define MAIN   /* Only use when testing routines */
+/*#define MAIN   */ /* Only use when testing routines */
 
 #ifdef MAIN
 #define DEBUG
@@ -33,7 +33,7 @@
 static int   _pid[PIPEMAX];
 
 FILE *popen(command, type)
-    char *command, *type;
+    const char *command, *type;
 {
     register char *p = command;
     char *parameter;

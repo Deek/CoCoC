@@ -1,0 +1,11 @@
+include ../cmoc.make
+
+OFILES	= trig.o hyp.o log.o trnser.o dsqrt.o dinc.o \
+	dtype.o dmul.o ddiv.o daddsub.o dser.o dcmpr.o
+
+trans.l: $(OFILES)
+	lwar -c $@ $^
+
+clean:
+	-rm temp* trans.l $(OFILES) *.list *.map
+

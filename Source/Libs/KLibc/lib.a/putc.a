@@ -107,7 +107,7 @@ putw: pshs u
 *    closes all 16 files
 
 _tidyup: pshs u
- leax _iob,y point to array beg
+ leax __iob,y point to array beg
  ldb #_NFILE set up loop count
  pshs b
 

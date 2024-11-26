@@ -2,7 +2,6 @@
 * File i/o system calls
 *
 
- use /dd/defs/os9defs.a
  psect lseek_a,0,0,3,0,0
 
 * lseek(fd,offset,type)
@@ -21,7 +20,7 @@ lseek10 cmpd #1 from here?
  ldb #E$Seek
 
 lserr clra
- std errno,y
+ std _errno,y
  ldd #-1
  leax _flacc,y
  std 0,x

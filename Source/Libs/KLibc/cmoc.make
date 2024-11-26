@@ -2,7 +2,7 @@
 MAKEFLAGS+=-rR
 
 AFLAGS= --pragma=index0tonone,condundefzero,undefextern,dollarnotlocal,noforwardrefmax
-CFLAGS= -I/dd/defs -O2 -nodefaultlibs --function-stack=0 --os9
+CFLAGS= -I../../../../Defs -I../defs -O2 -nodefaultlibs --function-stack=0 --os9
 
 # default top level to current dir
 TOP?=	$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -14,6 +14,7 @@ O2U?=	tr '\015' '\012'
 #our scripts
 DCCMOC	= $(TOP)/dccmoc.sed
 RMA2LW	= $(TOP)/rma2lw.sed
+CC = $(CMOC)
 
 # implicit rules to compile with CMOC/lwasm
 %.s: %.a $(RMA2LW)

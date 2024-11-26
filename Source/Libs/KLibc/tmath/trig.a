@@ -1,9 +1,5 @@
  psect dtrig_a,0,0,0,0,0
 
- ifp1
- use mdefs.a
- endc
-
 acos:
  lbsr _dprep
  lbsr ACOS

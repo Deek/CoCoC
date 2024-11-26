@@ -1,8 +1,9 @@
+#include <stddef.h>
 #include <module.h>
 
 static char d[12];
 
-getdrive()
+static char *getdrive()
    {
    char  *np;
    char  c;
@@ -10,7 +11,7 @@ getdrive()
    struct mod_config *mp;
    register char     *p;
 
-   if ((mp = modlink("Init", 0x0c, 0)) != -1)
+   if ((mp = (struct mod_config *)modlink("Init", 0x0c, 0)) != -1)
       {
       np = (char *)mp + mp->m_sysdrive;
       p = d;
@@ -18,7 +19,7 @@ getdrive()
         *p++ = c;
       *p++ = (c & 0x7f);
       *p = 0;
-      munlink(mp);
+      munlink((struct mod_com *)mp);
       return (d);
       }
    return (0);

@@ -15,7 +15,7 @@ ctime:
 #else
 char *
 ctime(ticks)
-time_t	*ticks;
+const time_t	*ticks;
 {
 	return (asctime(localtime(ticks)));
 }

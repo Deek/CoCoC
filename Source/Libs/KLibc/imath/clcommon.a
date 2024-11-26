@@ -4,6 +4,10 @@
 
  psect clcommon_a,0,0,1,0,0
 
+ vsect
+_flacc: rmb 8 floating point & longs accumlator
+ endsect
+
 _lbexit: tfr cc,a save carry
  puls x get ret adr
  stx 2,s overwrite ls word

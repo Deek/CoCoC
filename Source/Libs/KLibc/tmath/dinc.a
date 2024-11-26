@@ -1,9 +1,5 @@
  psect dinc_a,0,0,0,0,0
 
- ifp1
- use mdefs.a
- endc
-
 * increment or decrement double pointed to by x
 
 _dinc: pshs x,y

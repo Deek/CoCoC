@@ -4,9 +4,6 @@
 
 pmode equ $0b r/w for owner, r for others
 
- ifp1
- use /dd/defs/os9defs.a
- endc
  psect access_a,0,0,2,0,0
 
 * access(name,mode)

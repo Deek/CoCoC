@@ -1,0 +1,11 @@
+include ../cmoc.make
+
+OFILES = abs.o minmax.o uminmax.o clmul.o cldiv.o cludiv.o claddsub.o clcompare.o \
+	clbits.o clnegcompl.o clconvert.o clmove.o clincdec.o clshifts.o \
+	clcommon.o ccmult.o ccmod.o ccdiv.o cshifts.o rpterr.o
+
+math.l: $(OFILES)
+	lwar -c $@ $^
+
+clean:
+	-rm *.l *.o *.list *.map

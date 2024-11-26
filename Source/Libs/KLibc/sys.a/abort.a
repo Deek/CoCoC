@@ -1,5 +1,3 @@
- use /dd/defs/os9defs.a
-
  psect abort,0,0,1,0,0
 abort: pshs d,x,y,u
  leax core,pcr
@@ -11,7 +9,7 @@ abort: pshs d,x,y,u
 
  cmpd #-1
  bne abort10
- ldd errno,y
+ ldd _errno,y
  os9 F$Exit
 
 abort10 leas 4,s

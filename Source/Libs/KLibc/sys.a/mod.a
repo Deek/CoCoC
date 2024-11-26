@@ -3,12 +3,12 @@
 *
 
 shiftla macro
- rept \1
  lsla
- endr
+ lsla
+ lsla
+ lsla
  endm
 
- use /dd/defs/os9defs.a
  psect mod_a,0,0,1,0,0
 
 * modlink(modname,type,language)

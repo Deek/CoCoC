@@ -1,11 +1,7 @@
 
- ifp1
- use /dd/defs/os9defs.a
- endc
-
  psect rpterr_a,0,0,0,0,0
 
-_rpterr: std errno,y
+_rpterr: std _errno,y
  pshs y,b
  os9 F$ID
  puls y,b

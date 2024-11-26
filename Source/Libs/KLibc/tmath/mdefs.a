@@ -26,7 +26,7 @@ EXM equ $7E EXPONENT UNUSED MASK
 
 * set up variable stack for transcendentals
 
- csect
+ section _constant
 EABS rmb WBC
 ESHX rmb WBC
 EORD rmb WBC

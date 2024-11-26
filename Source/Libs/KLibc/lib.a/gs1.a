@@ -3,10 +3,6 @@
 *  remember to declare the returns as long!!!
 *
 
- ifp1
- use /dd/defs/os9defs.a
- endc
-
  psect gs1,0,0,1,0,0
 
 _gs_size:
@@ -22,7 +18,7 @@ common1 pshs U
  ldx #-1 return -1
  tfr X,U sign extend
  clra
- std errno,Y only an error sometimes
+ std _errno,Y only an error sometimes
 common2 stx _flacc,Y top half
  leax _flacc,Y need a pointer for lmove
  stu 2,X bottom half

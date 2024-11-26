@@ -76,7 +76,7 @@ cmpnam lda ,x
 clenup leas 33,s done w/ scratch area
  puls y,u,pc
 error clra
- std errno error code
+ std _errno error code
  ldd #-1 error flag
  bra clenup
 device fcs "@"

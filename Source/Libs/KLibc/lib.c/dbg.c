@@ -124,9 +124,9 @@ _dumprof(){}
 
 /*page*/
 char  *h1 =
-{"addr   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  0 2 4 6 8 a c e \n"};
+"addr   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  0 2 4 6 8 a c e \n";
 char *h2 =
-{"----  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  ----------------\n"};
+"----  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  ----------------\n";
 
 /*
 ** full screen display of 256 bytes from the prom
@@ -252,7 +252,7 @@ char  *s;
 ** converts integer 'n' into 'd' digits in string 's'.
 */
 
-static itoh(n, d, s)
+static char *itoh(n, d, s)
 int   n, d;
 char *s;
    {
@@ -297,7 +297,7 @@ char  *s;
    }
 
 
-static skipspace(s)
+static char *skipspace(s)
 char  *s;
    {
    while (*s == ' ')
@@ -311,7 +311,7 @@ static showsp()
    char  *p;
 
    strcpy(p = line, uspmsg);
-   p = itoh(sp, 4, p + strlen(p));
+   p = itoh((int)sp, 4, p + strlen(p));
    strcpy(p, "\n");
    writeln(2, line, strlen(line));
    }
