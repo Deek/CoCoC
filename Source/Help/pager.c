@@ -19,6 +19,7 @@
 
 #include "help.h"
 #include <stdio.h>
+#include <ctype.h>
 
 int width,height; /* width/height of screen */
 int linesleft; /* Number of lines to fulfill request */
@@ -41,45 +42,70 @@ pagerinit()
 /*
  * Process line before handing it to the pager code
  *
- * Specifically, this expands TABs, breaks lines at LFs, and, if any line
- *   is too long after this, will break the line to fit the screen so that
- *   the pager can keep an accurate count of screen lines filled.
+ * Specifically, this expands tab characters, and does word wrapping such that
+ * the pager can still keep an accurate count of screen lines filled.
+ * Ed#3: word wrapping indents wrapped paragraphs now.
  */
 #define LF '\x0A'
 #define TAB '\x09'
 outline(str)
 char *str;
 {
-   char c;    /* Current character being inspected */
-   int space=0;      /* Location of last space in output */
-   char *strspace; /* Location of last space in input */
-   int col=0;  /* Current output column */
-   int rtn=0;  /* Value to return */
-   int i;      /* Used to count when expanding tabs */
+   int   space;         /* Location of last space in output */
+   char  *strspace;     /* pointer to last space in input */
+   int   col;           /* Current output column */
+   int   rtn = 0;       /* Value to return */
+   int   lspace = -1;   /* leading space count */
+   int   i;             /* Used to count when expanding tabs */
+   char  c;             /* Current character being inspected */
 
-   if(!*str) return(outpage(str)); /* special handling for blank lines */
+   if (!*str)
+      return outpage (str); /* special handling for blank lines */
 
-   while(*str && !rtn) {
-      col=0;space=0;
-      while(col<width && (c=*str)!=LF && c) { /* copy one line to pagebuff */
-         if(c==TAB) {
-            for(i=(col/4+1)*4-col;i>0;i--)  /* expand tabs */
-               pagebuff[col++]=' ';
-         } else {
-            if (c==' ') { strspace=str;space = col;} /* remember last space */
-            pagebuff[col++]=c;
+   while (*str && !rtn) {
+      col = 0;
+      space = 0;
+
+      /*
+         If there were leading spaces on the first line, and we have already
+         split the line, lspace will be set here to a positive number. We
+         now insert as many spaces as we found on that first line to get our
+         split paragraph to line up.
+      */
+      if (lspace > 0)
+         while (col < lspace)
+            pagebuff[col++] = ' ';
+
+      while (col < width && (c = *str)) { /* fill pagebuff 1 char at a time */
+         switch ((int) c) {
+         case LF:    /* ignore linefeeds */
+            break;
+
+         case TAB:   /* expand tabs (minus 1 char, last added in 'default') */
+            c = ' '; /* filling with spaces */
+            for (i = (col / TABWIDTH + 1) * TABWIDTH - col; i > 1; i--)
+               pagebuff[col++] = c;
+         case ' ':
+            strspace = str;
+            space = col;
+         default:    /* non-space chars */
+            if (lspace < 0 && !isspace (c)) /* first non-space char in par? */
+               lspace = col;        /* save column of first non-space */
+            pagebuff[col++] = c;
+            break;
          }
          str++;
       }
-      pagebuff[col]='\0';  /* Mark end of line */
-      if(col>=width && space) {   /* If line too long, break at last space */
-         pagebuff[space]='\0';    /* Mark end */
-         str=strspace;            /* Restore read position */
+
+      pagebuff[col] = '\0';         /* Mark end of line */
+      if (col >= width && space) {  /* If line too long, break at last space */
+         pagebuff[space] = '\0';    /* Mark new end of line */
+         str = strspace;            /* Set read position to last space */
       }
-      rtn=outpage(pagebuff);
-      if(col>=width)              /* If we broke the line.. */
-         while((c=*str)==' ' || c==TAB) str++;   /* ..skip whitespace */
-      if(c==LF) str++;  /* If we broke at a LF, skip it */
+      rtn = outpage (pagebuff);     /* output screen line and clear pagebuff */
+
+      if (col >= width)             /* If we broke the line.. */
+         while (isspace (*str)) str++;   /* ..skip whitespace */
    }
    return rtn;
 }

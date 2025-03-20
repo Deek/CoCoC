@@ -25,6 +25,7 @@ struct stacknode {
 };
 #define NULL (struct stacknode *)0
 
+#define TABWIDTH	4
 
 #define BUF_SIZE 1000
 extern char scratch[BUF_SIZE];  /* Available for general use */
